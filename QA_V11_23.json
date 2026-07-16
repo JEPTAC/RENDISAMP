@@ -1,0 +1,21 @@
+{
+  "version": "11.23-home-recuperado-profesional",
+  "fecha": "2026-07-16",
+  "resultado": "APROBADO",
+  "comprobaciones": {
+    "javascript_sintaxis": "OK",
+    "css_parseo": "OK",
+    "referencias_locales_html": "OK",
+    "ids_duplicados_html": "0",
+    "imagenes_estaticas_sin_alt": "0",
+    "desbordamiento_horizontal_1728": false,
+    "desbordamiento_horizontal_1024": false,
+    "desbordamiento_horizontal_390": false,
+    "superposicion_hero_explorador_1728": false,
+    "superposicion_hero_explorador_1024": false,
+    "superposicion_hero_explorador_390": false,
+    "prefers_reduced_motion": "preservado",
+    "estructura_hero": "normalizada"
+  },
+  "nota": "Las integraciones externas se conservaron por revisión de dependencias. Su conexión efectiva requiere credenciales y reglas válidas del entorno de producción."
+}

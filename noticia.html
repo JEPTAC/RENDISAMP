@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Detalle de noticia del portal de Rendición de Cuentas de San Pedro.">
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+  <title>Noticia | Rendición de Cuentas</title>
+</head>
+<body data-page="news">
+  <div id="siteHeader"></div>
+
+  <main id="main-content">
+    <article class="news-detail" id="newsArticle" aria-live="polite"></article>
+
+    <section class="related-news-section" id="relatedNewsSection">
+      <div class="site-shell">
+        <div class="news-section-heading">
+          <div>
+            <span class="section-kicker">CONTINÚE EXPLORANDO</span>
+            <h2>Noticias relacionadas</h2>
+          </div>
+          <a href="noticias.html">Volver a todas las noticias →</a>
+        </div>
+        <ul class="news-card-grid news-card-grid--related" id="relatedNews"></ul>
+      </div>
+    </section>
+  </main>
+
+  <div id="siteFooter"></div>
+  <div id="globalDialogs"></div>
+
+  <script src="shared.js"></script>
+  <script src="noticia.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css">
+  <title>Rendición de Cuentas | San Pedro</title>
+</head>
+<body data-page="year" data-year="2027">
+  <div id="siteHeader"></div>
+  <main id="main-content" data-year-page="true">
+    <section class="page-hero">
+      <div class="site-shell page-hero__grid">
+        <div class="reveal"><span class="page-hero__badge" id="yearStatus"></span><h1>Rendición de Cuentas <span data-year-text></span></h1><h2 id="yearHeadline"></h2><p id="yearSummary"></p></div>
+        <aside class="year-selector-card reveal"><span>NAVEGACIÓN EXCLUSIVA</span><h2>Cambiar de vigencia</h2><select id="yearPagePicker"></select><div class="year-selector-stats"><div><strong id="yearProgress"></strong><span>Avance</span></div><div><strong id="yearDocuments"></strong><span>Recursos</span></div><div><strong id="yearVideos"></strong><span>Videos</span></div><div><strong id="yearCommitments"></strong><span>Compromisos</span></div></div></aside>
+      </div>
+    </section>
+
+    <nav class="year-subnav"><div class="site-shell year-subnav__inner"><a href="#resumen">Resumen</a><a href="#indicadores">Indicadores</a><a href="#historias">Historias</a><a href="#documentos">Documentos</a><a href="#compromisos">Compromisos</a></div></nav>
+
+    <section class="year-section" id="resumen"><div class="site-shell"><div class="year-section__head"><div><span class="section-kicker">RESUMEN EJECUTIVO</span><h2>La gestión de <span data-year-text></span> en una sola lectura.</h2></div><p>Esta página contiene únicamente la información de la vigencia seleccionada. Los demás años se consultan desde páginas diferentes.</p></div><div class="year-overview reveal"><div><span class="section-kicker">LECTURA GENERAL</span><h3>Información organizada para entender y verificar.</h3><p>Los resultados principales, las fuentes documentales y el seguimiento ciudadano se conectan en una experiencia estable y exclusiva para esta edición.</p><a class="button button-primary" href="recursos.html">Consultar centro documental</a></div><div class="sector-bars" id="sectorBars"></div></div></div></section>
+
+    <section class="year-section year-section--soft" id="indicadores"><div class="site-shell"><div class="year-section__head"><div><span class="section-kicker">INDICADORES</span><h2>Resultados destacados</h2></div><p>Valores demostrativos configurables desde el futuro panel conectado a base de datos.</p></div><div class="year-metrics" id="yearMetrics"></div></div></section>
+
+    <section class="year-section" id="historias"><div class="site-shell"><div class="year-section__head"><div><span class="section-kicker">PERIÓDICO DE LA GESTIÓN</span><h2>Historias de la vigencia</h2></div><p>Una capa editorial para explicar el impacto detrás de cada cifra.</p></div><div class="year-stories" id="yearStories"></div></div></section>
+
+    <section class="year-section year-section--soft" id="documentos"><div class="site-shell"><div class="year-section__head"><div><span class="section-kicker">CENTRO DOCUMENTAL</span><h2>Recursos de <span data-year-text></span></h2></div><a class="button button-secondary" href="recursos.html">Abrir biblioteca completa</a></div><div class="year-resources-grid" id="yearResources"></div></div></section>
+
+    <section class="year-section" id="compromisos"><div class="site-shell"><div class="year-section__head"><div><span class="section-kicker">SEGUIMIENTO PÚBLICO</span><h2>Compromisos y respuestas</h2></div><p><b id="yearQuestions"></b> respuestas ciudadanas relacionadas con esta edición.</p></div><div><article class="commitment-row reveal"><span>Cumplido</span><div><h3>Publicación de la base consolidada de indicadores.</h3><p>Responsable: Planeación institucional</p></div><b>100%</b></article><article class="commitment-row reveal"><span>En ejecución</span><div><h3>Fortalecimiento del seguimiento a solicitudes ciudadanas.</h3><p>Responsable: Atención al ciudadano</p></div><b>74%</b></article><article class="commitment-row reveal"><span>Pendiente</span><div><h3>Incorporación de nuevos conjuntos de datos abiertos.</h3><p>Responsable: Tecnología y comunicaciones</p></div><b>28%</b></article></div></div></section>
+
+    <section class="newsletter-bar"><div class="site-shell newsletter-box"><div><h2>Reciba actualizaciones de la vigencia <span data-year-text></span></h2><p>Nuevos documentos, compromisos y publicaciones.</p></div><form id="yearNewsletter" aria-label="Suscripción a la vigencia"><input type="email" placeholder="Correo electrónico" required><button class="button button-primary">Suscribirme</button></form></div></section>
+  </main>
+  <div id="siteFooter"></div><div id="globalDialogs"></div>
+  <dialog class="dialog" id="resourcePreviewDialog"><button class="dialog-close" data-close-dialog="resourcePreviewDialog" aria-label="Cerrar ventana">×</button><div id="resourcePreviewContent"></div></dialog>
+  <dialog class="dialog" id="storyDialog"><button class="dialog-close" data-close-dialog="storyDialog" aria-label="Cerrar ventana">×</button><div id="storyDialogContent"></div></dialog>
+  <script src="shared.js"></script><script src="year-page.js"></script>
+</body>
+</html>

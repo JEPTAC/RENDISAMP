@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Portal especial de Rendición de Cuentas de San Pedro, Valle del Cauca.">
+  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.23-home-recovery">
+  <title>Rendición de Cuentas | San Pedro</title>
+</head>
+<body data-page="home">
+  <div id="siteHeader"></div>
+  <main id="main-content">
+    <section class="home-hero" aria-labelledby="homeHeroTitle">
+      <div class="home-hero__visual" aria-hidden="true">
+        <div class="hero-cloud cloud-a"></div>
+        <div class="hero-cloud cloud-b"></div>
+        <div class="sun-disc"></div>
+        <div class="mountain-layer"></div>
+        <div class="lake-layer"></div>
+        <div class="hill-layer"></div>
+        <div class="hero-person">
+          <span class="person-arm arm-left"></span>
+          <span class="person-arm arm-right"></span>
+        </div>
+
+        <div class="hero-float-card">
+          <small>Edición destacada</small>
+          <strong id="homeHeroProgress">92%</strong>
+          <span>avance general 2025</span>
+        </div>
+      </div>
+
+      <div class="site-shell home-hero__grid">
+        <div class="home-hero__copy reveal">
+          <span>PORTAL HISTÓRICO · SAN PEDRO</span>
+          <h1 id="homeHeroTitle">Conozca la gestión.<br>Construyamos <em>confianza.</em></h1>
+          <p>Explore resultados, documentos, videos, compromisos e ideas ciudadanas en una experiencia visual, clara y organizada por vigencias.</p>
+
+          <div class="hero-buttons">
+            <a class="button button-primary" href="rendicion-2025.html">Explorar Rendición 2025 →</a>
+            <a class="button button-secondary" href="vigencias.html">Ver todas las vigencias</a>
+          </div>
+
+          <div class="hero-trust">
+            <div class="avatar-stack" aria-hidden="true">
+              <span>SP</span><span>RC</span><span>✓</span><span>+</span>
+            </div>
+            <p>Información pública organizada para ciudadanos, veedurías y comunidad.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="explorer-bar">
+      <div class="site-shell explorer-panel">
+        <div class="explorer-tabs"><button class="active" type="button"><span aria-hidden="true">▣</span> Vigencias</button><button type="button"><span aria-hidden="true">▤</span> Recursos</button><button type="button"><span aria-hidden="true">✦</span> Ideas ciudadanas</button></div>
+        <form class="explorer-form" id="homeExploreForm" aria-label="Selector de vigencia">
+          <div class="field-box"><label>Vigencia</label><select id="homeYear"></select></div>
+          <div class="field-box"><label>Consulta principal</label><input value="Resumen general de la gestión" readonly></div>
+          <div class="field-box"><label>Contenido</label><input value="Indicadores, documentos y compromisos" readonly></div>
+          <button class="button button-primary">Abrir edición</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="home-section home-section--white">
+      <div class="site-shell">
+        <div class="home-section__head"><div><span>EDICIONES DISPONIBLES</span><h2>Explore las vigencias</h2></div><a class="button button-secondary" href="vigencias.html">Ver archivo histórico →</a></div>
+        <div class="editions-carousel" id="featuredYears"></div>
+      </div>
+    </section>
+
+    <section class="home-section home-section--soft">
+      <div class="site-shell">
+        <div class="home-section__head"><div><span>PORTADA DE LA GESTIÓN</span><h2>Lo más destacado</h2></div><p>Una mezcla entre periódico digital y portal institucional: historias claras, recursos visuales y acceso rápido a las fuentes.</p></div>
+        <div class="editorial-deals">
+          <article class="editorial-feature reveal"><div><span>INFORME ESPECIAL</span><h3>La gestión explicada sin perder el contexto.</h3><p>Resultados, inversión, cobertura, retos y compromisos en una portada diseñada para comprender.</p><a class="button button-secondary editorial-feature__action" href="rendicion-2025.html"><span>Leer edición 2025</span><b aria-hidden="true">→</b></a></div></article>
+          <div id="editorialCards" style="display:contents"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="home-section home-section--white">
+      <div class="site-shell trust-strip">
+        <article class="trust-card reveal"><span>✓</span><div><strong>Información verificable</strong><small>Fuentes y documentos relacionados</small></div></article>
+        <article class="trust-card reveal"><span>24/7</span><div><strong>Consulta permanente</strong><small>Repositorio disponible en cualquier momento</small></div></article>
+        <article class="trust-card reveal"><span>▣</span><div><strong>Navegación por vigencias</strong><small>Cada año tiene su propia página</small></div></article>
+        <article class="trust-card reveal"><span>✦</span><div><strong>Participación visible</strong><small>Ideas con estado y respuesta oficial</small></div></article>
+      </div>
+    </section>
+
+    <section class="home-section home-section--soft">
+      <div class="site-shell">
+        <div class="home-section__head"><div><span>LABORATORIO CIUDADANO</span><h2>Lo que propone la comunidad</h2></div><p><b id="homeIdeasCount">0</b> ideas ciudadanas registradas en esta demostración.</p></div>
+        <div class="citizen-layout"><div id="citizenQuotes" style="display:contents"></div><article class="ideas-cta reveal"><span>PARTICIPE</span><h3>Una gran idea puede transformar el municipio.</h3><p>Presente propuestas, apoye iniciativas y consulte la respuesta institucional.</p><a class="button button-secondary" href="ideas.html">Entrar al laboratorio →</a></article></div>
+      </div>
+    </section>
+
+    <section class="newsletter-bar">
+      <div class="site-shell newsletter-box reveal">
+        <div><h2>Reciba nuevas publicaciones</h2><p><b id="homeResourceCount">0</b> recursos se encuentran disponibles actualmente.</p></div>
+        <form id="newsletterForm" aria-label="Suscripción a publicaciones"><input type="email" placeholder="Correo electrónico" required><button class="button button-primary">Suscribirme</button></form>
+      </div>
+    </section>
+  </main>
+  <div id="siteFooter"></div><div id="globalDialogs"></div>
+  <script src="shared.js?v=11.23-home-recovery"></script><script src="home.js?v=11.23-home-recovery"></script>
+</body>
+</html>
