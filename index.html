@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Portal especial de Rendición de Cuentas de San Pedro, Valle del Cauca.">
-  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.28-map-contrast-popup-wide">
+  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.30-projects-cinematic">
   <title>Rendición de Cuentas | San Pedro</title>
 </head>
 <body data-page="home">
@@ -76,6 +76,102 @@
       </div>
     </section>
 
+    <section class="project-console" id="proyectos-destacados" aria-labelledby="projectConsoleTitle">
+      <div class="site-shell project-console__shell">
+        <header class="project-console__head">
+          <div>
+            <span>PORTAFOLIO DE PROYECTOS</span>
+            <h2 id="projectConsoleTitle">Explore los proyectos <em>destacados</em></h2>
+            <p>Desplácese, arrastre o use las flechas para recorrer el portafolio. Cada proyecto abre una ficha con información, fotografías y enlaces relacionados.</p>
+          </div>
+          <div class="project-console__head-actions">
+            <span class="project-console__counter"><b id="projectConsoleCurrent">01</b><i>/</i><small id="projectConsoleTotal">05</small></span>
+            <button class="project-console__manage" id="projectConsoleManage" type="button" hidden>Gestionar proyectos</button>
+          </div>
+        </header>
+
+        <div class="project-console__viewport" id="projectConsoleViewport">
+          <div class="project-console__backdrop" id="projectConsoleBackdrop" aria-hidden="true"></div>
+          <div class="project-console__ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="project-console__track" id="projectConsoleTrack" role="listbox" aria-label="Selector de proyectos"></div>
+
+          <button class="project-console__nav project-console__nav--prev" id="projectConsolePrev" type="button" aria-label="Proyecto anterior">←</button>
+          <button class="project-console__nav project-console__nav--next" id="projectConsoleNext" type="button" aria-label="Proyecto siguiente">→</button>
+
+          <div class="project-console__selected" id="projectConsoleSelected" aria-live="polite">
+            <span>PROYECTO SELECCIONADO</span>
+            <h3>Proyecto 01</h3>
+            <p>Espacio preparado para publicar la información del proyecto.</p>
+            <button type="button" id="projectConsoleOpen">Abrir ficha <b aria-hidden="true">↗</b></button>
+          </div>
+
+          <div class="project-console__hint" aria-hidden="true">
+            <i></i><span>Arrastre o deslice para explorar</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="san-pedro-cinematic" id="san-pedro-cinematica" aria-labelledby="cinematicTitle">
+      <div class="san-pedro-cinematic__scroll">
+        <div class="san-pedro-cinematic__stage">
+          <header class="san-pedro-cinematic__intro">
+            <span>RETRATOS DEL MUNICIPIO</span>
+            <h2 id="cinematicTitle">San Pedro se vive como una <em>historia</em></h2>
+            <p>Un recorrido visual por símbolos, arquitectura, memoria y vida pública antes de explorar el territorio por capas.</p>
+          </header>
+
+          <div class="san-pedro-cinematic__frames" id="cinematicFrames">
+            <figure class="san-pedro-cinematic__frame is-active" data-cinematic-frame="0">
+              <picture>
+                <source data-srcset="assets/cinematica/monumento-musical.webp" type="image/webp">
+                <img data-src="assets/cinematica/monumento-musical.jpg" alt="Monumento de músicos en San Pedro al atardecer" decoding="async">
+              </picture>
+              <span class="san-pedro-cinematic__shade"></span>
+            </figure>
+            <figure class="san-pedro-cinematic__frame" data-cinematic-frame="1">
+              <picture>
+                <source data-srcset="assets/cinematica/iglesia-san-pedro.webp" type="image/webp">
+                <img data-src="assets/cinematica/iglesia-san-pedro.jpg" alt="Iglesia de San Pedro bajo un cielo de atardecer" decoding="async">
+              </picture>
+              <span class="san-pedro-cinematic__shade"></span>
+            </figure>
+            <figure class="san-pedro-cinematic__frame" data-cinematic-frame="2">
+              <picture>
+                <source data-srcset="assets/cinematica/parque-himno.webp" type="image/webp">
+                <img data-src="assets/cinematica/parque-himno.jpg" alt="Parque de San Pedro con monumento al himno municipal" decoding="async">
+              </picture>
+              <span class="san-pedro-cinematic__shade"></span>
+            </figure>
+            <figure class="san-pedro-cinematic__frame" data-cinematic-frame="3">
+              <picture>
+                <source data-srcset="assets/cinematica/alcaldia-san-pedro.webp" type="image/webp">
+                <img data-src="assets/cinematica/alcaldia-san-pedro.jpg" alt="Fachada de la Alcaldía Municipal de San Pedro" decoding="async">
+              </picture>
+              <span class="san-pedro-cinematic__shade"></span>
+            </figure>
+          </div>
+
+          <div class="san-pedro-cinematic__copy" id="cinematicCopy" aria-live="polite">
+            <span id="cinematicEyebrow">01 · MEMORIA QUE SUENA</span>
+            <h3 id="cinematicHeading">La música también guarda <em>memoria</em></h3>
+            <p id="cinematicText">En San Pedro, el arte público convierte el paisaje cotidiano en un escenario donde la historia parece seguir sonando.</p>
+            <blockquote id="cinematicQuote">“San Pedro no solo se recorre: se escucha, se mira y se recuerda.”</blockquote>
+          </div>
+
+          <nav class="san-pedro-cinematic__rail" id="cinematicRail" aria-label="Escenas de la cinemática">
+            <button class="is-active" type="button" data-cinematic-step="0"><span>01</span><i></i></button>
+            <button type="button" data-cinematic-step="1"><span>02</span><i></i></button>
+            <button type="button" data-cinematic-step="2"><span>03</span><i></i></button>
+            <button type="button" data-cinematic-step="3"><span>04</span><i></i></button>
+          </nav>
+
+          <div class="san-pedro-cinematic__progress" aria-hidden="true"><i id="cinematicProgress"></i></div>
+          <div class="san-pedro-cinematic__scroll-hint" aria-hidden="true"><i></i><span>Continúe desplazándose</span></div>
+        </div>
+      </div>
+    </section>
+
     <section class="home-section home-section--white">
       <div class="site-shell">
         <div class="home-section__head"><div><span>EDICIONES DISPONIBLES</span><h2>Explore las vigencias</h2></div><a class="button button-secondary" href="vigencias.html">Ver archivo histórico →</a></div>
@@ -117,6 +213,6 @@
     </section>
   </main>
   <div id="siteFooter"></div><div id="globalDialogs"></div>
-  <script src="shared.js?v=11.28-map-contrast-popup-wide"></script><script src="home.js?v=11.28-map-contrast-popup-wide"></script>
+  <script src="shared.js?v=11.30-projects-cinematic"></script><script src="home.js?v=11.30-projects-cinematic"></script><script src="home-experience.js?v=11.30-projects-cinematic"></script>
 </body>
 </html>
