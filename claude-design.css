@@ -11071,3 +11071,947 @@ body.page-home .home-hero:not(.has-admin-banner) .hill-layer,
 body.claude-page-home .home-hero:not(.has-admin-banner) .hill-layer{
   opacity:.72!important;
 }
+
+/* =========================================================
+   V11.25 · Hero editorial, retícula estable y responsive real
+   Correcciones solicitadas sobre V11.24 sin alterar datos,
+   Firebase, administrador ni navegación existente.
+   ========================================================= */
+
+body.page-home,
+body.claude-page-home{
+  --v1125-ink:#061d3d;
+  --v1125-blue:#0878d1;
+  --v1125-cyan:#21c8e9;
+  --v1125-teal:#22b99e;
+  --v1125-violet:#7a5ce4;
+  --v1125-orange:#f28a3c;
+  overflow-x:clip!important;
+}
+
+/* ---------- Portada: misma escala, acabado más premium ---------- */
+body.page-home .home-hero,
+body.claude-page-home .home-hero,
+body.hero-layout-balanced.claude-page-home .home-hero,
+body.hero-layout-wide.claude-page-home .home-hero,
+body.hero-layout-compact.claude-page-home .home-hero{
+  isolation:isolate!important;
+  border-radius:54px!important;
+  border-color:rgba(31,132,201,.16)!important;
+  background:
+    radial-gradient(circle at calc(91% + var(--hero-x) * 2%) calc(10% + var(--hero-y) * 2%),rgba(255,255,255,.82),transparent 15rem),
+    radial-gradient(circle at 48% 112%,rgba(33,200,233,.19),transparent 31rem),
+    radial-gradient(circle at 4% 8%,rgba(122,92,228,.055),transparent 26rem),
+    linear-gradient(112deg,#ffffff 0%,#f4faff 44%,#d8efff 61%,#2094d0 100%)!important;
+  box-shadow:
+    0 42px 110px rgba(4,35,73,.16),
+    0 12px 32px rgba(8,120,209,.08),
+    inset 0 1px 0 rgba(255,255,255,.98)!important;
+}
+
+body.page-home .home-hero::after,
+body.claude-page-home .home-hero::after{
+  background:
+    radial-gradient(circle at 86% 12%,rgba(255,255,255,.28),transparent 19rem),
+    linear-gradient(124deg,rgba(255,255,255,.5),transparent 25% 72%,rgba(255,255,255,.12))!important;
+}
+
+body.page-home .home-hero__copy,
+body.claude-page-home .home-hero__copy,
+body.page-home .home-hero.has-admin-banner .home-hero__copy,
+body.claude-page-home .home-hero.has-admin-banner .home-hero__copy{
+  border:1px solid transparent!important;
+  border-radius:44px 44px 44px 26px!important;
+  background:
+    radial-gradient(circle at 92% 5%,rgba(33,200,233,.13),transparent 14rem) padding-box,
+    radial-gradient(circle at 7% 96%,rgba(122,92,228,.055),transparent 13rem) padding-box,
+    linear-gradient(145deg,rgba(255,255,255,.94),rgba(244,251,255,.78)) padding-box,
+    linear-gradient(120deg,rgba(255,255,255,.98),rgba(33,200,233,.44),rgba(122,92,228,.22),rgba(255,255,255,.9)) border-box!important;
+  box-shadow:
+    0 30px 76px rgba(4,43,87,.13),
+    0 1px 0 rgba(255,255,255,.95) inset,
+    -18px -18px 54px rgba(100,199,245,.07) inset!important;
+  backdrop-filter:blur(28px) saturate(1.12)!important;
+}
+
+/* Se elimina definitivamente la línea larga inferior señalada. */
+body.page-home .home-hero__copy::after,
+body.claude-page-home .home-hero__copy::after{
+  content:none!important;
+  display:none!important;
+}
+
+body.page-home .home-hero__copy::before,
+body.claude-page-home .home-hero__copy::before{
+  width:260px!important;
+  height:260px!important;
+  top:-184px!important;
+  right:-142px!important;
+  border-color:rgba(24,135,207,.12)!important;
+  box-shadow:
+    0 0 0 34px rgba(33,200,233,.035),
+    0 0 0 72px rgba(122,92,228,.018),
+    0 0 70px rgba(33,200,233,.12)!important;
+}
+
+body.page-home .home-hero__copy > span,
+body.claude-page-home .home-hero__copy > span{
+  background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(221,244,255,.82))!important;
+  box-shadow:0 12px 28px rgba(4,69,124,.09),inset 0 1px 0 #fff!important;
+}
+
+body.page-home .home-hero__copy h1,
+body.claude-page-home .home-hero__copy h1{
+  letter-spacing:-.064em!important;
+  text-wrap:balance!important;
+}
+
+/* Cursiva editorial elegante: confianza y última palabra de títulos. */
+body.page-home .home-hero__copy h1 em,
+body.claude-page-home .home-hero__copy h1 em,
+body.page-home .title-accent-word,
+body.claude-page-home .title-accent-word{
+  display:inline-block;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-style:italic!important;
+  font-weight:500!important;
+  letter-spacing:-.045em!important;
+  text-transform:none!important;
+}
+
+body.page-home .home-hero__copy h1 em,
+body.claude-page-home .home-hero__copy h1 em{
+  padding-right:.06em;
+  background:linear-gradient(102deg,#0878d1 0%,#20bbdc 48%,#7358d9 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+}
+
+body.page-home .home-hero__copy h1 em::after,
+body.claude-page-home .home-hero__copy h1 em::after{
+  left:4%!important;
+  right:2%!important;
+  bottom:-3px!important;
+  height:5px!important;
+  opacity:.72!important;
+  transform:scaleX(.92) skewX(-18deg)!important;
+  background:linear-gradient(90deg,rgba(33,200,233,.55),rgba(122,92,228,.24),transparent)!important;
+}
+
+body.page-home .home-section__head h2 .title-accent-word,
+body.claude-page-home .home-section__head h2 .title-accent-word{
+  color:#0878d1!important;
+}
+
+body.page-home .territory-focus-card h3 .title-accent-word,
+body.claude-page-home .territory-focus-card h3 .title-accent-word{
+  color:var(--card-accent)!important;
+}
+
+body.page-home .home-highlights .home-section__head h2 .title-accent-word,
+body.claude-page-home .home-highlights .home-section__head h2 .title-accent-word,
+body.page-home .home-highlights .editorial-feature h3 .title-accent-word,
+body.claude-page-home .home-highlights .editorial-feature h3 .title-accent-word{
+  color:#78e4f7!important;
+}
+
+body.page-home .home-highlights .deal-card h3 .title-accent-word,
+body.claude-page-home .home-highlights .deal-card h3 .title-accent-word{
+  color:#167ec3!important;
+}
+
+body.page-home .ideas-cta h3 .title-accent-word,
+body.claude-page-home .ideas-cta h3 .title-accent-word{
+  color:#7358d9!important;
+}
+
+body.page-home .home-hero__visual,
+body.claude-page-home .home-hero__visual,
+body.hero-layout-balanced .home-hero__visual,
+body.hero-layout-wide .home-hero__visual,
+body.hero-layout-compact .home-hero__visual{
+  border-radius:48px 48px 48px 30px!important;
+  border-color:rgba(255,255,255,.76)!important;
+  background:
+    radial-gradient(circle at calc(76% + var(--hero-x) * 4%) calc(17% + var(--hero-y) * 3%),rgba(255,255,255,.5),transparent 13rem),
+    radial-gradient(circle at 28% 82%,rgba(33,200,233,.54),transparent 18rem),
+    radial-gradient(circle at 92% 90%,rgba(122,92,228,.28),transparent 17rem),
+    linear-gradient(145deg,#06376c 0%,#087cc0 43%,#25bada 100%)!important;
+  box-shadow:
+    0 36px 82px rgba(1,39,80,.31),
+    0 0 0 8px rgba(255,255,255,.16),
+    inset 0 1px 0 rgba(255,255,255,.62),
+    inset 0 -52px 110px rgba(2,30,70,.19)!important;
+}
+
+body.page-home .home-hero__visual::before,
+body.claude-page-home .home-hero__visual::before{
+  opacity:.78!important;
+  background:
+    radial-gradient(circle at 74% 14%,rgba(255,255,255,.28),transparent 12rem),
+    repeating-radial-gradient(ellipse at 72% 42%,transparent 0 31px,rgba(255,255,255,.14) 32px 33px,transparent 34px 64px),
+    linear-gradient(122deg,rgba(4,22,52,.22),transparent 38%,rgba(33,200,233,.14))!important;
+}
+
+body.page-home .home-hero__visual::after,
+body.claude-page-home .home-hero__visual::after{
+  background:
+    linear-gradient(90deg,rgba(3,24,55,.22),transparent 34%),
+    radial-gradient(circle at 16% 82%,rgba(33,200,233,.19),transparent 14rem),
+    linear-gradient(180deg,transparent 55%,rgba(2,27,63,.32))!important;
+}
+
+body.page-home .hero-visual-aurora,
+body.claude-page-home .hero-visual-aurora{
+  left:-22%!important;
+  right:-16%!important;
+  bottom:-30%!important;
+  height:72%!important;
+  background:
+    radial-gradient(ellipse at 35% 45%,rgba(33,200,233,.72),transparent 42%),
+    radial-gradient(ellipse at 72% 35%,rgba(122,92,228,.34),transparent 47%)!important;
+  filter:blur(18px)!important;
+}
+
+body.page-home .hero-float-card,
+body.claude-page-home .hero-float-card{
+  border-radius:28px 28px 28px 18px!important;
+  background:
+    radial-gradient(circle at 100% 0,rgba(33,200,233,.28),transparent 8rem),
+    linear-gradient(145deg,rgba(3,25,56,.91),rgba(5,72,121,.88))!important;
+  box-shadow:0 28px 62px rgba(1,24,58,.39),inset 0 1px 0 rgba(255,255,255,.24)!important;
+}
+
+/* La cápsula informativa queda limpia: sin línea extendida ni sombras lineales. */
+body.page-home .hero-trust,
+body.claude-page-home .hero-trust{
+  border-color:rgba(8,120,209,.12)!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.93),rgba(226,246,255,.82))!important;
+  box-shadow:0 12px 30px rgba(4,55,103,.08),inset 0 1px 0 #fff!important;
+}
+
+/* ---------- Tarjetas territoriales: retícula exacta e iconografía recta ---------- */
+body.page-home .territory-focus-grid,
+body.claude-page-home .territory-focus-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-rows:1fr!important;
+  align-items:stretch!important;
+  gap:18px!important;
+}
+
+body.page-home .territory-focus-card,
+body.claude-page-home .territory-focus-card{
+  min-height:340px!important;
+  height:100%!important;
+  padding:25px!important;
+  border-radius:30px!important;
+  background:
+    radial-gradient(circle at 92% 3%,rgba(var(--card-accent-rgb),.2),transparent 10rem),
+    radial-gradient(circle at 12% 105%,rgba(var(--card-accent-rgb),.13),transparent 13rem),
+    linear-gradient(150deg,rgba(255,255,255,.99),rgba(239,248,255,.91))!important;
+}
+
+body.page-home .territory-focus-card::after,
+body.claude-page-home .territory-focus-card::after{
+  right:-48px!important;
+  bottom:-48px!important;
+  width:178px!important;
+  height:178px!important;
+  border-radius:50%!important;
+}
+
+body.page-home .territory-focus-icon,
+body.claude-page-home .territory-focus-icon{
+  display:grid!important;
+  place-items:center!important;
+  width:58px!important;
+  height:58px!important;
+  border-radius:19px!important;
+  transform:none!important;
+  rotate:0deg!important;
+}
+
+body.page-home .territory-focus-icon svg,
+body.claude-page-home .territory-focus-icon svg{
+  width:27px!important;
+  height:27px!important;
+  display:block!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  transform:none!important;
+}
+
+body.page-home .territory-focus-card:hover .territory-focus-icon,
+body.page-home .territory-focus-card:focus-visible .territory-focus-icon,
+body.page-home .territory-focus-card.active .territory-focus-icon,
+body.claude-page-home .territory-focus-card:hover .territory-focus-icon,
+body.claude-page-home .territory-focus-card:focus-visible .territory-focus-icon,
+body.claude-page-home .territory-focus-card.active .territory-focus-icon{
+  transform:translateY(-4px) scale(1.065)!important;
+  rotate:0deg!important;
+}
+
+body.page-home .territory-focus-card h3,
+body.claude-page-home .territory-focus-card h3{
+  min-height:58px!important;
+  max-width:92%!important;
+  font-size:clamp(21px,1.55vw,27px)!important;
+}
+
+body.page-home .territory-focus-card p,
+body.claude-page-home .territory-focus-card p{
+  margin-bottom:54px!important;
+  font-size:11px!important;
+}
+
+body.page-home .territory-focus-card > button,
+body.claude-page-home .territory-focus-card > button{
+  left:25px!important;
+  right:25px!important;
+  bottom:23px!important;
+  width:calc(100% - 50px)!important;
+  height:34px!important;
+  min-height:34px!important;
+  overflow:visible!important;
+  transform:none!important;
+  rotate:0deg!important;
+}
+
+body.page-home .territory-focus-card > button::after,
+body.claude-page-home .territory-focus-card > button::after,
+body.page-home .territory-focus-card .admin-quick-card-edit::after,
+body.claude-page-home .territory-focus-card .admin-quick-card-edit::after{
+  content:none!important;
+  display:none!important;
+}
+
+body.page-home .territory-focus-card > button b,
+body.claude-page-home .territory-focus-card > button b{
+  width:31px!important;
+  height:31px!important;
+  font-family:"Century Gothic",Arial,sans-serif!important;
+  font-size:17px!important;
+  font-style:normal!important;
+  line-height:1!important;
+  transform:none!important;
+  rotate:0deg!important;
+}
+
+body.admin-popup-enabled .territory-focus-card > .admin-quick-card-edit{
+  top:16px!important;
+  right:16px!important;
+  max-width:88px!important;
+}
+
+/* ---------- Destacados: composición 2 filas, todo cabe y se fusiona ---------- */
+body.page-home .home-highlights,
+body.claude-page-home .home-highlights{
+  overflow:hidden!important;
+  margin:28px auto 34px!important;
+  padding:clamp(50px,4.3vw,66px) 0!important;
+  border-radius:48px!important;
+  background:
+    radial-gradient(circle at 86% 8%,rgba(33,200,233,.22),transparent 25rem),
+    radial-gradient(circle at 52% 112%,rgba(122,92,228,.18),transparent 28rem),
+    radial-gradient(circle at 4% 74%,rgba(27,144,215,.15),transparent 22rem),
+    linear-gradient(138deg,#031a36 0%,#073e70 50%,#052b51 100%)!important;
+  box-shadow:
+    0 -42px 78px rgba(12,100,158,.10),
+    0 46px 86px rgba(3,40,77,.16),
+    0 30px 86px rgba(3,27,59,.24),
+    inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+
+/* Difusión visual en los límites sin cortar el contenido. */
+body.page-home .home-highlights > .site-shell::before,
+body.claude-page-home .home-highlights > .site-shell::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:-34px -52px;
+  pointer-events:none;
+  border-radius:58px;
+  background:
+    linear-gradient(180deg,rgba(69,178,229,.08),transparent 14%,transparent 86%,rgba(51,133,200,.08));
+  filter:blur(18px);
+}
+
+body.page-home .home-highlights::before,
+body.claude-page-home .home-highlights::before{
+  opacity:.65!important;
+  background:
+    repeating-radial-gradient(ellipse at 10% 52%,transparent 0 38px,rgba(101,210,248,.13) 39px 40px,transparent 41px 78px),
+    radial-gradient(circle at 74% 20%,rgba(255,255,255,.12) 0 2px,transparent 3px),
+    radial-gradient(circle at 35% 80%,rgba(33,200,233,.18) 0 3px,transparent 4px),
+    linear-gradient(115deg,transparent 38%,rgba(255,255,255,.035) 50%,transparent 62%)!important;
+  background-size:auto,82px 82px,126px 126px,220% 100%!important;
+}
+
+body.page-home .home-highlights .home-section__head,
+body.claude-page-home .home-highlights .home-section__head{
+  align-items:end!important;
+  margin-bottom:30px!important;
+}
+
+body.page-home .home-highlights .cd-section-mark,
+body.claude-page-home .home-highlights .cd-section-mark,
+body.page-home .home-highlights .cd-section-mark span,
+body.page-home .home-highlights .cd-section-mark em,
+body.claude-page-home .home-highlights .cd-section-mark span,
+body.claude-page-home .home-highlights .cd-section-mark em{
+  color:#fff!important;
+  opacity:1!important;
+  text-shadow:0 4px 16px rgba(0,0,0,.22)!important;
+}
+
+body.page-home .home-highlights .editorial-deals,
+body.claude-page-home .home-highlights .editorial-deals{
+  display:grid!important;
+  grid-template-columns:minmax(280px,.95fr) repeat(2,minmax(240px,1fr))!important;
+  grid-template-rows:250px 184px!important;
+  grid-auto-flow:row!important;
+  grid-auto-rows:184px!important;
+  height:auto!important;
+  min-height:448px!important;
+  gap:14px!important;
+  align-items:stretch!important;
+}
+
+body.page-home .home-highlights .editorial-feature,
+body.claude-page-home .home-highlights .editorial-feature{
+  grid-column:1!important;
+  grid-row:1 / 3!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:448px!important;
+  padding:30px!important;
+  border-radius:30px!important;
+}
+
+body.page-home .home-highlights .editorial-feature h3,
+body.claude-page-home .home-highlights .editorial-feature h3{
+  max-width:100%!important;
+  font-size:clamp(29px,2.05vw,38px)!important;
+  line-height:.98!important;
+}
+
+body.page-home .home-highlights .editorial-feature p,
+body.claude-page-home .home-highlights .editorial-feature p{
+  display:block!important;
+  max-width:92%!important;
+  overflow:visible!important;
+  -webkit-line-clamp:unset!important;
+  font-size:10px!important;
+}
+
+body.page-home .home-highlights .editorial-feature__action,
+body.claude-page-home .home-highlights .editorial-feature__action{
+  left:30px!important;
+  right:auto!important;
+  bottom:28px!important;
+  max-width:calc(100% - 60px)!important;
+}
+
+body.page-home .home-highlights .deal-card,
+body.claude-page-home .home-highlights .deal-card{
+  width:100%!important;
+  height:250px!important;
+  min-height:0!important;
+  grid-template-columns:112px minmax(0,1fr)!important;
+  grid-template-rows:1fr!important;
+  border-radius:27px!important;
+}
+
+body.page-home .home-highlights #editorialCards,
+body.claude-page-home .home-highlights #editorialCards{
+  display:contents!important;
+}
+
+/* PDF y PPT: mismas dimensiones y misma fila. */
+body.page-home .home-highlights #editorialCards > .deal-card:nth-child(1),
+body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(1){
+  grid-column:2!important;
+  grid-row:1!important;
+}
+body.page-home .home-highlights #editorialCards > .deal-card:nth-child(2),
+body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(2){
+  grid-column:3!important;
+  grid-row:1!important;
+}
+
+/* Video: único formato diferente, ancho y estable debajo. */
+body.page-home .home-highlights #editorialCards > .deal-card:nth-child(3),
+body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(3){
+  grid-column:2 / 4!important;
+  grid-row:2!important;
+  height:184px!important;
+  grid-template-columns:142px minmax(0,1fr)!important;
+}
+
+body.page-home .home-highlights .deal-card__visual,
+body.claude-page-home .home-highlights .deal-card__visual{
+  width:112px!important;
+  min-width:112px!important;
+  min-height:100%!important;
+  height:100%!important;
+  border-radius:0!important;
+}
+
+body.page-home .home-highlights #editorialCards > .deal-card:nth-child(3) .deal-card__visual,
+body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(3) .deal-card__visual{
+  width:142px!important;
+  min-width:142px!important;
+}
+
+body.page-home .home-highlights .deal-card__content,
+body.claude-page-home .home-highlights .deal-card__content{
+  display:flex!important;
+  flex-direction:column!important;
+  min-width:0!important;
+  height:100%!important;
+  padding:18px 18px 58px!important;
+}
+
+body.page-home .home-highlights .deal-card__meta,
+body.claude-page-home .home-highlights .deal-card__meta{
+  min-height:24px!important;
+  padding-right:68px!important;
+  margin-bottom:8px!important;
+}
+
+body.page-home .home-highlights .deal-card h3,
+body.claude-page-home .home-highlights .deal-card h3{
+  display:-webkit-box!important;
+  max-width:100%!important;
+  margin:0 0 8px!important;
+  font-size:clamp(15px,1.06vw,18px)!important;
+  line-height:1.12!important;
+  -webkit-line-clamp:4!important;
+}
+
+body.page-home .home-highlights #editorialCards > .deal-card:nth-child(3) h3,
+body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(3) h3{
+  -webkit-line-clamp:2!important;
+  font-size:clamp(16px,1.1vw,19px)!important;
+}
+
+body.page-home .home-highlights .deal-card p,
+body.claude-page-home .home-highlights .deal-card p{
+  margin-top:auto!important;
+  font-size:9px!important;
+}
+
+body.page-home .home-highlights .deal-card__action,
+body.claude-page-home .home-highlights .deal-card__action{
+  left:18px!important;
+  right:18px!important;
+  bottom:15px!important;
+  min-height:36px!important;
+}
+
+body.admin-popup-enabled .home-highlights .deal-card > .admin-quick-card-edit{
+  top:12px!important;
+  right:12px!important;
+  max-width:62px!important;
+  min-height:27px!important;
+  padding:4px 7px!important;
+  font-size:8px!important;
+}
+
+body.admin-popup-enabled .home-highlights .editorial-feature > .admin-quick-card-edit{
+  top:14px!important;
+  right:14px!important;
+}
+
+/* El recorrido lateral no tapa contenido mientras se edita. */
+body.admin-popup-enabled .cd-section-rail{
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+/* ---------- Fusión con la sección siguiente y franja informativa ---------- */
+body.page-home .home-proof,
+body.claude-page-home .home-proof{
+  margin-top:-18px!important;
+  padding-top:52px!important;
+  background:
+    linear-gradient(180deg,rgba(7,59,109,.075),transparent 34%),
+    transparent!important;
+}
+
+/* ---------- Portátil pequeño: 1366 px y alturas 740/760 ---------- */
+@media (min-width:1081px) and (max-width:1366px){
+  body.page-home .home-hero__grid,
+  body.claude-page-home .home-hero__grid{
+    grid-template-columns:minmax(0,1fr) minmax(390px,.9fr)!important;
+    gap:28px!important;
+    padding-inline:34px!important;
+  }
+
+  body.page-home .home-hero__copy,
+  body.claude-page-home .home-hero__copy{
+    padding:34px!important;
+  }
+
+  body.page-home .home-hero__copy h1,
+  body.claude-page-home .home-hero__copy h1{
+    font-size:clamp(47px,4.25vw,59px)!important;
+  }
+
+  body.page-home .home-hero__visual,
+  body.claude-page-home .home-hero__visual{
+    width:calc(46% - 24px)!important;
+  }
+
+  body.page-home .territory-focus-grid,
+  body.claude-page-home .territory-focus-grid{
+    gap:12px!important;
+  }
+
+  body.page-home .territory-focus-card,
+  body.claude-page-home .territory-focus-card{
+    min-height:326px!important;
+    padding:21px!important;
+  }
+
+  body.page-home .territory-focus-card h3,
+  body.claude-page-home .territory-focus-card h3{
+    font-size:clamp(19px,1.62vw,23px)!important;
+  }
+
+  body.page-home .home-highlights .editorial-deals,
+  body.claude-page-home .home-highlights .editorial-deals{
+    grid-template-columns:minmax(250px,.9fr) repeat(2,minmax(220px,1fr))!important;
+  }
+}
+
+@media (min-width:1024px) and (max-height:780px){
+  body.page-home .home-hero,
+  body.claude-page-home .home-hero,
+  body.hero-layout-balanced.claude-page-home .home-hero,
+  body.hero-layout-wide.claude-page-home .home-hero,
+  body.hero-layout-compact.claude-page-home .home-hero{
+    height:clamp(640px,calc(100svh - 28px),700px)!important;
+    min-height:640px!important;
+    margin-top:10px!important;
+  }
+
+  body.page-home .home-hero__grid,
+  body.claude-page-home .home-hero__grid{
+    padding-block:30px!important;
+  }
+
+  body.page-home .home-hero__copy,
+  body.claude-page-home .home-hero__copy{
+    padding:30px 34px!important;
+  }
+
+  body.page-home .home-hero__copy > span,
+  body.claude-page-home .home-hero__copy > span{
+    margin-bottom:17px!important;
+  }
+
+  body.page-home .home-hero__copy h1,
+  body.claude-page-home .home-hero__copy h1{
+    margin-bottom:18px!important;
+    font-size:clamp(45px,4vw,58px)!important;
+  }
+
+  body.page-home .home-hero__copy > p,
+  body.claude-page-home .home-hero__copy > p{
+    margin-bottom:20px!important;
+    line-height:1.5!important;
+  }
+
+  body.page-home .home-hero .hero-buttons,
+  body.claude-page-home .home-hero .hero-buttons{
+    margin-bottom:20px!important;
+  }
+
+  body.page-home .home-highlights,
+  body.claude-page-home .home-highlights{
+    padding-block:44px!important;
+  }
+}
+
+/* ---------- Tableta / portátil angosto ---------- */
+@media (max-width:1080px){
+  body.page-home .home-hero,
+  body.claude-page-home .home-hero{
+    border-radius:40px!important;
+  }
+
+  body.page-home .home-hero__copy,
+  body.claude-page-home .home-hero__copy{
+    border-radius:34px 34px 34px 22px!important;
+  }
+
+  body.page-home .home-hero__visual,
+  body.claude-page-home .home-hero__visual{
+    border-radius:34px 34px 34px 22px!important;
+  }
+
+  body.page-home .territory-focus-grid,
+  body.claude-page-home .territory-focus-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+
+  body.page-home .home-highlights .editorial-deals,
+  body.claude-page-home .home-highlights .editorial-deals{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-template-rows:auto!important;
+    grid-auto-rows:280px!important;
+    min-height:0!important;
+  }
+
+  body.page-home .home-highlights .editorial-feature,
+  body.claude-page-home .home-highlights .editorial-feature{
+    grid-column:1 / 3!important;
+    grid-row:auto!important;
+    min-height:320px!important;
+    height:320px!important;
+  }
+
+  body.page-home .home-highlights #editorialCards > .deal-card:nth-child(1),
+  body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(1),
+  body.page-home .home-highlights #editorialCards > .deal-card:nth-child(2),
+  body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(2){
+    grid-column:auto!important;
+    grid-row:auto!important;
+    height:280px!important;
+  }
+
+  body.page-home .home-highlights #editorialCards > .deal-card:nth-child(3),
+  body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(3){
+    grid-column:1 / 3!important;
+    grid-row:auto!important;
+    height:190px!important;
+  }
+}
+
+/* ---------- iOS y móviles: safe areas, svh y controles táctiles ---------- */
+@media (max-width:767px){
+  html,
+  body{
+    max-width:100%!important;
+    overflow-x:clip!important;
+  }
+
+  body.page-home .home-hero,
+  body.claude-page-home .home-hero,
+  body.page-home .home-highlights,
+  body.claude-page-home .home-highlights{
+    width:calc(100% - 14px)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    border-radius:28px!important;
+  }
+
+  body.page-home .home-hero__grid,
+  body.claude-page-home .home-hero__grid{
+    padding:
+      18px
+      max(13px,env(safe-area-inset-right))
+      314px
+      max(13px,env(safe-area-inset-left))!important;
+  }
+
+  body.page-home .home-hero__copy,
+  body.claude-page-home .home-hero__copy{
+    width:100%!important;
+    max-width:none!important;
+    padding:25px 19px!important;
+    border-radius:24px 24px 24px 17px!important;
+  }
+
+  body.page-home .home-hero__copy > span,
+  body.claude-page-home .home-hero__copy > span{
+    margin-bottom:18px!important;
+    padding:8px 11px!important;
+    font-size:8px!important;
+  }
+
+  body.page-home .home-hero__copy h1,
+  body.claude-page-home .home-hero__copy h1{
+    max-width:100%!important;
+    margin-bottom:20px!important;
+    font-size:clamp(37px,11.5vw,50px)!important;
+    line-height:.98!important;
+    letter-spacing:-.06em!important;
+  }
+
+  body.page-home .home-hero__copy > p,
+  body.claude-page-home .home-hero__copy > p{
+    margin-bottom:22px!important;
+    font-size:14px!important;
+    line-height:1.55!important;
+  }
+
+  body.page-home .home-hero .hero-buttons,
+  body.claude-page-home .home-hero .hero-buttons{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+  }
+
+  body.page-home .home-hero .hero-buttons .button,
+  body.claude-page-home .home-hero .hero-buttons .button{
+    width:100%!important;
+    justify-content:center!important;
+  }
+
+  body.page-home .hero-trust,
+  body.claude-page-home .hero-trust{
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr)!important;
+    width:100%!important;
+    padding:8px 10px 8px 8px!important;
+    border-radius:18px!important;
+  }
+
+  body.page-home .hero-trust p,
+  body.claude-page-home .hero-trust p{
+    max-width:none!important;
+    font-size:8.5px!important;
+  }
+
+  body.page-home .home-hero__visual,
+  body.claude-page-home .home-hero__visual{
+    left:11px!important;
+    right:11px!important;
+    bottom:11px!important;
+    height:290px!important;
+    border-radius:22px 22px 22px 16px!important;
+  }
+
+  body.page-home .hero-float-card,
+  body.claude-page-home .hero-float-card{
+    right:12px!important;
+    bottom:12px!important;
+    width:150px!important;
+    padding:15px!important;
+    border-radius:18px 18px 18px 13px!important;
+  }
+
+  body.page-home .hero-float-card strong,
+  body.claude-page-home .hero-float-card strong{
+    font-size:42px!important;
+  }
+
+  body.page-home .territory-focus-grid,
+  body.claude-page-home .territory-focus-grid{
+    grid-template-columns:1fr!important;
+    gap:13px!important;
+  }
+
+  body.page-home .territory-focus-card,
+  body.claude-page-home .territory-focus-card{
+    min-height:310px!important;
+    padding:22px!important;
+  }
+
+  body.page-home .home-highlights,
+  body.claude-page-home .home-highlights{
+    padding-block:38px!important;
+  }
+
+  body.page-home .home-highlights .home-section__head,
+  body.claude-page-home .home-highlights .home-section__head{
+    margin-bottom:22px!important;
+  }
+
+  body.page-home .home-highlights .home-section__head h2,
+  body.claude-page-home .home-highlights .home-section__head h2{
+    white-space:normal!important;
+    font-size:clamp(38px,12vw,50px)!important;
+  }
+
+  body.page-home .home-highlights .editorial-deals,
+  body.claude-page-home .home-highlights .editorial-deals{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-rows:none!important;
+    grid-auto-rows:auto!important;
+    gap:12px!important;
+  }
+
+  body.page-home .home-highlights .editorial-feature,
+  body.claude-page-home .home-highlights .editorial-feature,
+  body.page-home .home-highlights #editorialCards > .deal-card:nth-child(1),
+  body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(1),
+  body.page-home .home-highlights #editorialCards > .deal-card:nth-child(2),
+  body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(2),
+  body.page-home .home-highlights #editorialCards > .deal-card:nth-child(3),
+  body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(3){
+    grid-column:1!important;
+    grid-row:auto!important;
+    width:100%!important;
+  }
+
+  body.page-home .home-highlights .editorial-feature,
+  body.claude-page-home .home-highlights .editorial-feature{
+    min-height:340px!important;
+    height:340px!important;
+  }
+
+  body.page-home .home-highlights .deal-card,
+  body.claude-page-home .home-highlights .deal-card,
+  body.page-home .home-highlights #editorialCards > .deal-card:nth-child(3),
+  body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(3){
+    height:230px!important;
+    grid-template-columns:104px minmax(0,1fr)!important;
+  }
+
+  body.page-home .home-highlights .deal-card__visual,
+  body.claude-page-home .home-highlights .deal-card__visual,
+  body.page-home .home-highlights #editorialCards > .deal-card:nth-child(3) .deal-card__visual,
+  body.claude-page-home .home-highlights #editorialCards > .deal-card:nth-child(3) .deal-card__visual{
+    width:104px!important;
+    min-width:104px!important;
+  }
+
+  .cd-section-rail{
+    display:none!important;
+  }
+}
+
+@supports (-webkit-touch-callout:none){
+  @media (max-width:767px){
+    body.page-home .home-hero,
+    body.claude-page-home .home-hero{
+      min-height:auto!important;
+    }
+
+    body.page-home .home-hero__copy,
+    body.claude-page-home .home-hero__copy,
+    body.page-home .home-hero__visual,
+    body.claude-page-home .home-hero__visual{
+      -webkit-backdrop-filter:blur(20px) saturate(1.08)!important;
+    }
+
+    body.page-home .territory-focus-card:hover,
+    body.page-home .territory-focus-card.active,
+    body.claude-page-home .territory-focus-card:hover,
+    body.claude-page-home .territory-focus-card.active{
+      transform:none!important;
+    }
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  body.page-home .home-hero,
+  body.claude-page-home .home-hero,
+  body.page-home .home-hero__copy,
+  body.claude-page-home .home-hero__copy,
+  body.page-home .home-hero__visual,
+  body.claude-page-home .home-hero__visual,
+  body.page-home .territory-focus-card,
+  body.claude-page-home .territory-focus-card{
+    scroll-behavior:auto!important;
+    transition:none!important;
+  }
+}

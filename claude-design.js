@@ -85,6 +85,61 @@
     return (heading?.textContent || "Sección").trim().replace(/\s+/g, " ");
   }
 
+  function accentTitleLastWords(root = document) {
+    const headings = root.querySelectorAll(
+      "main h1, main h2, main h3"
+    );
+
+    headings.forEach(heading => {
+      if (!heading.isConnected) return;
+      if (heading.closest("dialog,.context-editor,.admin-console")) return;
+
+      const existing = heading.querySelector(".title-accent-word,em");
+      if (existing) {
+        existing.classList.add("title-accent-word");
+        return;
+      }
+
+      const walker = document.createTreeWalker(
+        heading,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode(node) {
+            return /\p{L}/u.test(node.nodeValue || "")
+              ? NodeFilter.FILTER_ACCEPT
+              : NodeFilter.FILTER_REJECT;
+          }
+        }
+      );
+
+      const textNodes = [];
+      while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+      for (let index = textNodes.length - 1; index >= 0; index -= 1) {
+        const node = textNodes[index];
+        const value = node.nodeValue || "";
+        const matches = [...value.matchAll(/[\p{L}\p{M}][\p{L}\p{M}'’\-]*/gu)];
+        const match = matches.at(-1);
+        if (!match || typeof match.index !== "number") continue;
+
+        const start = match.index;
+        const end = start + match[0].length;
+        const fragment = document.createDocumentFragment();
+
+        if (start > 0) fragment.append(value.slice(0,start));
+
+        const accent = document.createElement("span");
+        accent.className = "title-accent-word";
+        accent.textContent = value.slice(start,end);
+        fragment.append(accent);
+
+        if (end < value.length) fragment.append(value.slice(end));
+        node.replaceWith(fragment);
+        break;
+      }
+    });
+  }
+
   function suitableSections() {
     return [...document.querySelectorAll(
       "main > section, main > article, .site-main > section, .site-main > article"
@@ -536,6 +591,7 @@
     normalizeHomeHeroStructure();
     bindHomeHeroMotion();
     const sections = decorateSections();
+    accentTitleLastWords(document);
     decorateCards();
     normalizeAdminControls();
     setupReveal();

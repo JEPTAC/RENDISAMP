@@ -2,7 +2,7 @@
   "use strict";
 
   const STORE_KEY = "sp_territory_experience_v1";
-  const BUILD = "11.20-territorio-sin-historia-publica";
+  const BUILD = "11.25-territorio-ui-responsive";
   const HOME_PATHS = new Set(["","index.html","/"]);
   const CENTER = [3.99557,-76.22805];
 
@@ -32,6 +32,13 @@
       description:"Ideas, encuentros y ejercicios de control social."
     }
   };
+
+  const TERRITORY_FOCUS_ICONS = [
+    `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>`,
+    `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.5h16"></path><path d="M6.5 14.5a4.8 4.8 0 0 1 8.7-2.8 3.5 3.5 0 0 1 1.3 6.8H7a2.5 2.5 0 0 1-.5-5Z"></path><path d="m8 20-1 2"></path><path d="m13 20-1 2"></path><path d="m18 20-1 2"></path></svg>`,
+    `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16"></path><path d="M7 16V9"></path><path d="M12 16V5"></path><path d="M17 16v-4"></path><path d="m6 6 3-3 3 2 5-4"></path></svg>`,
+    `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="2.5"></circle><circle cx="16" cy="9" r="2.5"></circle><circle cx="12" cy="7" r="2.7"></circle><path d="M3.5 19c.4-3 2.2-5 4.5-5 1 0 1.9.3 2.7.9"></path><path d="M20.5 19c-.4-3-2.2-5-4.5-5-1 0-1.9.3-2.7.9"></path><path d="M7.5 20c.3-3.6 2-5.8 4.5-5.8s4.2 2.2 4.5 5.8"></path></svg>`
+  ];
 
   /*
    * Coordenadas de referencia cartográfica abierta. No representan polígonos
@@ -671,7 +678,7 @@
               aria-label="Activar capa ${escapeHtml(mode.label)}"
             >
               <div class="territory-card-index">0${index + 1}</div>
-              <div class="territory-focus-icon" aria-hidden="true">${["⌖","◫","✓","◎"][index]}</div>
+              <div class="territory-focus-icon" aria-hidden="true">${TERRITORY_FOCUS_ICONS[index]}</div>
               <span>${escapeHtml(mode.label).toUpperCase()}</span>
               <h3>${escapeHtml([
                 "Conozca cada lugar",
@@ -681,7 +688,7 @@
               ][index])}</h3>
               <p>${escapeHtml(mode.description)}</p>
               <button type="button" tabindex="-1">
-                Abrir capa <b aria-hidden="true">↗</b>
+                Abrir capa <b aria-hidden="true">→</b>
               </button>
             </article>`).join("")}
         </div>

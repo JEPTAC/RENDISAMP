@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.24-home-motion-color";
+  const PORTAL_BUILD = "11.25-hero-grid-responsive";
 
   /*
    * Arranque visual temprano.
