@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.28-map-contrast-popup-wide";
+  const PORTAL_BUILD = "11.29-immersive-start";
 
   /*
    * Arranque visual temprano.

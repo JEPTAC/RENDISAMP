@@ -900,6 +900,142 @@
     hero.classList.remove("home-hero--banner-inside");
   }
 
+
+
+  function setupImmersiveIntro() {
+    if (pageName() !== "home") return;
+
+    const intro = document.getElementById("immersiveExperience");
+    const rail = document.getElementById("immersiveRail");
+    const stage = intro?.querySelector(".immersive-intro__stage");
+    const title = document.getElementById("immersiveStoryTitle");
+    const body = document.getElementById("immersiveStoryText");
+    const stepLabel = document.getElementById("immersiveStepLabel");
+    const progressText = document.getElementById("immersiveProgressText");
+    const hero = intro?.querySelector(".immersive-intro__hero");
+    const chapter = intro?.querySelector(".immersive-intro__chapter");
+    const scene = intro?.querySelector(".immersive-intro__scene");
+
+    if (!intro || !rail || !stage || !title || !body || !stepLabel || !progressText) {
+      return;
+    }
+
+    const chapters = [
+      {
+        step: "01 · Recorrido",
+        label: "Inicio",
+        title: "Entrada editorial de la gestión",
+        text: "Un inicio cinematográfico que introduce a San Pedro, la rendición de cuentas y la navegación por vigencias con profundidad visual."
+      },
+      {
+        step: "02 · Vigencias",
+        label: "Vigencias",
+        title: "Cada año vive en su propio espacio",
+        text: "La experiencia muestra que cada vigencia es una edición consultable, con contexto, recursos y continuidad histórica."
+      },
+      {
+        step: "03 · Territorio",
+        label: "Territorio",
+        title: "El territorio se explora con intención",
+        text: "Mapas, capas y recorridos se integran como una escena navegable para que el municipio se sienta vivo y verificable."
+      },
+      {
+        step: "04 · Recursos",
+        label: "Recursos",
+        title: "Los documentos se abren sin saturar la portada",
+        text: "Informes, videos, presentaciones y repositorios se descubren como parte del relato, sin romper la experiencia visual."
+      },
+      {
+        step: "05 · Noticias",
+        label: "Noticias",
+        title: "La gestión también se cuenta en tiempo real",
+        text: "Novedades, avances y publicaciones refuerzan la sensación de actualidad y convierten el portal en una experiencia dinámica."
+      },
+      {
+        step: "06 · Participación",
+        label: "Participación",
+        title: "La ciudadanía también forma parte del recorrido",
+        text: "Ideas visibles, estados claros y respuestas públicas cierran el recorrido con una experiencia que invita a participar."
+      }
+    ];
+
+    const buttons = [...rail.querySelectorAll("button[data-step]")];
+    const total = chapters.length;
+
+    if (!intro.dataset.bound) {
+      intro.dataset.bound = "true";
+      buttons.forEach(button => {
+        button.addEventListener("click", () => {
+          const step = Number(button.dataset.step || 0);
+          const maxScroll = Math.max(intro.offsetHeight - window.innerHeight, 1);
+          const target = intro.offsetTop + maxScroll * (step / (total - 1));
+          window.scrollTo({
+            top: target,
+            behavior: prefersReducedMotion() ? "auto" : "smooth"
+          });
+        });
+      });
+    }
+
+    const update = intro._immersiveUpdate || (() => {
+      if (window.innerWidth <= 900) return;
+
+      const rect = intro.getBoundingClientRect();
+      const maxProgress = Math.max(intro.offsetHeight - window.innerHeight, 1);
+      const progress = Math.min(Math.max((-rect.top) / maxProgress, 0), 1);
+      const exact = progress * (total - 1);
+      const index = Math.min(total - 1, Math.max(0, Math.round(exact)));
+      const chapterData = chapters[index];
+
+      stepLabel.textContent = chapterData.step;
+      title.textContent = chapterData.title;
+      body.textContent = chapterData.text;
+      progressText.textContent = `Capítulo ${index + 1} de ${total}`;
+
+      buttons.forEach((button, buttonIndex) => {
+        button.classList.toggle("is-active", buttonIndex === index);
+      });
+
+      if (scene) {
+        scene.style.transform = `translate3d(0, ${(-progress * 34).toFixed(2)}px, 0) scale(${(1 + progress * 0.045).toFixed(4)})`;
+      }
+      if (hero) {
+        hero.style.transform = `translate3d(0, ${(progress * -18).toFixed(2)}px, 0)`;
+        hero.style.opacity = `${(1 - progress * 0.14).toFixed(3)}`;
+      }
+      if (chapter) {
+        chapter.style.transform = `translate3d(0, ${(progress * -8).toFixed(2)}px, 0)`;
+      }
+
+      const glowA = intro.querySelector(".immersive-intro__skyglow--a");
+      const glowB = intro.querySelector(".immersive-intro__skyglow--b");
+      const contours = intro.querySelector(".immersive-intro__contours");
+      const beam = intro.querySelector(".immersive-intro__beam");
+      const particles = intro.querySelector(".immersive-intro__particles");
+      const terrainBack = intro.querySelector(".immersive-intro__terrain--back");
+      const terrainFront = intro.querySelector(".immersive-intro__terrain--front");
+      const lake = intro.querySelector(".immersive-intro__lake");
+      if (glowA) glowA.style.transform = `translate3d(${(progress * 18).toFixed(2)}px, ${(progress * 12).toFixed(2)}px, 0)`;
+      if (glowB) glowB.style.transform = `translate3d(${(-progress * 12).toFixed(2)}px, ${(-progress * 8).toFixed(2)}px, 0)`;
+      if (contours) contours.style.transform = `translate3d(${(-progress * 12).toFixed(2)}px, ${(progress * 10).toFixed(2)}px, 0)`;
+      if (beam) beam.style.opacity = `${(0.34 + (1 - progress) * 0.22).toFixed(3)}`;
+      if (particles) particles.style.transform = `translate3d(${(-progress * 10).toFixed(2)}px, ${(progress * 16).toFixed(2)}px, 0)`;
+      if (terrainBack) terrainBack.style.transform = `translate3d(${(-progress * 14).toFixed(2)}px, ${(progress * -6).toFixed(2)}px, 0)`;
+      if (terrainFront) terrainFront.style.transform = `translate3d(${(progress * 8).toFixed(2)}px, ${(progress * 4).toFixed(2)}px, 0)`;
+      if (lake) lake.style.transform = `translate3d(${(-progress * 5).toFixed(2)}px, ${(progress * 2).toFixed(2)}px, 0)`;
+    });
+
+    intro._immersiveUpdate = update;
+    update();
+
+    if (!intro.dataset.immersiveListeners) {
+      intro.dataset.immersiveListeners = "true";
+      window.addEventListener("scroll", update, {passive:true});
+      window.addEventListener("resize", update, {passive:true});
+    }
+  }
+
+
   function refresh() {
     ensurePageClass();
     addCursorGlow();
@@ -907,6 +1043,7 @@
     addPageSignature();
     normalizeHomeHeroStructure();
     bindHomeHeroMotion();
+    setupImmersiveIntro();
     const sections = decorateSections();
     accentTitleLastWords(document);
     decorateCards();
