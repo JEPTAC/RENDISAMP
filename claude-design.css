@@ -13406,3 +13406,13 @@ html[data-viewport-tier="large"] body.claude-page-home .site-shell{
   background:linear-gradient(180deg,#ffffff,#e8f4ff)!important;
   box-shadow:0 10px 22px rgba(5,45,91,.12)!important;
 }
+
+/* V11.28.1 · Contraste del botón Presentar una idea */
+.claude-page-ideas .page-hero .year-selector-card #openIdeaForm,
+.claude-page-ideas .page-hero .year-selector-card #openIdeaForm *,
+.claude-page-ideas .page-hero .year-selector-card .button-primary,
+.claude-page-ideas .page-hero .year-selector-card .button-primary *{
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  text-shadow:0 1px 1px rgba(5,45,91,.16)!important;
+}
