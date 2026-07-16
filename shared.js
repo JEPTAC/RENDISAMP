@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.27-adaptive-balance";
+  const PORTAL_BUILD = "11.28-map-contrast-popup-wide";
 
   /*
    * Arranque visual temprano.
@@ -482,27 +482,29 @@ function ensureFeedbackStyles() {
     .sp-loading-popup__backdrop{
       position:absolute;
       inset:0;
-      background:rgba(3,20,42,.52);
+      background:rgba(8,26,52,.42);
       backdrop-filter:blur(7px);
     }
     .sp-loading-popup__card{
       position:relative;
       z-index:2;
       display:grid;
-      justify-items:center;
-      gap:8px;
-      width:min(260px,calc(100vw - 36px));
-      min-height:250px;
-      padding:24px 22px 22px;
+      grid-template-columns:auto minmax(0,1fr);
+      align-items:center;
+      gap:16px 18px;
+      width:min(520px,calc(100vw - 36px));
+      min-height:170px;
+      padding:20px 22px;
       overflow:hidden;
       border:1px solid rgba(255,255,255,.24);
-      border-radius:30px;
+      border-radius:28px;
       color:#fff;
-      text-align:center;
+      text-align:left;
       background:
-        radial-gradient(circle at 50% 18%,rgba(67,195,232,.20),transparent 34%),
-        linear-gradient(155deg,#061d3b,#0a376c 60%,#126ab6);
-      box-shadow:0 34px 95px rgba(3,20,42,.44),
+        radial-gradient(circle at 16% 26%,rgba(110,245,228,.30),transparent 18%),
+        radial-gradient(circle at 84% 18%,rgba(255,255,255,.18),transparent 18%),
+        linear-gradient(135deg,#3da3e8 0%,#53c1ef 24%,#6caeff 52%,#8b82f0 76%,#5c63d8 100%);
+      box-shadow:0 34px 95px rgba(3,20,42,.34),
         inset 0 1px 0 rgba(255,255,255,.18);
       transform:translateY(10px) scale(.97);
       transition:transform .28s cubic-bezier(.2,.8,.2,1),background .28s ease;
@@ -512,43 +514,68 @@ function ensureFeedbackStyles() {
     }
     .sp-loading-popup.is-success .sp-loading-popup__card{
       background:
-        radial-gradient(circle at 50% 18%,rgba(101,226,176,.19),transparent 34%),
-        linear-gradient(155deg,#062f2a,#08725f 62%,#39b980);
+        radial-gradient(circle at 16% 26%,rgba(186,255,227,.28),transparent 18%),
+        linear-gradient(135deg,#36b48b 0%,#49c5a0 48%,#5ed2be 100%);
     }
     .sp-loading-popup.is-error .sp-loading-popup__card{
       background:
-        radial-gradient(circle at 50% 18%,rgba(255,173,142,.18),transparent 34%),
-        linear-gradient(155deg,#4b1d20,#8a312c 62%,#c8513d);
+        radial-gradient(circle at 16% 26%,rgba(255,228,210,.28),transparent 18%),
+        linear-gradient(135deg,#dc6b53 0%,#e88362 42%,#ef9d72 100%);
     }
     .sp-loading-popup__gif{
       display:block;
-      width:146px;
-      height:146px;
+      grid-column:1;
+      grid-row:1 / span 2;
+      width:132px;
+      height:132px;
       object-fit:contain;
       background:transparent;
       filter:drop-shadow(0 14px 24px rgba(0,0,0,.25));
     }
-    .sp-loading-popup__title{
+    .sp-loading-popup__title,
+    .sp-loading-popup__message{
+      grid-column:2;
       color:#fff;
-      font:800 21px/1.05 "Century Gothic",Arial,sans-serif;
-      letter-spacing:-.035em;
+    }
+    .sp-loading-popup__title{
+      font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive;
+      font-size:36px;
+      font-weight:400;
+      line-height:.96;
+      letter-spacing:.01em;
     }
     .sp-loading-popup__message{
-      max-width:205px;
-      color:rgba(255,255,255,.80);
-      font:600 10px/1.48 "Century Gothic",Arial,sans-serif;
+      max-width:none;
+      color:rgba(255,255,255,.95);
+      font:600 italic 13px/1.55 "Century Gothic",Arial,sans-serif;
     }
     html.has-sp-loading-popup{
       overflow:hidden;
     }
-    @media (max-width:580px){
+    @media (max-width:640px){
       .sp-loading-popup__card{
-        width:min(240px,calc(100vw - 30px));
-        min-height:236px;
+        grid-template-columns:1fr;
+        width:min(300px,calc(100vw - 28px));
+        min-height:0;
+        padding:20px 18px;
+        text-align:center;
+      }
+      .sp-loading-popup__gif,
+      .sp-loading-popup__title,
+      .sp-loading-popup__message{
+        grid-column:auto;
+        grid-row:auto;
       }
       .sp-loading-popup__gif{
-        width:134px;
-        height:134px;
+        width:118px;
+        height:118px;
+        margin-inline:auto;
+      }
+      .sp-loading-popup__title{
+        font-size:32px;
+      }
+      .sp-loading-popup__message{
+        font-size:12px;
       }
     }
   `;
