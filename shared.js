@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.26-kinetic-hero-buttons";
+  const PORTAL_BUILD = "11.27-adaptive-balance";
 
   /*
    * Arranque visual temprano.

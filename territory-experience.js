@@ -1464,27 +1464,9 @@
   }
 
   function focusCardMotion(card) {
-    if (
-      matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      !matchMedia("(hover:hover) and (pointer:fine)").matches
-    ) return;
-
-    let frame = 0;
-    card.addEventListener("pointermove",event => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        const rect = card.getBoundingClientRect();
-        const x = (event.clientX - rect.left) / rect.width - .5;
-        const y = (event.clientY - rect.top) / rect.height - .5;
-        card.style.setProperty("--territory-card-x",x.toFixed(3));
-        card.style.setProperty("--territory-card-y",y.toFixed(3));
-      });
-    },{passive:true});
-    card.addEventListener("pointerleave",() => {
-      card.style.removeProperty("--territory-card-x");
-      card.style.removeProperty("--territory-card-y");
-    },{passive:true});
+    if (!card) return;
+    card.classList.add("cd-card","cd-reveal");
+    window.ClaudeStudio?.bindBalance?.(card);
   }
 
   function ensureAdminDialog() {

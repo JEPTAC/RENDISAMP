@@ -22,7 +22,11 @@
     refreshIdle:null,
     railSignature:"",
     cursorFrame:0,
-    cardRects:new WeakMap()
+    cardRects:new WeakMap(),
+    balanceControllers:new WeakMap(),
+    adaptiveResizeTimer:0,
+    longTaskObserver:null,
+    longTaskCount:0
   };
 
   const reducedMotionQuery = window.matchMedia(
@@ -34,6 +38,137 @@
 
   const prefersReducedMotion = () => reducedMotionQuery.matches;
   const supportsFinePointer = () => finePointerQuery.matches;
+
+
+  function viewportTier() {
+    const width = Math.max(document.documentElement.clientWidth,window.innerWidth || 0);
+    const height = Math.max(document.documentElement.clientHeight,window.innerHeight || 0);
+
+    if (width < 768) return "mobile";
+    if (height < 740) return "legacy";
+    if (width >= 1920 && height >= 900) return "ultra";
+    if (width >= 1440 && height >= 780) return "large";
+    if (width < 1120 || height < 780) return "compact";
+    return "standard";
+  }
+
+  function motionTier() {
+    const viewport = viewportTier();
+    const connection = navigator.connection
+      || navigator.mozConnection
+      || navigator.webkitConnection;
+    const saveData = Boolean(connection?.saveData);
+    const cores = Number(navigator.hardwareConcurrency || 0);
+    const memory = Number(navigator.deviceMemory || 0);
+    const width = Math.max(document.documentElement.clientWidth,window.innerWidth || 0);
+    const height = Math.max(document.documentElement.clientHeight,window.innerHeight || 0);
+
+    if (
+      prefersReducedMotion()
+      || saveData
+      || viewport === "mobile"
+      || viewport === "legacy"
+    ) return "low";
+
+    const knownHighHardware = cores >= 8 && memory >= 8;
+    const strongFallback = !memory && cores >= 8 && width >= 1800 && height >= 820;
+
+    if (
+      supportsFinePointer()
+      && width >= 1280
+      && height >= 720
+      && (knownHighHardware || strongFallback)
+    ) return "high";
+
+    if (
+      supportsFinePointer()
+      && width >= 1024
+      && (cores >= 4 || !cores)
+      && (memory >= 4 || !memory)
+    ) return "medium";
+
+    return "low";
+  }
+
+  function setExperienceTier(nextMotion = motionTier()) {
+    const nextViewport = viewportTier();
+    const root = document.documentElement;
+    const body = document.body;
+
+    root.dataset.motionTier = nextMotion;
+    root.dataset.viewportTier = nextViewport;
+    if (body) {
+      body.dataset.motionTier = nextMotion;
+      body.dataset.viewportTier = nextViewport;
+    }
+
+    window.PortalExperience = {
+      motionTier:nextMotion,
+      viewportTier:nextViewport,
+      cores:Number(navigator.hardwareConcurrency || 0),
+      memory:Number(navigator.deviceMemory || 0),
+      saveData:Boolean(
+        (navigator.connection
+          || navigator.mozConnection
+          || navigator.webkitConnection)?.saveData
+      )
+    };
+
+    if (nextMotion !== "high") {
+      document.querySelector(".cd-cursor-glow")?.remove();
+    }
+
+    return window.PortalExperience;
+  }
+
+  function downgradeMotionTier() {
+    const current = document.documentElement.dataset.motionTier;
+    if (current === "high") setExperienceTier("medium");
+    else if (current === "medium") setExperienceTier("low");
+  }
+
+  function installAdaptiveExperience() {
+    setExperienceTier();
+
+    const refreshTier = () => {
+      clearTimeout(state.adaptiveResizeTimer);
+      state.adaptiveResizeTimer = window.setTimeout(() => {
+        setExperienceTier();
+        addCursorGlow();
+      },160);
+    };
+
+    window.addEventListener("resize",refreshTier,{passive:true});
+    reducedMotionQuery.addEventListener?.("change",refreshTier);
+    finePointerQuery.addEventListener?.("change",refreshTier);
+
+    const connection = navigator.connection
+      || navigator.mozConnection
+      || navigator.webkitConnection;
+    connection?.addEventListener?.("change",refreshTier);
+
+    if (
+      "PerformanceObserver" in window
+      && document.documentElement.dataset.motionTier === "high"
+    ) {
+      try {
+        state.longTaskObserver = new PerformanceObserver(list => {
+          list.getEntries().forEach(entry => {
+            if (entry.duration < 80) return;
+            state.longTaskCount += 1;
+            if (state.longTaskCount >= 3) {
+              downgradeMotionTier();
+              state.longTaskObserver?.disconnect();
+              state.longTaskObserver = null;
+            }
+          });
+        });
+        state.longTaskObserver.observe({entryTypes:["longtask"]});
+      } catch (_) {
+        state.longTaskObserver = null;
+      }
+    }
+  }
 
   function pageName() {
     const filename = (location.pathname.split("/").pop() || "").toLowerCase();
@@ -76,6 +211,7 @@
     );
     document.documentElement.dataset.claudePage = page;
     applyHeroLayoutClass();
+    setExperienceTier(document.documentElement.dataset.motionTier || motionTier());
   }
 
   function sectionTitle(section) {
@@ -87,7 +223,7 @@
 
   function accentTitleLastWords(root = document) {
     const headings = root.querySelectorAll(
-      "main h1, main h2, main h3"
+      "main h1, main h2, main h3, .site-footer h2, .site-footer h3"
     );
 
     headings.forEach(heading => {
@@ -165,22 +301,7 @@
   }
 
   function addHeroAtmosphere() {
-    const hero = document.querySelector(
-      ".home-hero,.page-hero,.news-page-hero"
-    );
-    if (!hero || hero.querySelector(":scope > .bs-hero-atmosphere")) return;
-
-    const atmosphere = document.createElement("div");
-    atmosphere.className = "bs-hero-atmosphere";
-    atmosphere.setAttribute("aria-hidden","true");
-    atmosphere.innerHTML = `
-      <span class="bs-hero-atmosphere__grid"></span>
-      <span class="bs-hero-atmosphere__ribbon bs-hero-atmosphere__ribbon--a"></span>
-      <span class="bs-hero-atmosphere__ribbon bs-hero-atmosphere__ribbon--b"></span>
-      <span class="bs-hero-atmosphere__orbit"></span>
-      <span class="bs-hero-atmosphere__particles"></span>
-      <span class="bs-hero-atmosphere__flare"></span>`;
-    hero.prepend(atmosphere);
+    document.querySelectorAll(".bs-hero-atmosphere").forEach(node => node.remove());
   }
 
   function addAmbient(section,index) {
@@ -232,6 +353,7 @@
 
   const CARD_SELECTOR = [
     ".edition-card",
+    ".territory-focus-card",
     ".deal-card",
     ".quote-card",
     ".trust-card",
@@ -254,58 +376,168 @@
     ".request-summary > article"
   ].join(",");
 
+  function createBalanceController(element,options = {}) {
+    if (!element || state.balanceControllers.has(element)) {
+      return state.balanceControllers.get(element) || null;
+    }
+
+    const controller = {
+      element,
+      current:{rx:0,ry:0,rz:0,x:0,y:0,scale:1},
+      target:{rx:0,ry:0,rz:0,x:0,y:0,scale:1},
+      velocity:{rx:0,ry:0,rz:0,x:0,y:0,scale:0},
+      frame:0,
+      active:false,
+      options
+    };
+
+    const keys = ["rx","ry","rz","x","y","scale"];
+    const render = () => {
+      controller.frame = 0;
+      const tier = document.documentElement.dataset.motionTier || "low";
+      const stiffness = tier === "high" ? .13 : tier === "medium" ? .16 : .2;
+      const damping = tier === "high" ? .78 : tier === "medium" ? .72 : .64;
+      let moving = false;
+
+      keys.forEach(key => {
+        controller.velocity[key] += (
+          controller.target[key] - controller.current[key]
+        ) * stiffness;
+        controller.velocity[key] *= damping;
+        controller.current[key] += controller.velocity[key];
+        if (
+          Math.abs(controller.target[key] - controller.current[key]) > .004
+          || Math.abs(controller.velocity[key]) > .004
+        ) moving = true;
+      });
+
+      element.style.setProperty("--balance-rx",`${controller.current.rx.toFixed(3)}deg`);
+      element.style.setProperty("--balance-ry",`${controller.current.ry.toFixed(3)}deg`);
+      element.style.setProperty("--balance-rz",`${controller.current.rz.toFixed(3)}deg`);
+      element.style.setProperty("--balance-x",`${controller.current.x.toFixed(3)}px`);
+      element.style.setProperty("--balance-y",`${controller.current.y.toFixed(3)}px`);
+      element.style.setProperty("--balance-scale",controller.current.scale.toFixed(4));
+
+      if (moving) controller.frame = requestAnimationFrame(render);
+      else element.classList.remove("is-balancing");
+    };
+
+    controller.schedule = () => {
+      element.classList.add("is-balancing");
+      if (!controller.frame) controller.frame = requestAnimationFrame(render);
+    };
+
+    controller.set = values => {
+      Object.assign(controller.target,values);
+      controller.schedule();
+    };
+
+    controller.impulse = values => {
+      Object.entries(values).forEach(([key,value]) => {
+        if (key in controller.velocity) controller.velocity[key] += value;
+      });
+      controller.schedule();
+    };
+
+    controller.release = () => {
+      controller.active = false;
+      controller.set({rx:0,ry:0,rz:0,x:0,y:0,scale:1});
+    };
+
+    element.classList.add("weighted-balance");
+    element.style.setProperty("--balance-origin",options.origin || "50% 100%");
+    element.dataset.balanceRole = options.role || "card";
+    state.balanceControllers.set(element,controller);
+    return controller;
+  }
+
   function bindCardMotion(card) {
-    if (card.dataset.cdMotion === "1") return;
-    card.dataset.cdMotion = "1";
-    card.classList.add("cd-card", "cd-reveal");
+    if (card.dataset.cdMotion === "3") return;
+    card.dataset.cdMotion = "3";
+    card.classList.add("cd-card","cd-reveal");
 
     const siblings = [...(card.parentElement?.children || [])];
     const index = Math.max(siblings.indexOf(card),0);
-    card.style.setProperty("--cd-order", String(index));
+    card.style.setProperty("--cd-order",String(index));
 
-    if (prefersReducedMotion() || !supportsFinePointer()) return;
+    const origin = index % 2 === 0 ? "16% 100%" : "84% 100%";
+    const controller = createBalanceController(card,{
+      role:card.matches(".territory-focus-card") ? "territory" : "card",
+      origin
+    });
+    if (!controller || prefersReducedMotion()) return;
 
-    let frame = 0;
-    let latestEvent = null;
+    let pressed = false;
+    let last = {nx:0,ny:0};
 
-    const cacheRect = () => {
-      state.cardRects.set(card,card.getBoundingClientRect());
+    const coordinates = event => {
+      const rect = card.getBoundingClientRect();
+      return {
+        nx:Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2)),
+        ny:Math.max(-1,Math.min(1,((event.clientY-rect.top)/rect.height-.5)*2))
+      };
     };
 
-    card.addEventListener("pointerenter",cacheRect,{passive:true});
-
-    card.addEventListener("pointermove",event => {
-      if (event.pointerType === "touch") return;
-      latestEvent = event;
-      if (frame) return;
-
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        const rect = state.cardRects.get(card)
-          || card.getBoundingClientRect();
-        const x = Math.max(
-          0,
-          Math.min(1,(latestEvent.clientX - rect.left) / rect.width)
-        );
-        const y = Math.max(
-          0,
-          Math.min(1,(latestEvent.clientY - rect.top) / rect.height)
-        );
-
-        card.style.setProperty("--cd-x",`${(x * 100).toFixed(1)}%`);
-        card.style.setProperty("--cd-y",`${(y * 100).toFixed(1)}%`);
-        card.style.setProperty("--cd-rx",`${((.5 - y) * 1.8).toFixed(2)}deg`);
-        card.style.setProperty("--cd-ry",`${((x - .5) * 2.5).toFixed(2)}deg`);
+    const applyWeight = (event,strong = false) => {
+      const tier = document.documentElement.dataset.motionTier || "low";
+      const point = coordinates(event);
+      last = point;
+      const base = tier === "high" ? 5.4 : tier === "medium" ? 3.6 : 2.1;
+      const weight = strong ? 1.18 : .62;
+      controller.set({
+        rx:-point.ny * base * weight,
+        ry:point.nx * base * .82 * weight,
+        rz:point.nx * base * .34 * weight,
+        x:point.nx * (tier === "high" ? 2.4 : 1.2) * weight,
+        y:Math.abs(point.nx) * -.65 * weight,
+        scale:strong ? .992 : .998
       });
+      card.style.setProperty("--balance-light-x",`${((point.nx+1)*50).toFixed(1)}%`);
+      card.style.setProperty("--balance-light-y",`${((point.ny+1)*50).toFixed(1)}%`);
+    };
+
+    card.addEventListener("pointerdown",event => {
+      pressed = true;
+      controller.active = true;
+      card.classList.add("is-weighted");
+      applyWeight(event,true);
+      controller.impulse({
+        rz:last.nx * .36,
+        ry:last.nx * .42,
+        rx:-last.ny * .32
+      });
+      card.setPointerCapture?.(event.pointerId);
     },{passive:true});
 
-    card.addEventListener("pointerleave",() => {
-      if (frame) cancelAnimationFrame(frame);
-      frame = 0;
-      latestEvent = null;
-      state.cardRects.delete(card);
-      card.style.setProperty("--cd-rx","0deg");
-      card.style.setProperty("--cd-ry","0deg");
+    card.addEventListener("pointermove",event => {
+      const tier = document.documentElement.dataset.motionTier || "low";
+      if (!pressed && (tier === "low" || !supportsFinePointer())) return;
+      applyWeight(event,pressed);
+    },{passive:true});
+
+    const release = event => {
+      if (!pressed && event?.type !== "pointerleave") return;
+      pressed = false;
+      card.classList.remove("is-weighted");
+      controller.impulse({
+        rz:-last.nx * .7,
+        ry:-last.nx * .5,
+        rx:last.ny * .45
+      });
+      controller.release();
+      if (event?.pointerId !== undefined && card.hasPointerCapture?.(event.pointerId)) {
+        card.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    card.addEventListener("pointerup",release,{passive:true});
+    card.addEventListener("pointercancel",release,{passive:true});
+    card.addEventListener("lostpointercapture",release,{passive:true});
+    card.addEventListener("pointerleave",event => {
+      if (!pressed) {
+        controller.release();
+        card.classList.remove("is-weighted");
+      }
     },{passive:true});
   }
 
@@ -499,12 +731,18 @@
   }
 
   function addCursorGlow() {
+    const highTier = document.documentElement.dataset.motionTier === "high";
+    const existing = document.querySelector(".cd-cursor-glow");
     if (
-      prefersReducedMotion() ||
-      !supportsFinePointer() ||
-      window.innerWidth < 900 ||
-      document.querySelector(".cd-cursor-glow")
-    ) return;
+      !highTier
+      || prefersReducedMotion()
+      || !supportsFinePointer()
+      || window.innerWidth < 1100
+    ) {
+      existing?.remove();
+      return;
+    }
+    if (existing) return;
 
     const glow = document.createElement("div");
     glow.className = "cd-cursor-glow";
@@ -523,79 +761,121 @@
 
       state.cursorFrame = requestAnimationFrame(() => {
         state.cursorFrame = 0;
+        if (!glow.isConnected) return;
         glow.style.transform = `translate3d(${x}px,${y}px,0)`;
       });
     },{passive:true});
   }
 
 
-
-
   function bindHomeHeroMotion() {
     if (pageName() !== "home") return;
     const hero = document.querySelector(".home-hero");
-    if (!hero || hero.dataset.cdHeroMotion === "2") return;
-    hero.dataset.cdHeroMotion = "2";
+    const copy = hero?.querySelector(".home-hero__copy");
+    const visual = hero?.querySelector(".home-hero__visual");
+    const progress = hero?.querySelector(".hero-float-card");
+    if (!hero || !copy || !visual || hero.dataset.cdHeroMotion === "3") return;
+    hero.dataset.cdHeroMotion = "3";
 
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let frame = 0;
-    let visible = true;
+    const copyBalance = createBalanceController(copy,{
+      role:"hero-copy",
+      origin:"0% 56%"
+    });
+    const visualBalance = createBalanceController(visual,{
+      role:"hero-visual",
+      origin:"100% 56%"
+    });
+    const progressBalance = progress
+      ? createBalanceController(progress,{role:"hero-progress",origin:"100% 100%"})
+      : null;
 
-    const render = () => {
-      frame = 0;
-      if (!visible || document.hidden) return;
-      currentX += (targetX - currentX) * 0.105;
-      currentY += (targetY - currentY) * 0.105;
-      hero.style.setProperty("--hero-x",currentX.toFixed(3));
-      hero.style.setProperty("--hero-y",currentY.toFixed(3));
-      if (Math.abs(targetX-currentX) > .002 || Math.abs(targetY-currentY) > .002) {
-        frame = requestAnimationFrame(render);
+    if (prefersReducedMotion()) return;
+
+    let pressed = false;
+    let last = {nx:0,ny:0};
+
+    const coordinates = event => {
+      const rect = hero.getBoundingClientRect();
+      return {
+        nx:Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2)),
+        ny:Math.max(-1,Math.min(1,((event.clientY-rect.top)/rect.height-.5)*2))
+      };
+    };
+
+    const apply = (event,strong = false) => {
+      const tier = document.documentElement.dataset.motionTier || "low";
+      const point = coordinates(event);
+      last = point;
+      const amplitude = tier === "high" ? 3.2 : tier === "medium" ? 1.9 : 1.05;
+      const force = strong ? 1.22 : .58;
+
+      copyBalance?.set({
+        rx:-point.ny * amplitude * .38 * force,
+        ry:point.nx * amplitude * .46 * force,
+        rz:-point.nx * amplitude * .13 * force,
+        x:point.nx * amplitude * .34 * force,
+        y:point.ny * amplitude * .18 * force,
+        scale:strong ? .998 : 1
+      });
+      visualBalance?.set({
+        rx:-point.ny * amplitude * .7 * force,
+        ry:point.nx * amplitude * force,
+        rz:point.nx * amplitude * .22 * force,
+        x:point.nx * amplitude * 1.25 * force,
+        y:point.ny * amplitude * .72 * force,
+        scale:strong ? .996 : 1
+      });
+      progressBalance?.set({
+        rx:-point.ny * amplitude * .65 * force,
+        ry:point.nx * amplitude * .78 * force,
+        rz:point.nx * amplitude * .24 * force,
+        x:point.nx * amplitude * .8 * force,
+        y:point.ny * amplitude * .5 * force,
+        scale:strong ? .987 : 1
+      });
+
+      hero.style.setProperty("--hero-weight-x",`${((point.nx+1)*50).toFixed(1)}%`);
+      hero.style.setProperty("--hero-weight-y",`${((point.ny+1)*50).toFixed(1)}%`);
+    };
+
+    hero.addEventListener("pointerdown",event => {
+      pressed = true;
+      hero.classList.add("is-hero-weighted");
+      apply(event,true);
+      visualBalance?.impulse({rz:last.nx*.32,ry:last.nx*.4,rx:-last.ny*.32});
+      progressBalance?.impulse({rz:last.nx*.5,ry:last.nx*.36});
+      hero.setPointerCapture?.(event.pointerId);
+    },{passive:true});
+
+    hero.addEventListener("pointermove",event => {
+      const tier = document.documentElement.dataset.motionTier || "low";
+      if (!pressed && (tier === "low" || !supportsFinePointer())) return;
+      apply(event,pressed);
+    },{passive:true});
+
+    const release = event => {
+      if (!pressed && event?.type !== "pointerleave") return;
+      pressed = false;
+      hero.classList.remove("is-hero-weighted");
+      visualBalance?.impulse({rz:-last.nx*.8,ry:-last.nx*.55,rx:last.ny*.5});
+      progressBalance?.impulse({rz:-last.nx*1.1,ry:-last.nx*.7});
+      copyBalance?.release();
+      visualBalance?.release();
+      progressBalance?.release();
+      if (event?.pointerId !== undefined && hero.hasPointerCapture?.(event.pointerId)) {
+        hero.releasePointerCapture(event.pointerId);
       }
     };
 
-    const schedule = () => {
-      if (!frame && visible && !document.hidden) frame = requestAnimationFrame(render);
-    };
-
-    const reset = () => {
-      targetX = 0;
-      targetY = 0;
-      schedule();
-    };
-
-    if (prefersReducedMotion() || !supportsFinePointer()) {
-      hero.style.setProperty("--hero-x","0");
-      hero.style.setProperty("--hero-y","0");
-    } else {
-      hero.addEventListener("pointermove",event => {
-        if (event.pointerType === "touch") return;
-        const rect = hero.getBoundingClientRect();
-        targetX = Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2));
-        targetY = Math.max(-1,Math.min(1,((event.clientY-rect.top)/rect.height-.5)*2));
-        schedule();
-      },{passive:true});
-      hero.addEventListener("pointerleave",reset,{passive:true});
-    }
-
-    if ("IntersectionObserver" in window) {
-      const observer = new IntersectionObserver(entries => {
-        visible = Boolean(entries[0]?.isIntersecting);
-        hero.classList.toggle("hero-motion-paused",!visible);
-        if (visible) schedule();
-        else if (frame) {
-          cancelAnimationFrame(frame);
-          frame = 0;
-        }
-      },{rootMargin:"120px 0px",threshold:.02});
-      observer.observe(hero);
-    }
-
-    document.addEventListener("visibilitychange",() => {
-      hero.classList.toggle("hero-motion-paused",document.hidden || !visible);
-      if (!document.hidden && visible) schedule();
+    hero.addEventListener("pointerup",release,{passive:true});
+    hero.addEventListener("pointercancel",release,{passive:true});
+    hero.addEventListener("lostpointercapture",release,{passive:true});
+    hero.addEventListener("pointerleave",event => {
+      if (!pressed) {
+        copyBalance?.release();
+        visualBalance?.release();
+        progressBalance?.release();
+      }
     },{passive:true});
   }
 
@@ -622,6 +902,7 @@
 
   function refresh() {
     ensurePageClass();
+    addCursorGlow();
     addHeroAtmosphere();
     addPageSignature();
     normalizeHomeHeroStructure();
@@ -695,6 +976,7 @@
     }
 
     state.initialized = true;
+    installAdaptiveExperience();
     ensurePageClass();
     addCursorGlow();
     refresh();
@@ -715,7 +997,12 @@
     document.addEventListener("visibilitychange",syncVisibility,{passive:true});
   }
 
-  window.ClaudeStudio = {init,refresh};
+  window.ClaudeStudio = {
+    init,
+    refresh,
+    bindBalance:bindCardMotion,
+    setExperienceTier
+  };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded",init,{once:true});
