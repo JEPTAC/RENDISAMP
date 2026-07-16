@@ -671,6 +671,7 @@
               aria-label="Activar capa ${escapeHtml(mode.label)}"
             >
               <div class="territory-card-index">0${index + 1}</div>
+              <div class="territory-focus-icon" aria-hidden="true">${["⌖","◫","✓","◎"][index]}</div>
               <span>${escapeHtml(mode.label).toUpperCase()}</span>
               <h3>${escapeHtml([
                 "Conozca cada lugar",

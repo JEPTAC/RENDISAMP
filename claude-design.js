@@ -475,6 +475,39 @@
 
 
 
+
+  function bindHomeHeroMotion() {
+    if (pageName() !== "home") return;
+    const hero = document.querySelector(".home-hero");
+    if (!hero || hero.dataset.cdHeroMotion === "1") return;
+    hero.dataset.cdHeroMotion = "1";
+
+    const reset = () => {
+      hero.style.setProperty("--hero-x","0");
+      hero.style.setProperty("--hero-y","0");
+    };
+
+    if (prefersReducedMotion() || !supportsFinePointer()) {
+      reset();
+      return;
+    }
+
+    let frame = 0;
+    hero.addEventListener("pointermove",event => {
+      if (event.pointerType === "touch") return;
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const rect = hero.getBoundingClientRect();
+        const x = Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2));
+        const y = Math.max(-1,Math.min(1,((event.clientY-rect.top)/rect.height-.5)*2));
+        hero.style.setProperty("--hero-x",x.toFixed(3));
+        hero.style.setProperty("--hero-y",y.toFixed(3));
+      });
+    },{passive:true});
+    hero.addEventListener("pointerleave",reset,{passive:true});
+  }
+
   function normalizeHomeHeroStructure() {
     if (pageName() !== "home") return;
 
@@ -501,6 +534,7 @@
     addHeroAtmosphere();
     addPageSignature();
     normalizeHomeHeroStructure();
+    bindHomeHeroMotion();
     const sections = decorateSections();
     decorateCards();
     normalizeAdminControls();

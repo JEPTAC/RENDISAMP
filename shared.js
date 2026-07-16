@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.23-home-recuperado-profesional";
+  const PORTAL_BUILD = "11.24-home-motion-color";
 
   /*
    * Arranque visual temprano.
