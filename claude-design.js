@@ -534,33 +534,69 @@
   function bindHomeHeroMotion() {
     if (pageName() !== "home") return;
     const hero = document.querySelector(".home-hero");
-    if (!hero || hero.dataset.cdHeroMotion === "1") return;
-    hero.dataset.cdHeroMotion = "1";
+    if (!hero || hero.dataset.cdHeroMotion === "2") return;
+    hero.dataset.cdHeroMotion = "2";
+
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let frame = 0;
+    let visible = true;
+
+    const render = () => {
+      frame = 0;
+      if (!visible || document.hidden) return;
+      currentX += (targetX - currentX) * 0.105;
+      currentY += (targetY - currentY) * 0.105;
+      hero.style.setProperty("--hero-x",currentX.toFixed(3));
+      hero.style.setProperty("--hero-y",currentY.toFixed(3));
+      if (Math.abs(targetX-currentX) > .002 || Math.abs(targetY-currentY) > .002) {
+        frame = requestAnimationFrame(render);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame && visible && !document.hidden) frame = requestAnimationFrame(render);
+    };
 
     const reset = () => {
-      hero.style.setProperty("--hero-x","0");
-      hero.style.setProperty("--hero-y","0");
+      targetX = 0;
+      targetY = 0;
+      schedule();
     };
 
     if (prefersReducedMotion() || !supportsFinePointer()) {
-      reset();
-      return;
+      hero.style.setProperty("--hero-x","0");
+      hero.style.setProperty("--hero-y","0");
+    } else {
+      hero.addEventListener("pointermove",event => {
+        if (event.pointerType === "touch") return;
+        const rect = hero.getBoundingClientRect();
+        targetX = Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2));
+        targetY = Math.max(-1,Math.min(1,((event.clientY-rect.top)/rect.height-.5)*2));
+        schedule();
+      },{passive:true});
+      hero.addEventListener("pointerleave",reset,{passive:true});
     }
 
-    let frame = 0;
-    hero.addEventListener("pointermove",event => {
-      if (event.pointerType === "touch") return;
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        const rect = hero.getBoundingClientRect();
-        const x = Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2));
-        const y = Math.max(-1,Math.min(1,((event.clientY-rect.top)/rect.height-.5)*2));
-        hero.style.setProperty("--hero-x",x.toFixed(3));
-        hero.style.setProperty("--hero-y",y.toFixed(3));
-      });
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(entries => {
+        visible = Boolean(entries[0]?.isIntersecting);
+        hero.classList.toggle("hero-motion-paused",!visible);
+        if (visible) schedule();
+        else if (frame) {
+          cancelAnimationFrame(frame);
+          frame = 0;
+        }
+      },{rootMargin:"120px 0px",threshold:.02});
+      observer.observe(hero);
+    }
+
+    document.addEventListener("visibilitychange",() => {
+      hero.classList.toggle("hero-motion-paused",document.hidden || !visible);
+      if (!document.hidden && visible) schedule();
     },{passive:true});
-    hero.addEventListener("pointerleave",reset,{passive:true});
   }
 
   function normalizeHomeHeroStructure() {

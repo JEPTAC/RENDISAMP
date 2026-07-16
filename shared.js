@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.25-hero-grid-responsive";
+  const PORTAL_BUILD = "11.26-kinetic-hero-buttons";
 
   /*
    * Arranque visual temprano.
