@@ -282,7 +282,7 @@
     )].filter(section => {
       if (!section.isConnected) return false;
       if (section.matches(
-        ".home-hero,.page-hero,.news-page-hero,[hidden],.dialog-shell"
+        ".home-hero,.page-hero,.news-page-hero,.projects-psp-shell,[hidden],.dialog-shell"
       )) return false;
       return section.getBoundingClientRect().height > 80;
     });

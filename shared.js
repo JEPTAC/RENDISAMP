@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.38-sin-explorador";
+  const PORTAL_BUILD = "11.39-proyectos-psp";
 
   /*
    * Arranque visual temprano.
@@ -1169,6 +1169,7 @@ helpers.showClickEffect = showClickEffect;
                 <a href="vigencias.html"><b>Archivo histórico</b><span>Ver todas las ediciones</span></a>
               </div>
             </div>
+            <a href="${page === "home" ? "#proyectos" : "index.html#proyectos"}">Proyectos</a>
             <a class="${active("resources")}" href="recursos.html">Recursos</a>
             <a class="${active("news")}" href="noticias.html">Noticias</a>
             <a class="${active("ideas")}" href="ideas.html">Ideas ciudadanas</a>
@@ -1577,6 +1578,7 @@ helpers.showClickEffect = showClickEffect;
         <a class="search-item" href="vigencias.html"><span><strong>Archivo histórico</strong><small>Consulte todas las vigencias</small></span><b>→</b></a>
         <a class="search-item" href="recursos.html"><span><strong>Centro de recursos</strong><small>Informes, videos, datos y respuestas</small></span><b>→</b></a>
         <a class="search-item" href="noticias.html"><span><strong>Noticias y avances</strong><small>Novedades de la gestión y de la Rendición de Cuentas</small></span><b>→</b></a>
+        <a class="search-item" href="index.html#proyectos"><span><strong>Proyectos</strong><small>Biblioteca interactiva de carpetas institucionales</small></span><b>→</b></a>
         <a class="search-item" href="ideas.html"><span><strong>Ideas ciudadanas</strong><small>Propuestas y respuestas institucionales</small></span><b>→</b></a>`;
       return;
     }
@@ -1598,6 +1600,9 @@ helpers.showClickEffect = showClickEffect;
     state.ideas
       .filter(i => `${i.title} ${i.description} ${i.category} ${i.location}`.toLowerCase().includes(q))
       .forEach(i => results.push({ title:i.title, meta:`Idea · ${helpers.statusLabel(i.status)}`, href:`ideas.html?id=${i.id}` }));
+    (Array.isArray(state.content?.projects) ? state.content.projects : [])
+      .filter(item => `${item.title || ""} ${item.category || ""} ${item.description || ""} ${item.year || ""}`.toLowerCase().includes(q))
+      .forEach(item => results.push({ title:item.title || "Proyecto", meta:`Proyecto · ${item.category || "Sin categoría"}`, href:"index.html#proyectos" }));
     state.commitments
       .filter(item => `${item.title} ${item.responsible} ${item.scope} ${item.priority}`.toLowerCase().includes(q))
       .forEach(item => results.push({ title:item.title, meta:`Compromiso ${item.year} · ${item.priority}`, href:`rendicion-${item.year}.html#seguimiento` }));
