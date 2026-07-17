@@ -1,0 +1,3 @@
+Portal build: 11.40.6-google-client-configured
+Google OAuth client: 103022555921-i7cqb3o8tc4lbtf7n9endse1d423ck4m.apps.googleusercontent.com
+Firebase popup controller removed: signInWithPopup = 0
