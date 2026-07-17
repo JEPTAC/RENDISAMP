@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Actualizando portal</title>
+  <style>
+    :root{font-family:"Century Gothic",Arial,sans-serif;color:#112b46;background:#f4f8fc}
+    *{box-sizing:border-box}
+    body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px}
+    main{width:min(420px,100%);padding:28px;border:1px solid #dbe6ef;border-radius:20px;background:#fff;box-shadow:0 18px 50px rgba(16,43,70,.12);text-align:center}
+    .mark{width:48px;height:48px;margin:0 auto 18px;border-radius:15px;background:#123d68;display:grid;place-items:center;color:white;font-weight:800}
+    h1{font-size:20px;margin:0 0 8px}p{font-size:14px;line-height:1.55;color:#52687c;margin:0}
+    .bar{height:4px;border-radius:99px;background:#e8eef4;overflow:hidden;margin-top:22px}.bar::after{content:"";display:block;height:100%;width:42%;border-radius:inherit;background:#1f6aa5;animation:move .9s ease-in-out infinite alternate}
+    @keyframes move{to{transform:translateX(138%)}}
+  </style>
+</head>
+<body>
+<main>
+  <div class="mark">SP</div>
+  <h1>Actualizando el portal</h1>
+  <p id="status">Eliminando la versión de autenticación que quedó almacenada.</p>
+  <div class="bar" aria-hidden="true"></div>
+</main>
+<script>
+(async()=>{
+  const status=document.getElementById('status');
+  try{
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(reg=>reg.unregister()));
+    }
+    if('caches' in window){
+      const names=await caches.keys();
+      await Promise.all(names.map(name=>caches.delete(name)));
+    }
+    sessionStorage.removeItem('sp_legacy_coop_sw_removed_v11403');
+    sessionStorage.removeItem('sp_legacy_coop_sw_removed_v11404');
+    sessionStorage.setItem('sp_recovery_v11405','1');
+    status.textContent='Corrección aplicada. Abriendo la versión restaurada…';
+  }catch(error){
+    console.warn('[Portal] La limpieza terminó con observaciones.',error);
+    status.textContent='Abriendo la versión restaurada…';
+  }
+  const target=new URL('index.html',location.href);
+  target.searchParams.set('portal-build','11.40.5-cache-recovery');
+  target.searchParams.set('t',Date.now().toString());
+  setTimeout(()=>location.replace(target.href),450);
+})();
+</script>
+</body>
+</html>

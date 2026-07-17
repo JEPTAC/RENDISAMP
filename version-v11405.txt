@@ -1,0 +1,4 @@
+Portal Histórico San Pedro
+Build: 11.40.5-cache-recovery
+Firebase: restored GoogleAuthProvider + signInWithPopup
+Removed: resolveGoogleOAuthClientId / Google Identity Services credential bridge
