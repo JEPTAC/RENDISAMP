@@ -13417,211 +13417,262 @@ html[data-viewport-tier="large"] body.claude-page-home .site-shell{
   text-shadow:0 1px 1px rgba(5,45,91,.16)!important;
 }
 
+
 /* =========================================================
-   V11.33 · Stack Motion Hover Effects integrado
-   Basado conceptualmente en Codrops Stack Motion Hover Effects.
+   V11.34 · Stack Motion aplicado a tarjetas y figuras
+   Las imágenes permanecen estáticas.
    ========================================================= */
 
 .sm-stack-card{
-  --sm-stack-depth:1;
-  transform-style:preserve-3d;
-}
-
-.sm-stack-host{
-  position:relative;
-  display:block;
-  min-width:0;
-  min-height:0;
-  overflow:hidden;
-  border-radius:var(--sm-stack-radius,20px);
-  perspective:900px;
-  perspective-origin:50% 36%;
-  transform-style:preserve-3d;
+  --sm-card-radius:26px;
+  --sm-live-x:0px;
+  --sm-live-y:0px;
+  --sm-light-x:50%;
+  --sm-light-y:50%;
+  position:relative!important;
+  overflow:visible!important;
   isolation:isolate;
-  background:rgba(214,235,251,.28);
+  transform:none!important;
+  transform-style:preserve-3d;
+  transition:none!important;
 }
 
-.sm-stack-host > .sm-stack-layer{
+.sm-stack-card::before,
+.sm-stack-card::after{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+
+.sm-card-layer,
+.sm-card-surface,
+.sm-card-highlight{
   position:absolute;
   inset:0;
-  z-index:calc(1 + var(--sm-layer-index));
   display:block;
-  border-radius:inherit;
-  opacity:0;
+  border-radius:var(--sm-card-radius);
   pointer-events:none;
+  backface-visibility:hidden;
+  transform-origin:50% 82%;
+  will-change:transform,opacity;
+}
+
+.sm-card-layer{
+  z-index:0;
+  opacity:0;
   background:var(--sm-layer-color);
   background:
-    radial-gradient(circle at 76% 18%,rgba(255,255,255,.28),transparent 24%),
+    radial-gradient(circle at 78% 18%,rgba(255,255,255,.28),transparent 24%),
     linear-gradient(145deg,color-mix(in srgb,var(--sm-layer-color) 88%,white 12%),var(--sm-layer-color));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.28);
-  transform:translate3d(0,0,0) scale(1);
-  transform-origin:50% 100%;
-  will-change:transform,opacity;
-  backface-visibility:hidden;
+  border:1px solid rgba(255,255,255,.20);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+  transition:
+    transform .72s cubic-bezier(.18,.86,.24,1),
+    opacity .38s ease;
 }
 
-.sm-stack-host > .sm-stack-layer::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  border:1px solid rgba(255,255,255,.22);
-  border-radius:inherit;
-  background:linear-gradient(115deg,rgba(255,255,255,.13),transparent 34%,rgba(255,255,255,.04));
+.sm-card-surface{
+  z-index:1;
+  transition:
+    transform .64s cubic-bezier(.18,.86,.24,1),
+    box-shadow .38s ease,
+    border-color .38s ease;
 }
 
-.sm-stack-host > .sm-stack-surface{
-  position:relative!important;
-  z-index:8!important;
-  display:block;
-  width:100%;
-  transform:translate3d(0,0,0) scale(1);
-  transform-origin:50% 100%;
+.sm-card-highlight{
+  z-index:2;
+  opacity:0;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at var(--sm-light-x) var(--sm-light-y),rgba(255,255,255,.24),transparent 32%),
+    linear-gradient(120deg,rgba(255,255,255,.10),transparent 34%,rgba(255,255,255,.025));
+  mix-blend-mode:screen;
+  transition:opacity .34s ease;
+}
+
+.sm-stack-card > :not(.sm-card-layer):not(.sm-card-surface):not(.sm-card-highlight){
+  position:relative;
+  z-index:3;
+}
+
+.sm-card-content-motion{
+  transition:
+    transform .64s cubic-bezier(.18,.86,.24,1),
+    opacity .34s ease;
+  will-change:transform;
+}
+
+.sm-card-figure-motion{
+  transition:
+    transform .68s cubic-bezier(.18,.9,.22,1) var(--sm-figure-delay,0ms),
+    filter .36s ease var(--sm-figure-delay,0ms);
   will-change:transform;
   backface-visibility:hidden;
 }
 
-.sm-stack-card.sm-stack-active .sm-stack-host{
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
+/* Las fotografías, fondos e imágenes no se escalan ni se desplazan. */
+.sm-card-media-static,
+.sm-stack-card .news-visual,
+.sm-stack-card .has-cover-image,
+.sm-stack-card img,
+.sm-stack-card picture,
+.sm-stack-card video{
+  transform:none!important;
+  scale:1!important;
+  translate:none!important;
+  rotate:none!important;
+  animation:none!important;
 }
 
-.sm-stack-card :is(h2,h3,.edition-card__meta,.deal-card__meta,.edition-card__footer a,.deal-card__action,.resource-library-card button,.news-card footer a,.news-feature-card__footer a,.archive-card .button){
-  will-change:transform,opacity;
-}
-
-/* El movimiento de la biblioteca reemplaza el hover vertical básico. */
 .sm-stack-card:hover,
-.sm-stack-card:focus-within{
+.sm-stack-card:focus-within,
+.sm-stack-card[data-stack-active="true"]{
+  transform:none!important;
+  box-shadow:none!important;
+}
+
+.sm-stack-card.sm-stack-active{
+  z-index:12;
+}
+
+.sm-stack-card.sm-stack-active .sm-card-layer{
+  opacity:.72;
+}
+
+.sm-stack-card.sm-stack-active .sm-card-layer--1{
+  transform:translate3d(calc(-7px + var(--sm-live-x)),calc(8px + var(--sm-live-y)),0) rotate(-.38deg) scale(.992);
+}
+
+.sm-stack-card.sm-stack-active .sm-card-layer--2{
+  transform:translate3d(calc(7px + var(--sm-live-x)),calc(14px + var(--sm-live-y)),0) rotate(.42deg) scale(.986);
+  opacity:.58;
+}
+
+.sm-stack-card.sm-stack-active .sm-card-layer--3{
+  transform:translate3d(calc(-10px + var(--sm-live-x)),calc(20px + var(--sm-live-y)),0) rotate(-.52deg) scale(.980);
+  opacity:.42;
+}
+
+.sm-stack-card.sm-stack-active .sm-card-layer--4{
+  transform:translate3d(calc(9px + var(--sm-live-x)),calc(26px + var(--sm-live-y)),0) rotate(.58deg) scale(.974);
+  opacity:.28;
+}
+
+.sm-stack-card.sm-stack-active .sm-card-surface{
+  transform:translate3d(var(--sm-live-x),calc(-4px + var(--sm-live-y)),0) scale(.996);
+  box-shadow:0 22px 48px rgba(8,55,120,.13)!important;
+}
+
+.sm-stack-card.sm-stack-active .sm-card-highlight{
+  opacity:.72;
+}
+
+.sm-stack-card.sm-stack-active .sm-card-content-motion{
+  transform:translate3d(var(--sm-content-x),calc(-5px + var(--sm-content-y)),0);
+}
+
+.sm-stack-card.sm-stack-active .sm-card-figure-motion{
+  transform:translate3d(var(--sm-figure-x),var(--sm-figure-y),0) rotate(var(--sm-figure-r)) scale(1.025);
+  filter:drop-shadow(0 8px 14px rgba(7,61,128,.12));
+}
+
+/* El título y el control principal acompañan la profundidad sin exageración. */
+.sm-stack-card :is(h2,h3,.edition-card__footer a,.deal-card__action,.resource-library-card button,.news-read-link,.archive-card .button){
+  transition:
+    transform .58s cubic-bezier(.18,.86,.24,1),
+    color .25s ease,
+    background .25s ease;
+}
+
+.sm-stack-card.sm-stack-active :is(h2,h3){
+  transform:translate3d(0,-2px,0);
+}
+
+.sm-stack-card.sm-stack-active :is(.edition-card__footer a,.deal-card__action,.resource-library-card button,.news-read-link,.archive-card .button){
+  transform:translate3d(2px,-1px,0);
+}
+
+/* Anula el zoom heredado que todavía afectaba imágenes en noticias. */
+.sm-stack-card:hover .news-visual,
+.sm-stack-card:focus-within .news-visual,
+.sm-stack-card.sm-stack-active .news-visual,
+.sm-stack-card:hover .edition-card__visual,
+.sm-stack-card:hover .deal-card__visual,
+.sm-stack-card:hover .archive-card__visual,
+.sm-stack-card:hover .resource-library-card__cover{
+  transform:none!important;
+  filter:none!important;
+}
+
+/* Conserva el recorte visual dentro de cada bloque de imagen. */
+.sm-stack-card :is(
+  .edition-card__visual,
+  .deal-card__visual,
+  .archive-card__visual,
+  .resource-library-card__cover,
+  .news-feature-card__media,
+  .news-card__media
+){
+  overflow:hidden;
+}
+
+/* Tarjetas horizontales y destacadas mantienen su estructura. */
+.archive-card.sm-stack-card,
+.news-feature-card.sm-stack-card,
+.deal-card.sm-stack-card{
   transform:none!important;
 }
 
-/* El anfitrión conserva el tamaño exacto del medio original. */
-.edition-card > .sm-stack-host,
-.resource-library-card > .sm-stack-host,
-.news-card > .sm-stack-host{
-  align-self:auto;
-  min-height:0;
-  height:auto;
-}
-
-.deal-card > .sm-stack-host,
-.news-feature-card > .sm-stack-host,
-.archive-card > .sm-stack-host{
-  align-self:stretch;
-  min-height:0;
-  height:100%;
-}
-
-.edition-card > .sm-stack-host .edition-card__visual,
-.deal-card > .sm-stack-host .deal-card__visual,
-.resource-library-card > .sm-stack-host .resource-library-card__cover,
-.news-card > .sm-stack-host .news-card__media,
-.news-feature-card > .sm-stack-host .news-feature-card__media,
-.archive-card > .sm-stack-host .archive-card__visual{
-  min-width:100%;
-}
-
-/* En tarjetas de dos columnas, el marco ocupa la columna visual sin deformarla. */
-.archive-card > .sm-stack-host{
-  height:100%;
-  border-radius:inherit 0 0 inherit;
-}
-
-.archive-card > .sm-stack-host .archive-card__visual{
-  height:100%;
-  min-height:360px;
-}
-
-.news-feature-card > .sm-stack-host{
-  height:100%;
-}
-
-.news-feature-card > .sm-stack-host .news-feature-card__media{
-  height:100%;
-}
-
-/* Variación editorial para las tarjetas destacadas del inicio. */
-.home-highlights .deal-card > .sm-stack-host{
-  border-radius:inherit;
-}
-
-.home-highlights .deal-card.sm-stack-active{
-  z-index:8;
-}
-
-/* Respuesta táctil y equipos de recursos limitados. */
-html[data-motion-tier="low"] .sm-stack-host{
-  perspective:none;
-}
-
-html[data-motion-tier="low"] .sm-stack-host > .sm-stack-layer:nth-of-type(n+3){
+/* Equipos de recursos limitados: dos capas y desplazamiento menor. */
+html[data-motion-tier="low"] .sm-card-layer--3,
+html[data-motion-tier="low"] .sm-card-layer--4{
   display:none;
 }
 
-.sm-stack-reduced .sm-stack-host > .sm-stack-layer{
-  display:none!important;
+html[data-motion-tier="low"] .sm-stack-card.sm-stack-active .sm-card-layer--1{
+  transform:translate3d(-4px,6px,0) rotate(-.2deg) scale(.994);
 }
-
-.sm-stack-reduced .sm-stack-surface{
-  transition:transform .22s ease;
+html[data-motion-tier="low"] .sm-stack-card.sm-stack-active .sm-card-layer--2{
+  transform:translate3d(4px,10px,0) rotate(.2deg) scale(.989);
 }
-
-.sm-stack-reduced:focus-within .sm-stack-surface{
-  transform:translate3d(0,-2px,0) scale(.985);
-}
-
-@media (hover:hover) and (pointer:fine){
-  .sm-stack-reduced:hover .sm-stack-surface{
-    transform:translate3d(0,-2px,0) scale(.985);
-  }
+html[data-motion-tier="low"] .sm-stack-card.sm-stack-active .sm-card-surface{
+  transform:translate3d(0,-2px,0) scale(.998);
 }
 
 @media (max-width:760px){
-  .sm-stack-host{
-    perspective:none;
-  }
-
-  .sm-stack-host > .sm-stack-layer:nth-of-type(n+3){
+  .sm-card-layer--3,
+  .sm-card-layer--4{
     display:none;
   }
 
-  .archive-card > .sm-stack-host{
-    border-radius:inherit inherit 0 0;
+  .sm-stack-card.sm-stack-active .sm-card-layer--1{
+    transform:translate3d(-4px,7px,0) rotate(-.2deg) scale(.994);
   }
 
-  .archive-card > .sm-stack-host .archive-card__visual{
-    min-height:250px;
+  .sm-stack-card.sm-stack-active .sm-card-layer--2{
+    transform:translate3d(4px,11px,0) rotate(.22deg) scale(.989);
+  }
+
+  .sm-stack-card.sm-stack-active .sm-card-content-motion{
+    transform:translate3d(0,-3px,0);
   }
 }
 
 @media (prefers-reduced-motion:reduce){
-  .sm-stack-host > .sm-stack-layer{
+  .sm-card-layer{
     display:none!important;
   }
 
-  .sm-stack-host > .sm-stack-surface,
-  .sm-stack-card :is(h2,h3,a,button,small,strong){
+  .sm-card-surface,
+  .sm-card-highlight,
+  .sm-card-content-motion,
+  .sm-card-figure-motion,
+  .sm-stack-card :is(h2,h3,a,button){
     transform:none!important;
-    animation:none!important;
     transition:none!important;
+    animation:none!important;
   }
-}
 
-/* Anula únicamente la elevación heredada de las tarjetas que usan Stack Motion. */
-body.claude-studio :is(
-  .edition-card,
-  .deal-card,
-  .archive-card,
-  .resource-library-card,
-  .news-feature-card,
-  .news-card
-).sm-stack-card:hover,
-body.claude-studio :is(
-  .edition-card,
-  .deal-card,
-  .archive-card,
-  .resource-library-card,
-  .news-feature-card,
-  .news-card
-).sm-stack-card:focus-within{
-  transform:none!important;
+  .sm-card-highlight{
+    opacity:0!important;
+  }
 }
