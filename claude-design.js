@@ -351,6 +351,15 @@
     return sections;
   }
 
+  const STACK_MOTION_SELECTOR = [
+    ".edition-card",
+    ".deal-card",
+    ".archive-card",
+    ".resource-library-card",
+    ".news-feature-card",
+    ".news-card"
+  ].join(",");
+
   const CARD_SELECTOR = [
     ".edition-card",
     ".territory-focus-card",
@@ -452,7 +461,14 @@
   }
 
   function bindCardMotion(card) {
-    if (card.dataset.cdMotion === "3") return;
+    if (card.dataset.cdMotion === "3" || card.dataset.cdMotion === "stack") return;
+
+    if (card.matches(STACK_MOTION_SELECTOR)) {
+      card.dataset.cdMotion = "stack";
+      card.classList.add("cd-card","cd-reveal","sm-stack-candidate");
+      return;
+    }
+
     card.dataset.cdMotion = "3";
     card.classList.add("cd-card","cd-reveal");
 

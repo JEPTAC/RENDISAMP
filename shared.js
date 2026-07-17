@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.28-map-contrast-popup-wide";
+  const PORTAL_BUILD = "11.33-stack-motion";
 
   /*
    * Arranque visual temprano.
@@ -3030,6 +3030,8 @@ helpers.showClickEffect = showClickEffect;
     const scriptId = "claudeStudioScript";
     const motionId = "motionStudioScript";
     const territoryId = "territoryExperienceScript";
+    const stackAnimeId = "stackMotionAnimeScript";
+    const stackAdapterId = "stackMotionAdapterScript";
 
     let link = document.getElementById(cssId) || visualBoot.link;
     if (!link) {
@@ -3039,6 +3041,42 @@ helpers.showClickEffect = showClickEffect;
       link.href = `claude-design.css?v=${PORTAL_BUILD}`;
       document.head.appendChild(link);
     }
+
+    const loadStackMotion = () => {
+      const loadAdapter = () => {
+        if (document.getElementById(stackAdapterId)) {
+          window.PortalStackMotion?.init?.();
+          return;
+        }
+
+        const adapter = document.createElement("script");
+        adapter.id = stackAdapterId;
+        adapter.src = `stack-motion.js?v=${PORTAL_BUILD}`;
+        adapter.defer = true;
+        adapter.onload = () => window.PortalStackMotion?.init?.();
+        document.head.appendChild(adapter);
+      };
+
+      if (window.anime) {
+        loadAdapter();
+        return;
+      }
+
+      const existingAnime = document.getElementById(stackAnimeId);
+      if (existingAnime) {
+        existingAnime.addEventListener("load",loadAdapter,{once:true});
+        existingAnime.addEventListener("error",loadAdapter,{once:true});
+        return;
+      }
+
+      const animeScript = document.createElement("script");
+      animeScript.id = stackAnimeId;
+      animeScript.src = `stack-motion-anime.min.js?v=${PORTAL_BUILD}`;
+      animeScript.defer = true;
+      animeScript.onload = loadAdapter;
+      animeScript.onerror = loadAdapter;
+      document.head.appendChild(animeScript);
+    };
 
     const loadTerritoryExperience = () => {
       if (document.getElementById(territoryId)) {
@@ -3097,6 +3135,8 @@ helpers.showClickEffect = showClickEffect;
       },{once:true});
       existingStudio.addEventListener("error",loadMotion,{once:true});
     }
+
+    loadStackMotion();
   }
 
 
