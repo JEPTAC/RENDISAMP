@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.31.1-scroll-story";
+  const PORTAL_BUILD = "11.32-native-scroll-story";
 
   /*
    * Arranque visual temprano.

@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD = "11.31.1-scroll-story";
+  const BUILD = "11.32-native-scroll-story";
   const PROJECT_LIMIT = 10;
   const PROJECT_MINIMUM = 5;
 
@@ -491,12 +491,13 @@
           const relative = index - exact;
           const behind = Math.max(relative,0);
           const passed = Math.max(-relative,0);
-          const y = passed > 0 ? -Math.min(passed,1) * 118 : behind * 18;
-          const x = passed > 0 ? -Math.min(passed,1) * 18 : behind * 5;
-          const scale = passed > 0 ? 1 - Math.min(passed,1) * .06 : 1 - Math.min(behind,5) * .035;
-          const rotate = passed > 0 ? -1.1 * Math.min(passed,1) : Math.min(behind,5) * .24;
-          const opacity = passed >= 1 ? 0 : Math.max(.24,1 - behind * .13);
-          card.style.transform = `translate3d(${x}px,${y}%,0) rotate(${rotate}deg) scale(${scale})`;
+          const exit = Math.min(passed,1);
+          const y = passed > 0 ? `${-exit * 112}%` : `${behind * 18}px`;
+          const x = passed > 0 ? -exit * 30 : behind * 7;
+          const scale = passed > 0 ? 1 - exit * .075 : 1 - Math.min(behind,5) * .038;
+          const rotate = passed > 0 ? -1.35 * exit : Math.min(behind,5) * .34;
+          const opacity = passed >= 1 ? 0 : Math.max(.22,1 - behind * .14);
+          card.style.transform = `translate3d(${x}px,0,0) translateY(${y}) rotate(${rotate}deg) scale(${scale})`;
           card.style.opacity = String(opacity);
           card.style.zIndex = String(cards.length - index);
           card.setAttribute("aria-hidden",String(opacity < .15));
@@ -655,7 +656,7 @@
       if (reducedMotion.matches) {
         scrollController = setupStaticLayout(cards);
       } else {
-        scrollController = setupGsapStack(cards) || setupNativeStack(cards);
+        scrollController = setupNativeStack(cards);
       }
       motionCleanup = () => scrollController?.destroy?.();
       window.ScrollTrigger?.refresh?.(true);
@@ -1062,7 +1063,7 @@
       railButtons.forEach(button => {button.onclick = null;});
       activeIndex = -1;
       writeStory(0,false);
-      controller = reducedMotion.matches ? setupReduced() : (setupGsap() || setupNative());
+      controller = reducedMotion.matches ? setupReduced() : setupNative();
       window.ScrollTrigger?.refresh?.(true);
     }
 
@@ -1154,6 +1155,7 @@
     initCinematic();
     setupMediaLifecycle();
     setupNavigationStability();
+    document.documentElement.dataset.homeStoryReady = BUILD;
     window.dispatchEvent(new CustomEvent("portal:rendered",{detail:{source:"home-experience",build:BUILD}}));
   }
 

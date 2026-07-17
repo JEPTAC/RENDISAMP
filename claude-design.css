@@ -14762,3 +14762,245 @@ html[data-motion-tier="low"] .san-pedro-cinematic__frame{
 .project-console-card__visual::before{z-index:1;}
 .project-console-card__visual > i,
 .project-console-card__visual > b{z-index:2;}
+
+/* =========================================================
+   V11.32 · Baraja visible + historia cinematográfica nativa
+   ========================================================= */
+
+/* El recorrido no depende de CDN: cada sección crea su propio tramo de scroll. */
+.claude-page-home .project-console.project-console--native{
+  height:calc(100dvh + (max(var(--project-count),2) - 1) * 94dvh)!important;
+  min-height:760px!important;
+  overflow:visible!important;
+}
+.claude-page-home .project-console.project-console--native .project-console__shell{
+  position:sticky!important;
+  top:0!important;
+  height:100dvh!important;
+  min-height:620px!important;
+  overflow:hidden!important;
+}
+
+/* La baraja se reconoce incluso durante los primeros milisegundos de carga. */
+.project-console:not(.project-console--native):not(.project-console--static) .project-console-card:nth-child(1){transform:translate3d(0,0,0) rotate(0deg) scale(1);z-index:10;opacity:1;}
+.project-console:not(.project-console--native):not(.project-console--static) .project-console-card:nth-child(2){transform:translate3d(7px,18px,0) rotate(.34deg) scale(.962);z-index:9;opacity:.86;}
+.project-console:not(.project-console--native):not(.project-console--static) .project-console-card:nth-child(3){transform:translate3d(14px,36px,0) rotate(.68deg) scale(.924);z-index:8;opacity:.72;}
+.project-console:not(.project-console--native):not(.project-console--static) .project-console-card:nth-child(4){transform:translate3d(21px,54px,0) rotate(1.02deg) scale(.886);z-index:7;opacity:.58;}
+.project-console:not(.project-console--native):not(.project-console--static) .project-console-card:nth-child(5){transform:translate3d(28px,72px,0) rotate(1.36deg) scale(.848);z-index:6;opacity:.44;}
+
+.project-console-card{
+  transition:border-color .22s ease,box-shadow .22s ease,filter .22s ease!important;
+}
+.project-console-card.is-active{
+  filter:saturate(1.06) contrast(1.015);
+}
+.project-console-card:not(.is-active){
+  filter:saturate(.86) brightness(.88);
+}
+.project-console.is-scroll-active .project-console-card{
+  transition:border-color .18s ease,box-shadow .18s ease,filter .18s ease!important;
+}
+
+.project-console__steps::after{
+  transform:scaleX(var(--project-scroll-progress,0))!important;
+  transform-origin:left center!important;
+}
+.project-console__hint{
+  opacity:calc(1 - min(var(--project-scroll-progress,0) * 4,1));
+}
+.project-console__selected{
+  transition:transform .28s var(--bs-ease),background .28s ease!important;
+}
+.project-console.is-scroll-active .project-console__selected{
+  transform:translateY(-3px)!important;
+}
+
+/* El final de la baraja se funde con el inicio oscuro de la historia. */
+.project-console + .san-pedro-cinematic{
+  margin-top:-1px!important;
+}
+.project-console + .san-pedro-cinematic::before{
+  content:"";
+  position:absolute;
+  z-index:12;
+  left:0;right:0;top:-110px;
+  height:112px;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,26,49,0),#061a31 96%);
+}
+
+.claude-page-home .san-pedro-cinematic.san-pedro-cinematic--native{
+  height:calc(100dvh + (max(var(--cinematic-count),2) - 1) * 102dvh)!important;
+  min-height:760px!important;
+  overflow:visible!important;
+}
+.claude-page-home .san-pedro-cinematic.san-pedro-cinematic--native .san-pedro-cinematic__scroll{
+  height:100%!important;
+}
+.claude-page-home .san-pedro-cinematic.san-pedro-cinematic--native .san-pedro-cinematic__stage{
+  position:sticky!important;
+  top:0!important;
+  height:100dvh!important;
+  min-height:620px!important;
+}
+
+/* Encuadre cinematográfico: imagen controlada, aire editorial y texto permanente. */
+.san-pedro-cinematic__frames{
+  width:min(64vw,1040px)!important;
+  height:min(59vh,620px)!important;
+  top:clamp(156px,21vh,208px)!important;
+}
+.san-pedro-cinematic__frame{
+  transform:translateZ(0);
+  backface-visibility:hidden;
+}
+.san-pedro-cinematic__frame::after{
+  content:attr(data-cinematic-frame);
+  position:absolute;
+  z-index:4;
+  right:22px;
+  top:18px;
+  display:grid;
+  place-items:center;
+  width:48px;
+  height:48px;
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:15px;
+  color:#fff;
+  background:rgba(5,25,49,.46);
+  backdrop-filter:blur(10px);
+  font:700 12px/1 var(--bs-font);
+}
+.san-pedro-cinematic__frame img{
+  transform-origin:center center!important;
+  transition:none!important;
+}
+.san-pedro-cinematic__copy{
+  min-height:310px;
+  display:flex!important;
+  flex-direction:column;
+  justify-content:center;
+}
+.san-pedro-cinematic__copy::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:26px;
+  bottom:26px;
+  width:3px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#79d7f5,#939cf6,#c19af2);
+}
+.san-pedro-cinematic__copy blockquote{
+  margin-top:auto!important;
+}
+.san-pedro-cinematic__progress i{
+  width:calc(var(--cinematic-progress,0) * 100%)!important;
+}
+.san-pedro-cinematic__scroll-hint{
+  opacity:calc(1 - min(var(--cinematic-progress,0) * 5,1));
+}
+
+/* Cuando una escena cambia, el texto parece entrar como un nuevo capítulo. */
+.san-pedro-cinematic__copy.is-entering{
+  animation:sceneCardPulse .42s var(--bs-ease) both;
+}
+@keyframes sceneCardPulse{
+  0%{transform:translateY(-40%) scale(.985);opacity:.74}
+  100%{transform:translateY(-42%) scale(1);opacity:1}
+}
+
+@media (max-width:1100px){
+  .san-pedro-cinematic__frames{
+    width:calc(100vw - 40px)!important;
+    height:50vh!important;
+    left:20px!important;
+    right:20px!important;
+  }
+}
+
+@media (max-width:767px){
+  .claude-page-home .project-console.project-console--native{
+    height:calc(100dvh + (max(var(--project-count),2) - 1) * 72dvh)!important;
+  }
+  .claude-page-home .san-pedro-cinematic.san-pedro-cinematic--native{
+    height:calc(100dvh + (max(var(--cinematic-count),2) - 1) * 76dvh)!important;
+  }
+  .project-console__track{
+    perspective:900px!important;
+  }
+  .project-console-card:not(.is-active){filter:saturate(.92) brightness(.92);}
+  .san-pedro-cinematic__frames{
+    top:124px!important;
+    height:49dvh!important;
+  }
+  .san-pedro-cinematic__copy{
+    min-height:0!important;
+  }
+  .san-pedro-cinematic__frame::after{
+    width:38px;height:38px;right:12px;top:12px;border-radius:12px;font-size:10px;
+  }
+}
+
+@media (max-height:740px) and (min-width:768px){
+  .project-console__shell{padding-top:22px!important;padding-bottom:24px!important;}
+  .project-console__track{height:min(330px,47vh)!important;}
+  .san-pedro-cinematic__frames{top:122px!important;height:54vh!important;}
+  .san-pedro-cinematic__copy{padding:20px!important;min-height:260px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .project-console.project-console--native,
+  .san-pedro-cinematic.san-pedro-cinematic--native{
+    height:auto!important;
+    min-height:0!important;
+  }
+  .project-console.project-console--native .project-console__shell,
+  .san-pedro-cinematic.san-pedro-cinematic--native .san-pedro-cinematic__stage{
+    position:relative!important;
+    height:auto!important;
+    min-height:0!important;
+  }
+}
+
+.san-pedro-cinematic:not(.san-pedro-cinematic--reduced) .san-pedro-cinematic__static-caption{
+  position:absolute!important;
+  z-index:5!important;
+  left:20px!important;
+  bottom:18px!important;
+  display:block!important;
+  width:min(430px,62%)!important;
+  padding:15px 17px!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  border-radius:17px!important;
+  color:#fff!important;
+  background:linear-gradient(135deg,rgba(4,20,40,.76),rgba(8,48,82,.56))!important;
+  box-shadow:0 14px 34px rgba(2,14,29,.18)!important;
+  backdrop-filter:blur(11px);
+}
+.san-pedro-cinematic:not(.san-pedro-cinematic--reduced) .san-pedro-cinematic__static-caption span{
+  display:block!important;
+  color:#91dcff!important;
+  font:700 8px/1.25 var(--bs-font)!important;
+  letter-spacing:.16em!important;
+}
+.san-pedro-cinematic:not(.san-pedro-cinematic--reduced) .san-pedro-cinematic__static-caption h3{
+  margin:7px 0 4px!important;
+  color:#fff!important;
+  font-size:19px!important;
+  line-height:1.05!important;
+  letter-spacing:-.025em!important;
+}
+.san-pedro-cinematic:not(.san-pedro-cinematic--reduced) .san-pedro-cinematic__static-caption p{
+  margin:0!important;
+  color:rgba(235,245,255,.76)!important;
+  font-size:10px!important;
+  line-height:1.48!important;
+}
+@media(max-width:767px){
+  .san-pedro-cinematic:not(.san-pedro-cinematic--reduced) .san-pedro-cinematic__static-caption{
+    left:10px!important;right:10px!important;bottom:10px!important;width:auto!important;padding:11px 12px!important;border-radius:13px!important;
+  }
+  .san-pedro-cinematic:not(.san-pedro-cinematic--reduced) .san-pedro-cinematic__static-caption h3{font-size:15px!important;}
+  .san-pedro-cinematic:not(.san-pedro-cinematic--reduced) .san-pedro-cinematic__static-caption p{display:none!important;}
+}

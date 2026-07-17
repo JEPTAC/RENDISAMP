@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
 <meta content="Portal especial de Rendición de Cuentas de San Pedro, Valle del Cauca." name="description"/>
-<link href="assets/favicon.png" rel="icon"/><link href="manifest.json" rel="manifest"/><link href="styles.css?v=11.31.1-scroll-story" rel="stylesheet"/>
+<link href="assets/favicon.png" rel="icon"/><link href="manifest.json" rel="manifest"/><link href="styles.css?v=11.32-native-scroll-story" rel="stylesheet"/>
 <title>Rendición de Cuentas | San Pedro</title>
 <link crossorigin="anonymous" href="https://cdn.jsdelivr.net" rel="preconnect"/><link as="image" href="assets/cinematica/monumento-musical-960.avif" media="(max-width: 767px)" rel="preload" type="image/avif"/><link as="image" href="assets/cinematica/monumento-musical-1600.avif" media="(min-width: 768px)" rel="preload" type="image/avif"/></head>
 <body data-page="home">
@@ -84,10 +84,16 @@
 <button class="project-console__manage" hidden="" id="projectConsoleManage" type="button">Gestionar proyectos</button>
 </div>
 </header>
-<div class="project-console__viewport" id="projectConsoleViewport">
+<div class="project-console__viewport" id="projectConsoleViewport" tabindex="0">
 <div aria-hidden="true" class="project-console__backdrop" id="projectConsoleBackdrop"></div>
 <div aria-hidden="true" class="project-console__ambient"><i></i><i></i><i></i></div>
-<div aria-label="Selector de proyectos" class="project-console__track" id="projectConsoleTrack" role="listbox"></div>
+<div aria-label="Selector de proyectos" class="project-console__track" id="projectConsoleTrack" role="listbox">
+<button class="project-console-card is-active" data-project-index="0" role="option" type="button" aria-selected="true"><span class="project-console-card__visual"><i>01</i><b>2025 · Próximamente</b></span><span class="project-console-card__body"><small>Proyecto institucional</small><strong>Proyecto 01</strong><span>Espacio preparado para publicar la información del proyecto.</span><em>Abrir ficha <b aria-hidden="true">↗</b></em></span></button>
+<button class="project-console-card" data-project-index="1" role="option" type="button" aria-selected="false"><span class="project-console-card__visual"><i>02</i><b>2025 · Próximamente</b></span><span class="project-console-card__body"><small>Proyecto institucional</small><strong>Proyecto 02</strong><span>Espacio preparado para publicar la información del proyecto.</span><em>Abrir ficha <b aria-hidden="true">↗</b></em></span></button>
+<button class="project-console-card" data-project-index="2" role="option" type="button" aria-selected="false"><span class="project-console-card__visual"><i>03</i><b>2025 · Próximamente</b></span><span class="project-console-card__body"><small>Proyecto institucional</small><strong>Proyecto 03</strong><span>Espacio preparado para publicar la información del proyecto.</span><em>Abrir ficha <b aria-hidden="true">↗</b></em></span></button>
+<button class="project-console-card" data-project-index="3" role="option" type="button" aria-selected="false"><span class="project-console-card__visual"><i>04</i><b>2025 · Próximamente</b></span><span class="project-console-card__body"><small>Proyecto institucional</small><strong>Proyecto 04</strong><span>Espacio preparado para publicar la información del proyecto.</span><em>Abrir ficha <b aria-hidden="true">↗</b></em></span></button>
+<button class="project-console-card" data-project-index="4" role="option" type="button" aria-selected="false"><span class="project-console-card__visual"><i>05</i><b>2025 · Próximamente</b></span><span class="project-console-card__body"><small>Proyecto institucional</small><strong>Proyecto 05</strong><span>Espacio preparado para publicar la información del proyecto.</span><em>Abrir ficha <b aria-hidden="true">↗</b></em></span></button>
+</div>
 <button aria-label="Proyecto anterior" class="project-console__nav project-console__nav--prev" id="projectConsolePrev" type="button">←</button>
 <button aria-label="Proyecto siguiente" class="project-console__nav project-console__nav--next" id="projectConsoleNext" type="button">→</button>
 <div aria-live="polite" class="project-console__selected" id="projectConsoleSelected">
@@ -104,7 +110,7 @@
 </section>
 <section aria-labelledby="cinematicTitle" class="san-pedro-cinematic" id="san-pedro-cinematica">
 <div class="san-pedro-cinematic__scroll">
-<div class="san-pedro-cinematic__stage">
+<div class="san-pedro-cinematic__stage" tabindex="0">
 <header class="san-pedro-cinematic__intro">
 <span>RETRATOS DEL MUNICIPIO</span>
 <h2 id="cinematicTitle">San Pedro se vive como una <em>historia</em></h2>
@@ -114,19 +120,19 @@
 <figure class="san-pedro-cinematic__frame is-active" data-cinematic-frame="0">
 <picture><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/monumento-musical-960.avif 960w, assets/cinematica/monumento-musical-1600.avif 1600w" type="image/avif"/><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/monumento-musical-960.webp 960w, assets/cinematica/monumento-musical-1600.webp 1600w" type="image/webp"/><img alt="Monumento de músicos en San Pedro al atardecer" decoding="async" fetchpriority="high" height="900" loading="eager" sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" src="assets/cinematica/monumento-musical-1600.jpg" srcset="assets/cinematica/monumento-musical-960.jpg 960w, assets/cinematica/monumento-musical-1600.jpg 1600w" width="1600"/></picture>
 <span class="san-pedro-cinematic__shade"></span>
-<figcaption class="san-pedro-cinematic__static-caption"></figcaption></figure>
+<figcaption class="san-pedro-cinematic__static-caption"><span>01 · MEMORIA</span><h3>Un territorio que también suena</h3><p>La música y el arte público convierten la plaza en memoria compartida.</p></figcaption></figure>
 <figure class="san-pedro-cinematic__frame" data-cinematic-frame="1">
 <picture><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/iglesia-san-pedro-960.avif 960w, assets/cinematica/iglesia-san-pedro-1600.avif 1600w" type="image/avif"/><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/iglesia-san-pedro-960.webp 960w, assets/cinematica/iglesia-san-pedro-1600.webp 1600w" type="image/webp"/><img alt="Iglesia de San Pedro bajo un cielo de atardecer" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" src="assets/cinematica/iglesia-san-pedro-1600.jpg" srcset="assets/cinematica/iglesia-san-pedro-960.jpg 960w, assets/cinematica/iglesia-san-pedro-1600.jpg 1600w" width="1600"/></picture>
 <span class="san-pedro-cinematic__shade"></span>
-<figcaption class="san-pedro-cinematic__static-caption"></figcaption></figure>
+<figcaption class="san-pedro-cinematic__static-caption"><span>02 · ARQUITECTURA</span><h3>La torre acompaña el paso del tiempo</h3><p>Entre luz, tradición y vida cotidiana, la arquitectura conserva la identidad del municipio.</p></figcaption></figure>
 <figure class="san-pedro-cinematic__frame" data-cinematic-frame="2">
 <picture><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/parque-himno-960.avif 960w, assets/cinematica/parque-himno-1600.avif 1600w" type="image/avif"/><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/parque-himno-960.webp 960w, assets/cinematica/parque-himno-1600.webp 1600w" type="image/webp"/><img alt="Parque de San Pedro con monumento al himno municipal" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" src="assets/cinematica/parque-himno-1600.jpg" srcset="assets/cinematica/parque-himno-960.jpg 960w, assets/cinematica/parque-himno-1600.jpg 1600w" width="1600"/></picture>
 <span class="san-pedro-cinematic__shade"></span>
-<figcaption class="san-pedro-cinematic__static-caption"></figcaption></figure>
+<figcaption class="san-pedro-cinematic__static-caption"><span>03 · ENCUENTRO</span><h3>El parque reúne voces e historias</h3><p>La sombra de los árboles, el himno y la plaza forman un punto de encuentro ciudadano.</p></figcaption></figure>
 <figure class="san-pedro-cinematic__frame" data-cinematic-frame="3">
 <picture><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/alcaldia-san-pedro-960.avif 960w, assets/cinematica/alcaldia-san-pedro-1600.avif 1600w" type="image/avif"/><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/alcaldia-san-pedro-960.webp 960w, assets/cinematica/alcaldia-san-pedro-1600.webp 1600w" type="image/webp"/><img alt="Fachada de la Alcaldía Municipal de San Pedro" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" src="assets/cinematica/alcaldia-san-pedro-1600.jpg" srcset="assets/cinematica/alcaldia-san-pedro-960.jpg 960w, assets/cinematica/alcaldia-san-pedro-1600.jpg 1600w" width="1600"/></picture>
 <span class="san-pedro-cinematic__shade"></span>
-<figcaption class="san-pedro-cinematic__static-caption"></figcaption></figure>
+<figcaption class="san-pedro-cinematic__static-caption"><span>04 · GESTIÓN</span><h3>Lo público también tiene un rostro</h3><p>La Alcaldía conecta decisiones, documentos y participación con la vida de la comunidad.</p></figcaption></figure>
 </div>
 <div aria-live="polite" class="san-pedro-cinematic__copy" id="cinematicCopy">
 <span id="cinematicEyebrow">01 · MEMORIA QUE SUENA</span>
@@ -182,6 +188,6 @@
 </section>
 </main>
 <div id="siteFooter"></div><div id="globalDialogs"></div>
-<script defer="" src="shared.js?v=11.31.1-scroll-story"></script><script defer="" src="home.js?v=11.31.1-scroll-story"></script><script defer="" src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script><script defer="" src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script><script defer="" src="home-experience.js?v=11.31.1-scroll-story"></script>
+<script src="shared.js?v=11.32-native-scroll-story"></script><script src="home.js?v=11.32-native-scroll-story"></script><script src="home-experience.js?v=11.32-native-scroll-story"></script><script src="home-story-fallback.js?v=11.32-native-scroll-story"></script>
 </body>
 </html>
