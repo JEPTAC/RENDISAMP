@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.36-editorial-compact-hero";
+  const PORTAL_BUILD = "11.37-editorial-hero-reset";
 
   /*
    * Arranque visual temprano.
@@ -977,9 +977,10 @@ helpers.showClickEffect = showClickEffect;
 
   function applyHeroPresentation() {
     const hero = document.querySelector(".home-hero");
-    if (!hero) return;
+    const visual = hero?.querySelector(".home-hero__visual");
+    if (!hero || !visual) return;
 
-    let media = hero.querySelector(":scope > .home-hero__media");
+    let media = visual.querySelector(":scope > .home-hero__media");
     if (!media) {
       media = document.createElement("figure");
       media.className = "home-hero__media";
@@ -987,7 +988,7 @@ helpers.showClickEffect = showClickEffect;
         <img class="home-hero__media-image" alt="" loading="eager" decoding="async" fetchpriority="high">
         <span class="home-hero__media-overlay" aria-hidden="true"></span>
         <span class="home-hero__media-light" aria-hidden="true"></span>`;
-      hero.prepend(media);
+      visual.prepend(media);
     }
 
     const image = media.querySelector(".home-hero__media-image");
