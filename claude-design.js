@@ -795,11 +795,11 @@
 
     const copyBalance = createBalanceController(copy,{
       role:"hero-copy",
-      origin:"0% 56%"
+      origin:"50% 56%"
     });
     const visualBalance = createBalanceController(visual,{
       role:"hero-visual",
-      origin:"100% 56%"
+      origin:"50% 56%"
     });
     const progressBalance = progress
       ? createBalanceController(progress,{role:"hero-progress",origin:"100% 100%"})
@@ -822,7 +822,7 @@
       const tier = document.documentElement.dataset.motionTier || "low";
       const point = coordinates(event);
       last = point;
-      const amplitude = tier === "high" ? 3.2 : tier === "medium" ? 1.9 : 1.05;
+      const amplitude = tier === "high" ? 1.65 : tier === "medium" ? 1.05 : .55;
       const force = strong ? 1.22 : .58;
 
       copyBalance?.set({
@@ -834,11 +834,11 @@
         scale:strong ? .998 : 1
       });
       visualBalance?.set({
-        rx:-point.ny * amplitude * .7 * force,
-        ry:point.nx * amplitude * force,
-        rz:point.nx * amplitude * .22 * force,
-        x:point.nx * amplitude * 1.25 * force,
-        y:point.ny * amplitude * .72 * force,
+        rx:-point.ny * amplitude * .46 * force,
+        ry:point.nx * amplitude * .62 * force,
+        rz:point.nx * amplitude * .10 * force,
+        x:point.nx * amplitude * .52 * force,
+        y:point.ny * amplitude * .34 * force,
         scale:strong ? .996 : 1
       });
       progressBalance?.set({
@@ -904,15 +904,15 @@
     if (!hero || !grid || !visual) return;
 
     /*
-     * La portada vuelve a su estructura semántica original: el panel visual
-     * es hermano de la cuadrícula de texto. La composición antigua lo movía
-     * dentro del bloque de contenido y provocaba recortes, alturas excesivas
-     * y superposiciones en resoluciones intermedias.
+     * V11.35: ambos paneles pertenecen a la misma cuadrícula. Así comparten
+     * exactamente ancho, altura, separación y alineación desde el primer
+     * render, sin cálculos absolutos ni diferencias entre resoluciones.
      */
-    if (visual.parentElement !== hero) {
-      hero.insertBefore(visual, grid);
+    if (visual.parentElement !== grid) {
+      grid.appendChild(visual);
     }
 
+    hero.classList.add("home-hero--unified-grid");
     hero.classList.remove("home-hero--banner-inside");
   }
 

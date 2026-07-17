@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.34-card-figure-motion";
+  const PORTAL_BUILD = "11.35-unified-hero";
 
   /*
    * Arranque visual temprano.
