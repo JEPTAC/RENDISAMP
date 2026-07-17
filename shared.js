@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.32.1-scroll-runway-fix";
+  const PORTAL_BUILD = "11.28-map-contrast-popup-wide";
 
   /*
    * Arranque visual temprano.
