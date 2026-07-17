@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.32-native-scroll-story";
+  const PORTAL_BUILD = "11.32.1-scroll-runway-fix";
 
   /*
    * Arranque visual temprano.

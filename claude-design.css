@@ -13949,7 +13949,7 @@ html[data-viewport-tier="large"] body.claude-page-home .site-shell{
 
 /* Fallback nativo: usa sticky sin bloquear eventos de rueda. */
 .project-console--native{
-  height:calc(100svh + (max(var(--project-count),2) - 1) * 76svh);
+  height:404svh;
 }
 .project-console--native .project-console__shell{position:sticky;top:0;}
 
@@ -14310,7 +14310,7 @@ html[data-viewport-tier="large"] body.claude-page-home .site-shell{
 .san-pedro-cinematic__static-caption{display:none;}
 
 .san-pedro-cinematic--native{
-  height:calc(100svh + (max(var(--cinematic-count),2) - 1) * 82svh);
+  height:346svh;
 }
 .san-pedro-cinematic--native .san-pedro-cinematic__stage{position:sticky!important;top:0;}
 
@@ -14499,7 +14499,7 @@ html[data-viewport-tier="large"] body.claude-page-home .site-shell{
   .project-console__steps{left:14px!important;right:116px!important;bottom:180px!important;}
   .project-console__nav{bottom:177px!important;width:38px!important;height:38px!important;}
   .project-console__nav--prev{right:58px!important;}.project-console__nav--next{right:14px!important;}
-  .project-console--native{height:calc(100dvh + (max(var(--project-count),2) - 1) * 64dvh);}
+  .project-console--native{height:356dvh;}
   .project-console--static .project-console__track{grid-template-columns:1fr!important;}
 
   .san-pedro-cinematic__stage{height:100dvh!important;min-height:620px!important;}
@@ -14521,7 +14521,7 @@ html[data-viewport-tier="large"] body.claude-page-home .site-shell{
   }
   .san-pedro-cinematic__skip{right:12px;top:14px;min-height:36px;padding:0 10px;font-size:8px;}
   .san-pedro-cinematic__scroll-hint{display:none!important;}
-  .san-pedro-cinematic--native{height:calc(100dvh + (max(var(--cinematic-count),2) - 1) * 68dvh);}
+  .san-pedro-cinematic--native{height:304dvh;}
   .san-pedro-cinematic--reduced .san-pedro-cinematic__frames{grid-template-columns:1fr!important;}
   .san-pedro-cinematic--reduced .san-pedro-cinematic__frame{min-height:380px;}
 }
@@ -14769,7 +14769,7 @@ html[data-motion-tier="low"] .san-pedro-cinematic__frame{
 
 /* El recorrido no depende de CDN: cada sección crea su propio tramo de scroll. */
 .claude-page-home .project-console.project-console--native{
-  height:calc(100dvh + (max(var(--project-count),2) - 1) * 94dvh)!important;
+  height:476dvh!important;
   min-height:760px!important;
   overflow:visible!important;
 }
@@ -14830,7 +14830,7 @@ html[data-motion-tier="low"] .san-pedro-cinematic__frame{
 }
 
 .claude-page-home .san-pedro-cinematic.san-pedro-cinematic--native{
-  height:calc(100dvh + (max(var(--cinematic-count),2) - 1) * 102dvh)!important;
+  height:406dvh!important;
   min-height:760px!important;
   overflow:visible!important;
 }
@@ -14921,10 +14921,10 @@ html[data-motion-tier="low"] .san-pedro-cinematic__frame{
 
 @media (max-width:767px){
   .claude-page-home .project-console.project-console--native{
-    height:calc(100dvh + (max(var(--project-count),2) - 1) * 72dvh)!important;
+    height:388dvh!important;
   }
   .claude-page-home .san-pedro-cinematic.san-pedro-cinematic--native{
-    height:calc(100dvh + (max(var(--cinematic-count),2) - 1) * 76dvh)!important;
+    height:328dvh!important;
   }
   .project-console__track{
     perspective:900px!important;
@@ -15003,4 +15003,28 @@ html[data-motion-tier="low"] .san-pedro-cinematic__frame{
   }
   .san-pedro-cinematic:not(.san-pedro-cinematic--reduced) .san-pedro-cinematic__static-caption h3{font-size:15px!important;}
   .san-pedro-cinematic:not(.san-pedro-cinematic--reduced) .san-pedro-cinematic__static-caption p{display:none!important;}
+}
+
+
+/* =========================================================
+   V11.32.1 · Corrección real del recorrido vertical
+   El alto dinámico final se asigna desde JavaScript en píxeles.
+   Estos valores son respaldos válidos para cinco proyectos y cuatro escenas.
+   ========================================================= */
+
+.project-console--native .project-console__shell,
+.san-pedro-cinematic--native .san-pedro-cinematic__stage{
+  position:sticky!important;
+  top:0!important;
+}
+
+.project-console--native.is-scroll-active .project-console__viewport,
+.san-pedro-cinematic--native.is-scroll-active .san-pedro-cinematic__stage{
+  outline:1px solid rgba(125,205,255,.16);
+  outline-offset:-1px;
+}
+
+.project-console--native .project-console-card,
+.san-pedro-cinematic--native .san-pedro-cinematic__frame{
+  will-change:transform,opacity;
 }

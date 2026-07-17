@@ -1,9 +1,21 @@
 (() => {
   "use strict";
 
-  const READY = "11.32-native-scroll-story-fallback";
+  const READY = "11.32.1-scroll-runway-fallback";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   const clamp = (value,min,max) => Math.min(Math.max(value,min),max);
+  const viewportHeight = () => Math.max(document.documentElement.clientHeight || 0,window.innerHeight || 0,560);
+
+  function setRunway(section,count,options = {}) {
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    const compact = viewportHeight() < 740;
+    const desktopFactor = Number(options.desktopFactor || .94);
+    const mobileFactor = Number(options.mobileFactor || .72);
+    const factor = mobile ? mobileFactor : compact ? Math.min(desktopFactor,.82) : desktopFactor;
+    const height = viewportHeight() + Math.max(count - 1,0) * viewportHeight() * factor;
+    section.style.setProperty("height",`${Math.round(height)}px`,"important");
+    section.style.setProperty("min-height",`${viewportHeight()}px`,"important");
+  }
 
   function makeScrollController(section,count,onProgress,options = {}) {
     let start = 0;
@@ -16,9 +28,10 @@
     section.classList.add(options.nativeClass || "is-native-story");
 
     const measure = () => {
+      setRunway(section,count,options);
       const rect = section.getBoundingClientRect();
       start = rect.top + window.scrollY;
-      end = start + Math.max(section.offsetHeight - window.innerHeight,1);
+      end = start + Math.max(section.offsetHeight - viewportHeight(),1);
     };
 
     const render = () => {
@@ -147,7 +160,12 @@
       });
       if (nearest !== activeIndex) updateCopy(nearest);
       section.style.setProperty("--project-scroll-progress",progress.toFixed(4));
-    },{nativeClass:"project-console--native",countProperty:"--project-count"});
+    },{
+      nativeClass:"project-console--native",
+      countProperty:"--project-count",
+      desktopFactor:.94,
+      mobileFactor:.72
+    });
 
     prev?.addEventListener("click",() => controller.go(activeIndex - 1));
     next?.addEventListener("click",() => controller.go(activeIndex + 1));
@@ -222,7 +240,12 @@
       if (nearest !== activeIndex) write(nearest);
       if (progress) progress.style.width = `${(value * 100).toFixed(2)}%`;
       section.style.setProperty("--cinematic-progress",value.toFixed(4));
-    },{nativeClass:"san-pedro-cinematic--native",countProperty:"--cinematic-count"});
+    },{
+      nativeClass:"san-pedro-cinematic--native",
+      countProperty:"--cinematic-count",
+      desktopFactor:1.02,
+      mobileFactor:.76
+    });
 
     rail.forEach((button,index) => button.addEventListener("click",() => controller.go(index)));
     document.getElementById("cinematicSkip")?.addEventListener("click",() => controller.skip());

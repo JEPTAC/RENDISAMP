@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD = "11.32-native-scroll-story";
+  const BUILD = "11.32.1-scroll-runway-fix";
   const PROJECT_LIMIT = 10;
   const PROJECT_MINIMUM = 5;
 
@@ -46,6 +46,28 @@
   ];
 
   const clamp = (value,min,max) => Math.min(Math.max(value,min),max);
+
+  function viewportHeight() {
+    return Math.max(
+      document.documentElement.clientHeight || 0,
+      window.innerHeight || 0,
+      560
+    );
+  }
+
+  function setScrollRunway(section,count,desktopFactor,mobileFactor) {
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    const compactHeight = viewportHeight() < 740;
+    const factor = mobile
+      ? mobileFactor
+      : compactHeight
+        ? Math.min(desktopFactor,.82)
+        : desktopFactor;
+    const height = viewportHeight() + Math.max(count - 1,0) * viewportHeight() * factor;
+    section.style.setProperty("height",`${Math.round(height)}px`,"important");
+    section.style.setProperty("min-height",`${viewportHeight()}px`,"important");
+    return height;
+  }
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g,char => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
   })[char]);
@@ -448,6 +470,8 @@
 
     function setupStaticLayout(cards) {
       section.classList.add("project-console--static");
+      section.style.setProperty("height","auto","important");
+      section.style.setProperty("min-height","0","important");
       updateSelectedContent(0,false);
       cards.forEach((card,index) => {
         card.style.removeProperty("transform");
@@ -474,8 +498,9 @@
       let snapping = false;
 
       const measure = () => {
+        setScrollRunway(section,cards.length,.94,.72);
         start = section.getBoundingClientRect().top + window.scrollY;
-        end = start + Math.max(section.offsetHeight - window.innerHeight,1);
+        end = start + Math.max(section.offsetHeight - viewportHeight(),1);
       };
 
       const render = () => {
@@ -835,6 +860,8 @@
 
     function setupReduced() {
       section.classList.add("san-pedro-cinematic--reduced");
+      section.style.setProperty("height","auto","important");
+      section.style.setProperty("min-height","0","important");
       fillStaticCaptions();
       frames.forEach(frame => {
         frame.style.removeProperty("transform");
@@ -861,8 +888,9 @@
       let snapTimer = 0;
       let snapping = false;
       const measure = () => {
+        setScrollRunway(section,frames.length,1.02,.76);
         start = section.getBoundingClientRect().top + window.scrollY;
-        end = start + Math.max(section.offsetHeight - window.innerHeight,1);
+        end = start + Math.max(section.offsetHeight - viewportHeight(),1);
       };
       const render = () => {
         frameId = 0;
