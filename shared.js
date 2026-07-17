@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.40-proyectos-vacio";
+  const PORTAL_BUILD = "11.40.1-popup-minimal";
 
   /*
    * Arranque visual temprano.
@@ -482,100 +482,125 @@ function ensureFeedbackStyles() {
     .sp-loading-popup__backdrop{
       position:absolute;
       inset:0;
-      background:rgba(8,26,52,.42);
-      backdrop-filter:blur(7px);
+      background:rgba(5,22,43,.24);
+      backdrop-filter:blur(3px);
     }
     .sp-loading-popup__card{
       position:relative;
       z-index:2;
       display:grid;
-      grid-template-columns:auto minmax(0,1fr);
+      grid-template-columns:74px minmax(0,1fr);
+      grid-template-rows:auto auto;
       align-items:center;
-      gap:16px 18px;
-      width:min(520px,calc(100vw - 36px));
-      min-height:170px;
-      padding:20px 22px;
+      column-gap:14px;
+      row-gap:4px;
+      width:min(380px,calc(100vw - 34px));
+      min-height:108px;
+      padding:15px 18px 15px 14px;
       overflow:hidden;
-      border:1px solid rgba(255,255,255,.24);
-      border-radius:28px;
+      border:1px solid rgba(255,255,255,.20);
+      border-radius:18px;
       color:#fff;
       text-align:left;
       background:
-        radial-gradient(circle at 16% 26%,rgba(110,245,228,.30),transparent 18%),
-        radial-gradient(circle at 84% 18%,rgba(255,255,255,.18),transparent 18%),
-        linear-gradient(135deg,#3da3e8 0%,#53c1ef 24%,#6caeff 52%,#8b82f0 76%,#5c63d8 100%);
-      box-shadow:0 34px 95px rgba(3,20,42,.34),
-        inset 0 1px 0 rgba(255,255,255,.18);
-      transform:translateY(10px) scale(.97);
-      transition:transform .28s cubic-bezier(.2,.8,.2,1),background .28s ease;
+        linear-gradient(135deg,rgba(8,45,88,.98),rgba(15,92,153,.97) 62%,rgba(41,162,211,.95));
+      box-shadow:0 20px 52px rgba(3,20,42,.25),
+        inset 0 1px 0 rgba(255,255,255,.16);
+      transform:translateY(6px) scale(.985);
+      transition:transform .22s cubic-bezier(.2,.8,.2,1),background .24s ease,opacity .2s ease;
+    }
+    .sp-loading-popup__card::after{
+      content:"";
+      position:absolute;
+      left:14px;
+      right:14px;
+      bottom:8px;
+      height:2px;
+      border-radius:999px;
+      background:linear-gradient(90deg,rgba(255,255,255,.18),rgba(255,255,255,.92),rgba(255,255,255,.18));
+      transform:translateX(-58%);
+      animation:spLoadingLine 1.25s ease-in-out infinite;
+      opacity:.72;
+    }
+    @keyframes spLoadingLine{
+      50%{transform:translateX(58%)}
     }
     .sp-loading-popup.is-visible .sp-loading-popup__card{
       transform:none;
     }
     .sp-loading-popup.is-success .sp-loading-popup__card{
-      background:
-        radial-gradient(circle at 16% 26%,rgba(186,255,227,.28),transparent 18%),
-        linear-gradient(135deg,#36b48b 0%,#49c5a0 48%,#5ed2be 100%);
+      background:linear-gradient(135deg,#116650,#168a6a 62%,#48b98a);
     }
     .sp-loading-popup.is-error .sp-loading-popup__card{
-      background:
-        radial-gradient(circle at 16% 26%,rgba(255,228,210,.28),transparent 18%),
-        linear-gradient(135deg,#dc6b53 0%,#e88362 42%,#ef9d72 100%);
+      background:linear-gradient(135deg,#87382f,#b64f3f 62%,#d67a5e);
+    }
+    .sp-loading-popup.is-success .sp-loading-popup__card::after,
+    .sp-loading-popup.is-error .sp-loading-popup__card::after{
+      animation:none;
+      transform:none;
+      opacity:.42;
     }
     .sp-loading-popup__gif{
       display:block;
       grid-column:1;
       grid-row:1 / span 2;
-      width:132px;
-      height:132px;
+      width:68px;
+      height:68px;
       object-fit:contain;
       background:transparent;
-      filter:drop-shadow(0 14px 24px rgba(0,0,0,.25));
+      filter:drop-shadow(0 8px 14px rgba(0,0,0,.18));
     }
     .sp-loading-popup__title,
     .sp-loading-popup__message{
       grid-column:2;
       color:#fff;
+      min-width:0;
     }
     .sp-loading-popup__title{
-      font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive;
-      font-size:36px;
-      font-weight:400;
-      line-height:.96;
-      letter-spacing:.01em;
+      align-self:end;
+      font:700 18px/1.08 "Century Gothic",Arial,sans-serif;
+      letter-spacing:-.025em;
     }
     .sp-loading-popup__message{
-      max-width:none;
-      color:rgba(255,255,255,.95);
-      font:600 italic 13px/1.55 "Century Gothic",Arial,sans-serif;
+      align-self:start;
+      max-width:240px;
+      overflow:hidden;
+      color:rgba(255,255,255,.78);
+      font:500 10.5px/1.45 "Century Gothic",Arial,sans-serif;
+      text-overflow:ellipsis;
     }
     html.has-sp-loading-popup{
       overflow:hidden;
     }
-    @media (max-width:640px){
-      .sp-loading-popup__card{
-        grid-template-columns:1fr;
-        width:min(300px,calc(100vw - 28px));
-        min-height:0;
-        padding:20px 18px;
-        text-align:center;
+    @media (max-width:520px){
+      .sp-loading-popup{
+        padding:14px;
       }
-      .sp-loading-popup__gif,
-      .sp-loading-popup__title,
-      .sp-loading-popup__message{
-        grid-column:auto;
-        grid-row:auto;
+      .sp-loading-popup__card{
+        grid-template-columns:60px minmax(0,1fr);
+        width:min(330px,calc(100vw - 28px));
+        min-height:94px;
+        padding:13px 15px 13px 12px;
+        column-gap:12px;
+        border-radius:16px;
       }
       .sp-loading-popup__gif{
-        width:118px;
-        height:118px;
-        margin-inline:auto;
+        width:56px;
+        height:56px;
       }
       .sp-loading-popup__title{
-        font-size:32px;
+        font-size:16px;
       }
       .sp-loading-popup__message{
-        font-size:12px;
+        font-size:9.5px;
+        line-height:1.4;
+      }
+    }
+    @media (prefers-reduced-motion:reduce){
+      .sp-loading-popup__card,
+      .sp-loading-popup__card::after{
+        animation:none!important;
+        transition:none!important;
       }
     }
   `;
