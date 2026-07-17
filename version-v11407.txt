@@ -1,0 +1,5 @@
+Portal build: 11.40.7-firebase-client-resolved-fedcm
+Firebase Google OAuth client: resolved at runtime from accounts:createAuthUri
+Google credential: GIS ID token + Firebase signInWithCredential
+FedCM button enabled: true
+Hardcoded Drive OAuth client removed: true

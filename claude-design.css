@@ -14286,3 +14286,93 @@ body.claude-page-home .explorer-panel{
     transition:none!important;
   }
 }
+
+
+/* V11.40.7 · Firebase Google credential layer */
+.firebase-google-layer{
+  position:fixed;
+  inset:0;
+  z-index:2147483600;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:rgba(6,21,43,.42);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .18s ease,visibility .18s ease;
+}
+.firebase-google-layer[hidden]{display:none!important}
+.firebase-google-layer.is-open{
+  opacity:1;
+  visibility:visible;
+}
+.firebase-google-card{
+  position:relative;
+  width:min(100%,390px);
+  padding:28px 28px 24px;
+  border:1px solid rgba(12,54,94,.12);
+  border-radius:22px;
+  background:rgba(255,255,255,.98);
+  box-shadow:0 24px 70px rgba(3,28,59,.20);
+  color:#12304f;
+  text-align:center;
+  transform:translateY(10px) scale(.985);
+  transition:transform .22s cubic-bezier(.2,.8,.2,1);
+}
+.firebase-google-layer.is-open .firebase-google-card{transform:none}
+.firebase-google-eyebrow{
+  display:block;
+  margin:0 0 8px;
+  color:#0c5d9c;
+  font:700 11px/1.2 "Century Gothic",Arial,sans-serif;
+  letter-spacing:.16em;
+}
+.firebase-google-card h2{
+  margin:0;
+  color:#102f4e;
+  font:700 clamp(22px,3vw,27px)/1.12 "Century Gothic",Arial,sans-serif;
+}
+.firebase-google-card p{
+  max-width:310px;
+  margin:10px auto 20px;
+  color:#62758a;
+  font:400 14px/1.55 "Century Gothic",Arial,sans-serif;
+}
+.firebase-google-official-button{
+  min-height:44px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:0 auto;
+}
+.firebase-google-status{
+  display:block;
+  margin-top:16px;
+  color:#7a8b9c;
+  font:400 11px/1.45 "Century Gothic",Arial,sans-serif;
+}
+.firebase-google-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:50%;
+  background:#eff4f8;
+  color:#284864;
+  font:400 22px/1 Arial,sans-serif;
+  cursor:pointer;
+  transition:background .16s ease,transform .16s ease;
+}
+.firebase-google-close:hover{background:#e3edf4;transform:rotate(4deg)}
+.firebase-google-layer.is-busy .firebase-google-close{pointer-events:none;opacity:.45}
+@media (max-width:520px){
+  .firebase-google-layer{padding:16px}
+  .firebase-google-card{padding:26px 18px 22px;border-radius:18px}
+}
+@media (prefers-reduced-motion:reduce){
+  .firebase-google-layer,.firebase-google-card,.firebase-google-close{transition:none!important}
+}
