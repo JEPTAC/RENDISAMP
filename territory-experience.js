@@ -696,7 +696,6 @@
     `;
 
     const anchor =
-      document.querySelector("#proyectos") ||
       document.querySelector(".explorer-bar") ||
       document.querySelector(".home-hero") ||
       document.querySelector("main > section");
