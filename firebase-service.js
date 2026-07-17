@@ -86,6 +86,8 @@
       "auth/too-many-requests":"Se realizaron demasiados intentos. Espere unos minutos.",
       "auth/network-request-failed":"No fue posible conectarse con Firebase.",
       "auth/popup-closed-by-user":"La ventana de acceso se cerró antes de completar el proceso.",
+      "auth/popup-blocked":"El navegador bloqueó la ventana de acceso. Habilite ventanas emergentes para este sitio.",
+      "auth/cancelled-popup-request":"Ya existe una ventana de acceso abierta. Complete o cierre ese proceso antes de intentarlo otra vez.",
       "auth/unauthorized-domain":"Debe autorizar el dominio de GitHub Pages en Firebase Authentication.",
       "permission-denied":"Las reglas de Firestore no permiten esta operación. Publique las reglas incluidas en el paquete.",
       "failed-precondition":"Firestore todavía no se encuentra configurado correctamente.",
@@ -379,13 +381,32 @@
     return credential;
   }
 
+  let googleSignInPromise = null;
+
   async function signInGoogle() {
-    if (!runtime.ready) await init();
-    const provider = new runtime.modules.auth.GoogleAuthProvider();
-    provider.setCustomParameters({prompt:"select_account"});
-    const credential = await runtime.modules.auth.signInWithPopup(runtime.auth,provider);
-    await handleAuthState(credential.user,{reason:"google_login"});
-    return credential;
+    if (googleSignInPromise) return googleSignInPromise;
+
+    googleSignInPromise = (async () => {
+      if (!runtime.ready) await init();
+      const provider = new runtime.modules.auth.GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt:"select_account",
+        hl:"es"
+      });
+
+      try {
+        const credential = await runtime.modules.auth.signInWithPopup(
+          runtime.auth,
+          provider
+        );
+        await handleAuthState(credential.user,{reason:"google_login"});
+        return credential;
+      } finally {
+        googleSignInPromise = null;
+      }
+    })();
+
+    return googleSignInPromise;
   }
 
   async function registerEmail(values = {}) {

@@ -12021,7 +12021,7 @@ body.claude-page-home .home-proof{
    ========================================================= */
 @font-face{
   font-family:"Brother Signature";
-  src:local("Brother Signature"),url("assets/fonts/Brother%20Signature.otf") format("opentype"),url("Brother%20Signature.otf") format("opentype");
+  src:local("Brother Signature"),url("assets/fonts/brother-signature.otf") format("opentype");
   font-style:normal;font-weight:400;font-display:swap;
 }
 body.page-home,body.claude-page-home{
@@ -12201,7 +12201,7 @@ body.page-home .home-highlights [data-admin-entity]>.admin-quick-card-edit,body.
    ========================================================= */
 @font-face{
   font-family:"Brother Signature";
-  src:url("assets/fonts/Brother%20Signature.otf") format("opentype");
+  src:url("assets/fonts/brother-signature.otf") format("opentype");
   font-style:normal;
   font-weight:400;
   font-display:swap;

@@ -1,5 +1,30 @@
 (() => {
-  const PORTAL_BUILD = "11.40.1-popup-minimal";
+  const PORTAL_BUILD = "11.40.2-font-coop";
+
+  /*
+   * GitHub Pages no permite definir cabeceras por archivo. Este service
+   * worker sirve únicamente las navegaciones con COOP compatible con
+   * ventanas OAuth, sin cachear ni modificar recursos del portal.
+   */
+  const coopBootstrap = (() => {
+    if (!("serviceWorker" in navigator) || !window.isSecureContext) return null;
+    const reloadKey = "sp_coop_sw_reloaded_v11402";
+    navigator.serviceWorker.register(`coop-sw.js?v=${PORTAL_BUILD}`, {
+      scope:"./",
+      updateViaCache:"none"
+    }).then(registration => {
+      registration.update().catch(() => {});
+      if (navigator.serviceWorker.controller) return;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (sessionStorage.getItem(reloadKey)) return;
+        sessionStorage.setItem(reloadKey,"1");
+        location.reload();
+      }, {once:true});
+    }).catch(error => {
+      console.info("[Portal] No fue posible activar la compatibilidad OAuth.", error);
+    });
+    return true;
+  })();
 
   /*
    * Arranque visual temprano.
@@ -2385,7 +2410,7 @@ helpers.showClickEffect = showClickEffect;
 
       configScript.onload = () => {
         const serviceScript = document.createElement("script");
-        serviceScript.src = "drive-service.js?v=11.0";
+        serviceScript.src = `drive-service.js?v=${PORTAL_BUILD}`;
         serviceScript.dataset.drivePortal = "true";
         serviceScript.onload = () => {
           window.DrivePortal?.init?.().finally(resolve);
@@ -2408,7 +2433,7 @@ helpers.showClickEffect = showClickEffect;
   function loadFirebaseService() {
     if (document.querySelector('script[data-firebase-portal]')) return;
     const script = document.createElement("script");
-    script.src = "firebase-service.js?v=11.0";
+    script.src = `firebase-service.js?v=${PORTAL_BUILD}`;
     script.dataset.firebasePortal = "true";
     script.onload = () => window.FirebasePortal?.init?.();
     script.onerror = () => helpers.toast("No fue posible cargar la conexión con Firebase.");
