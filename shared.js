@@ -1,28 +1,39 @@
 (() => {
-  const PORTAL_BUILD = "11.40.2-font-coop";
+  const PORTAL_BUILD = "11.40.3-google-credential";
 
   /*
-   * GitHub Pages no permite definir cabeceras por archivo. Este service
-   * worker sirve únicamente las navegaciones con COOP compatible con
-   * ventanas OAuth, sin cachear ni modificar recursos del portal.
+   * Retira el service worker experimental de V11.40.2. GitHub Pages no
+   * permite controlar COOP mediante ese mecanismo y mantenerlo activo
+   * puede dejar una navegación controlada innecesariamente.
    */
-  const coopBootstrap = (() => {
-    if (!("serviceWorker" in navigator) || !window.isSecureContext) return null;
-    const reloadKey = "sp_coop_sw_reloaded_v11402";
-    navigator.serviceWorker.register(`coop-sw.js?v=${PORTAL_BUILD}`, {
-      scope:"./",
-      updateViaCache:"none"
-    }).then(registration => {
-      registration.update().catch(() => {});
-      if (navigator.serviceWorker.controller) return;
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (sessionStorage.getItem(reloadKey)) return;
-        sessionStorage.setItem(reloadKey,"1");
+  const legacyCoopCleanup = (() => {
+    if (!("serviceWorker" in navigator)) return null;
+
+    const cleanupKey = "sp_legacy_coop_sw_removed_v11403";
+    const controlledByLegacyWorker = Boolean(
+      navigator.serviceWorker.controller?.scriptURL?.includes("coop-sw.js")
+    );
+
+    navigator.serviceWorker.getRegistrations().then(async registrations => {
+      const legacyRegistrations = registrations.filter(registration => {
+        const urls = [
+          registration.active?.scriptURL,
+          registration.waiting?.scriptURL,
+          registration.installing?.scriptURL
+        ].filter(Boolean);
+        return urls.some(url => url.includes("coop-sw.js"));
+      });
+
+      await Promise.all(legacyRegistrations.map(registration => registration.unregister()));
+
+      if (controlledByLegacyWorker && !sessionStorage.getItem(cleanupKey)) {
+        sessionStorage.setItem(cleanupKey,"1");
         location.reload();
-      }, {once:true});
+      }
     }).catch(error => {
-      console.info("[Portal] No fue posible activar la compatibilidad OAuth.", error);
+      console.info("[Portal] No fue posible retirar el service worker anterior.",error);
     });
+
     return true;
   })();
 

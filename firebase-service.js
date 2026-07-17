@@ -88,6 +88,12 @@
       "auth/popup-closed-by-user":"La ventana de acceso se cerró antes de completar el proceso.",
       "auth/popup-blocked":"El navegador bloqueó la ventana de acceso. Habilite ventanas emergentes para este sitio.",
       "auth/cancelled-popup-request":"Ya existe una ventana de acceso abierta. Complete o cierre ese proceso antes de intentarlo otra vez.",
+      "auth/google-client-id-missing":"No fue posible obtener el cliente OAuth de Google configurado en Firebase.",
+      "auth/google-sdk-load-failed":"No fue posible cargar el servicio oficial de acceso con Google.",
+      "auth/google-origin-not-authorized":`El dominio ${location.origin} no está autorizado en el cliente OAuth de Google.`,
+      "popup_closed":"La ventana de Google se cerró antes de completar el acceso.",
+      "popup_failed_to_open":"El navegador bloqueó la ventana de Google. Habilite ventanas emergentes para este sitio.",
+      "access_denied":"Google no autorizó el acceso solicitado.",
       "auth/unauthorized-domain":"Debe autorizar el dominio de GitHub Pages en Firebase Authentication.",
       "permission-denied":"Las reglas de Firestore no permiten esta operación. Publique las reglas incluidas en el paquete.",
       "failed-precondition":"Firestore todavía no se encuentra configurado correctamente.",
@@ -197,6 +203,11 @@
         await hydrateFromCloud();
 
         runtime.ready = true;
+
+        prepareGoogleIdentity().catch(error => {
+          console.info("[Firebase] El acceso con Google se preparará al solicitarlo.",error);
+        });
+
         emit("firebase:ready", {
           connected:runtime.connected,
           projectId:firebaseConfig.projectId
@@ -381,30 +392,309 @@
     return credential;
   }
 
+  const GOOGLE_IDENTITY_SCRIPT = "https://accounts.google.com/gsi/client";
+  const GOOGLE_IDENTITY_SCRIPT_ID = "google-identity-services-auth";
+  const GOOGLE_IDENTITY_SCOPE = "openid email profile";
+  const GOOGLE_CLIENT_CACHE_KEY = "sp_firebase_google_client_v1";
+
   let googleSignInPromise = null;
+  let googleIdentityPreparation = null;
+  let googleTokenClient = null;
+  let googleOAuthClientId = "";
+  let googleOAuthClientSource = "";
+
+  function authFlowError(code,message,details = {}) {
+    const error = new Error(message);
+    error.code = code;
+    Object.assign(error,details);
+    return error;
+  }
+
+  function loadGoogleIdentityServices() {
+    if (window.google?.accounts?.oauth2) return Promise.resolve(window.google.accounts.oauth2);
+
+    return new Promise((resolve,reject) => {
+      let settled = false;
+      let pollTimer = 0;
+      let timeoutTimer = 0;
+
+      const cleanup = () => {
+        if (pollTimer) window.clearInterval(pollTimer);
+        if (timeoutTimer) window.clearTimeout(timeoutTimer);
+      };
+
+      const succeed = () => {
+        if (settled || !window.google?.accounts?.oauth2) return false;
+        settled = true;
+        cleanup();
+        resolve(window.google.accounts.oauth2);
+        return true;
+      };
+
+      const fail = (message = "No fue posible cargar Google Identity Services.") => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(authFlowError("auth/google-sdk-load-failed",message));
+      };
+
+      const existing = document.getElementById(GOOGLE_IDENTITY_SCRIPT_ID)
+        || [...document.scripts].find(script => script.src === GOOGLE_IDENTITY_SCRIPT);
+
+      const script = existing || document.createElement("script");
+      if (!existing) {
+        script.id = GOOGLE_IDENTITY_SCRIPT_ID;
+        script.src = GOOGLE_IDENTITY_SCRIPT;
+        script.async = true;
+        script.defer = true;
+        script.referrerPolicy = "strict-origin-when-cross-origin";
+        document.head.appendChild(script);
+      }
+
+      script.addEventListener("load",() => {
+        window.setTimeout(() => {
+          if (!succeed()) {
+            fail("Google Identity Services cargó sin exponer la API de OAuth.");
+          }
+        },0);
+      },{once:true});
+      script.addEventListener("error",() => fail(),{once:true});
+
+      /*
+       * El script está precargado en el HTML con async/defer. Cuando termina
+       * antes de que firebase-service.js se ejecute, el evento load ya ocurrió.
+       * Este sondeo evita dejar la autenticación pendiente en ese escenario.
+       */
+      pollTimer = window.setInterval(succeed,50);
+      timeoutTimer = window.setTimeout(() => fail(
+        "Google Identity Services no respondió dentro del tiempo esperado."
+      ),15000);
+      succeed();
+    });
+  }
+
+  function findGoogleClientId(value,depth = 0) {
+    if (!value || depth > 8) return "";
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const result = findGoogleClientId(item,depth + 1);
+        if (result) return result;
+      }
+      return "";
+    }
+
+    if (typeof value !== "object") return "";
+
+    const provider = String(
+      value.provider
+      || value.providerId
+      || value.idpId
+      || value.name
+      || ""
+    ).toLowerCase();
+    const clientId = String(
+      value.clientId
+      || value.client_id
+      || value.oauthClientId
+      || value.googleClientId
+      || ""
+    ).trim();
+
+    if (clientId.endsWith(".apps.googleusercontent.com")
+      && (!provider || provider.includes("google"))) {
+      return clientId;
+    }
+
+    for (const item of Object.values(value)) {
+      const result = findGoogleClientId(item,depth + 1);
+      if (result) return result;
+    }
+    return "";
+  }
+
+  async function resolveGoogleOAuthClientId() {
+    if (googleOAuthClientId) return googleOAuthClientId;
+
+    const explicit = String(
+      window.FIREBASE_GOOGLE_CLIENT_ID
+      || document.querySelector('meta[name="firebase-google-client-id"]')?.content
+      || ""
+    ).trim();
+
+    if (explicit.endsWith(".apps.googleusercontent.com")) {
+      googleOAuthClientId = explicit;
+      googleOAuthClientSource = "explicit";
+      return googleOAuthClientId;
+    }
+
+    try {
+      const cached = String(sessionStorage.getItem(GOOGLE_CLIENT_CACHE_KEY) || "").trim();
+      if (cached.endsWith(".apps.googleusercontent.com")) {
+        googleOAuthClientId = cached;
+        googleOAuthClientSource = "session";
+        return googleOAuthClientId;
+      }
+    } catch {}
+
+    const apiKey = encodeURIComponent(firebaseConfig.apiKey);
+    const endpoints = [
+      `https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig?key=${apiKey}`,
+      `https://identitytoolkit.googleapis.com/v1/projects?key=${apiKey}`
+    ];
+
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetch(endpoint,{
+          method:"GET",
+          mode:"cors",
+          credentials:"omit",
+          cache:"no-store",
+          referrerPolicy:"strict-origin-when-cross-origin"
+        });
+        if (!response.ok) continue;
+        const payload = await response.json();
+        const clientId = findGoogleClientId(payload);
+        if (!clientId) continue;
+
+        googleOAuthClientId = clientId;
+        googleOAuthClientSource = endpoint.includes("v3/") ? "project-config-v3" : "project-config-v1";
+        try { sessionStorage.setItem(GOOGLE_CLIENT_CACHE_KEY,clientId); } catch {}
+        return googleOAuthClientId;
+      } catch (error) {
+        console.info("[Firebase] No se obtuvo el cliente de Google desde un endpoint de configuración.",error);
+      }
+    }
+
+    throw authFlowError(
+      "auth/google-client-id-missing",
+      "No fue posible leer el cliente OAuth de Google del proyecto Firebase."
+    );
+  }
+
+  async function prepareGoogleIdentity() {
+    if (googleTokenClient && googleOAuthClientId) {
+      return {clientId:googleOAuthClientId,source:googleOAuthClientSource};
+    }
+    if (googleIdentityPreparation) return googleIdentityPreparation;
+
+    googleIdentityPreparation = (async () => {
+      const [oauth2,clientId] = await Promise.all([
+        loadGoogleIdentityServices(),
+        resolveGoogleOAuthClientId()
+      ]);
+
+      googleTokenClient = oauth2.initTokenClient({
+        client_id:clientId,
+        scope:GOOGLE_IDENTITY_SCOPE,
+        include_granted_scopes:true,
+        callback:() => {},
+        error_callback:() => {}
+      });
+
+      return {clientId,source:googleOAuthClientSource};
+    })().catch(error => {
+      googleIdentityPreparation = null;
+      throw error;
+    });
+
+    return googleIdentityPreparation;
+  }
+
+  function requestGoogleAccessToken() {
+    if (!googleTokenClient) {
+      return Promise.reject(authFlowError(
+        "auth/google-sdk-load-failed",
+        "El acceso con Google todavía no está preparado."
+      ));
+    }
+
+    return new Promise((resolve,reject) => {
+      let settled = false;
+      const finish = (handler,value) => {
+        if (settled) return;
+        settled = true;
+        handler(value);
+      };
+
+      googleTokenClient.callback = response => {
+        if (response?.error) {
+          finish(reject,authFlowError(
+            response.error,
+            response.error_description || "Google rechazó la solicitud de acceso.",
+            {googleResponse:response}
+          ));
+          return;
+        }
+        if (!response?.access_token) {
+          finish(reject,authFlowError(
+            "auth/invalid-credential",
+            "Google no devolvió una credencial válida."
+          ));
+          return;
+        }
+        finish(resolve,response);
+      };
+
+      googleTokenClient.error_callback = response => {
+        const type = String(response?.type || response?.error || "unknown");
+        const code = type === "popup_closed"
+          ? "popup_closed"
+          : type === "popup_failed_to_open"
+            ? "popup_failed_to_open"
+            : `auth/google-${type.replace(/[^a-z0-9_-]+/gi,"-")}`;
+        finish(reject,authFlowError(
+          code,
+          response?.message || "No fue posible abrir el acceso seguro de Google.",
+          {googleResponse:response}
+        ));
+      };
+
+      try {
+        googleTokenClient.requestAccessToken({prompt:"select_account"});
+      } catch (error) {
+        finish(reject,error);
+      }
+    });
+  }
 
   async function signInGoogle() {
     if (googleSignInPromise) return googleSignInPromise;
 
     googleSignInPromise = (async () => {
       if (!runtime.ready) await init();
-      const provider = new runtime.modules.auth.GoogleAuthProvider();
-      provider.setCustomParameters({
-        prompt:"select_account",
-        hl:"es"
-      });
+      if (!runtime.ready || !runtime.auth || !runtime.modules?.auth) {
+        throw runtime.lastError || new Error("Firebase todavía no está disponible.");
+      }
+
+      await prepareGoogleIdentity();
+      const googleResponse = await requestGoogleAccessToken();
+      const credential = runtime.modules.auth.GoogleAuthProvider.credential(
+        null,
+        googleResponse.access_token
+      );
 
       try {
-        const credential = await runtime.modules.auth.signInWithPopup(
+        const userCredential = await runtime.modules.auth.signInWithCredential(
           runtime.auth,
-          provider
+          credential
         );
-        await handleAuthState(credential.user,{reason:"google_login"});
-        return credential;
-      } finally {
-        googleSignInPromise = null;
+        await handleAuthState(userCredential.user,{reason:"google_login"});
+        return userCredential;
+      } catch (error) {
+        if (error?.code === "auth/invalid-credential"
+          || error?.code === "auth/invalid-idp-response") {
+          throw authFlowError(
+            "auth/google-origin-not-authorized",
+            `El acceso de Google no coincide con la configuración Firebase para ${location.origin}.`,
+            {cause:error,clientId:googleOAuthClientId,clientSource:googleOAuthClientSource}
+          );
+        }
+        throw error;
       }
-    })();
+    })().finally(() => {
+      googleSignInPromise = null;
+    });
 
     return googleSignInPromise;
   }
@@ -829,6 +1119,13 @@
     init,
     signInEmail,
     signInGoogle,
+    prepareGoogleIdentity,
+    getGoogleAuthDiagnostics:() => ({
+      clientId:googleOAuthClientId,
+      clientSource:googleOAuthClientSource,
+      origin:location.origin,
+      prepared:Boolean(googleTokenClient)
+    }),
     registerEmail,
     resendVerification,
     sendPasswordReset,
