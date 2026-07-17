@@ -14247,3 +14247,233 @@ body.claude-page-home .home-section > .site-shell{
     transform:none!important;
   }
 }
+
+
+/* =========================================================
+   V11.35.1 · Hero compacto y ancho editorial
+   Menor ancho y altura sin perder la igualdad de los paneles
+   ========================================================= */
+
+body.page-home,
+body.claude-page-home{
+  --home-unified-width:min(1280px,calc(100% - 48px))!important;
+}
+
+body.page-home .site-shell,
+body.claude-page-home .site-shell,
+body.page-home .explorer-panel,
+body.claude-page-home .explorer-panel,
+body.page-home .territory-shell,
+body.claude-page-home .territory-shell,
+body.page-home .home-section > .site-shell,
+body.claude-page-home .home-section > .site-shell{
+  width:var(--home-unified-width)!important;
+  max-width:1280px!important;
+}
+
+body.page-home .home-hero,
+body.claude-page-home .home-hero,
+body.hero-layout-balanced.claude-page-home .home-hero,
+body.hero-layout-wide.claude-page-home .home-hero,
+body.hero-layout-compact.claude-page-home .home-hero{
+  width:var(--home-unified-width)!important;
+  height:clamp(520px,64svh,650px)!important;
+  min-height:520px!important;
+  max-height:650px!important;
+  margin-top:14px!important;
+  border-radius:38px!important;
+}
+
+body.page-home .home-hero__grid,
+body.claude-page-home .home-hero__grid,
+body.hero-layout-balanced .home-hero__grid,
+body.hero-layout-wide .home-hero__grid,
+body.hero-layout-compact .home-hero__grid{
+  padding:16px!important;
+  gap:16px!important;
+}
+
+body.page-home .home-hero__copy,
+body.claude-page-home .home-hero__copy,
+body.page-home .home-hero.has-admin-banner .home-hero__copy,
+body.claude-page-home .home-hero.has-admin-banner .home-hero__copy,
+body.page-home .home-hero__visual,
+body.claude-page-home .home-hero__visual{
+  border-radius:29px!important;
+}
+
+body.page-home .home-hero__copy,
+body.claude-page-home .home-hero__copy,
+body.page-home .home-hero.has-admin-banner .home-hero__copy,
+body.claude-page-home .home-hero.has-admin-banner .home-hero__copy{
+  padding:clamp(30px,3.1vw,48px)!important;
+}
+
+body.page-home .home-hero__copy > span,
+body.claude-page-home .home-hero__copy > span{
+  min-height:27px!important;
+  margin-bottom:13px!important;
+  padding-inline:11px!important;
+  font-size:8px!important;
+}
+
+body.page-home .home-hero__copy h1,
+body.claude-page-home .home-hero__copy h1{
+  margin-bottom:15px!important;
+  font-size:clamp(43px,3.7vw,62px)!important;
+  line-height:.93!important;
+}
+
+body.page-home .home-hero__copy > p,
+body.claude-page-home .home-hero__copy > p{
+  max-width:540px!important;
+  margin-bottom:17px!important;
+  font-size:clamp(12px,.9vw,15px)!important;
+  line-height:1.52!important;
+}
+
+body.page-home .home-hero .hero-buttons,
+body.claude-page-home .home-hero .hero-buttons{
+  gap:9px!important;
+  margin-bottom:16px!important;
+}
+
+body.page-home .home-hero .hero-buttons .button,
+body.claude-page-home .home-hero .hero-buttons .button{
+  min-height:42px!important;
+  padding-inline:15px!important;
+  border-radius:12px!important;
+  font-size:9px!important;
+}
+
+body.page-home .hero-trust,
+body.claude-page-home .hero-trust{
+  min-height:42px!important;
+  padding:6px 11px 6px 7px!important;
+  border-radius:15px!important;
+}
+
+body.page-home .home-hero__visual::before,
+body.claude-page-home .home-hero__visual::before{
+  top:17px!important;
+  left:17px!important;
+  height:28px!important;
+  padding-inline:10px!important;
+  font-size:7px!important;
+}
+
+body.page-home .hero-float-card,
+body.claude-page-home .hero-float-card{
+  right:17px!important;
+  bottom:17px!important;
+  width:clamp(158px,13vw,196px)!important;
+  padding:16px!important;
+  border-radius:18px!important;
+}
+
+body.page-home .hero-float-card strong,
+body.claude-page-home .hero-float-card strong{
+  font-size:clamp(40px,3.4vw,54px)!important;
+}
+
+body.page-home .explorer-bar,
+body.claude-page-home .explorer-bar{
+  margin-top:14px!important;
+}
+
+body.page-home .explorer-panel,
+body.claude-page-home .explorer-panel{
+  padding:13px!important;
+  border-radius:19px!important;
+}
+
+@media (min-width:768px) and (max-height:739px){
+  body.page-home .home-hero,
+  body.claude-page-home .home-hero{
+    height:clamp(490px,79svh,560px)!important;
+    min-height:490px!important;
+    max-height:560px!important;
+    border-radius:31px!important;
+  }
+
+  body.page-home .home-hero__grid,
+  body.claude-page-home .home-hero__grid{
+    padding:12px!important;
+    gap:12px!important;
+  }
+
+  body.page-home .home-hero__copy,
+  body.claude-page-home .home-hero__copy,
+  body.page-home .home-hero__visual,
+  body.claude-page-home .home-hero__visual{
+    border-radius:23px!important;
+  }
+
+  body.page-home .home-hero__copy,
+  body.claude-page-home .home-hero__copy{
+    padding:23px 29px!important;
+  }
+
+  body.page-home .home-hero__copy h1,
+  body.claude-page-home .home-hero__copy h1{
+    font-size:clamp(36px,3.55vw,49px)!important;
+    margin-bottom:11px!important;
+  }
+
+  body.page-home .home-hero__copy > p,
+  body.claude-page-home .home-hero__copy > p{
+    margin-bottom:12px!important;
+    font-size:11px!important;
+    line-height:1.42!important;
+  }
+
+  body.page-home .home-hero .hero-buttons,
+  body.claude-page-home .home-hero .hero-buttons{
+    margin-bottom:11px!important;
+  }
+
+  body.page-home .home-hero .hero-buttons .button,
+  body.claude-page-home .home-hero .hero-buttons .button{
+    min-height:37px!important;
+    font-size:8px!important;
+  }
+
+  body.page-home .hero-trust,
+  body.claude-page-home .hero-trust{
+    min-height:38px!important;
+  }
+}
+
+@media (min-width:1041px) and (max-width:1320px){
+  body.page-home,
+  body.claude-page-home{
+    --home-unified-width:calc(100% - 36px)!important;
+  }
+}
+
+@media (max-width:1040px){
+  body.page-home,
+  body.claude-page-home{
+    --home-unified-width:min(920px,calc(100% - 24px))!important;
+  }
+
+  body.page-home .home-hero,
+  body.claude-page-home .home-hero{
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+}
+
+@media (max-width:767px){
+  body.page-home,
+  body.claude-page-home{
+    --home-unified-width:calc(100% - 12px)!important;
+  }
+
+  body.page-home .home-hero__visual,
+  body.claude-page-home .home-hero__visual{
+    min-height:230px!important;
+    aspect-ratio:1.32/1!important;
+  }
+}

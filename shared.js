@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.35-unified-hero";
+  const PORTAL_BUILD = "11.35.1-compact-hero";
 
   /*
    * Arranque visual temprano.
