@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.30-projects-cinematic";
+  const PORTAL_BUILD = "11.31.1-scroll-story";
 
   /*
    * Arranque visual temprano.

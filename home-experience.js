@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD = "11.30-projects-cinematic";
+  const BUILD = "11.31.1-scroll-story";
   const PROJECT_LIMIT = 10;
   const PROJECT_MINIMUM = 5;
 
@@ -118,6 +118,33 @@
     ][index % 10];
   }
 
+  const NARRATIVE_STATE = {projectCount:PROJECT_MINIMUM,sceneCount:CINEMATIC_STORIES.length};
+
+  function ensureNarrativeProgress() {
+    let node = document.getElementById("homeNarrativeProgress");
+    if (node) return node;
+    node = document.createElement("div");
+    node.id = "homeNarrativeProgress";
+    node.className = "home-narrative-progress";
+    node.setAttribute("aria-hidden","true");
+    node.innerHTML = `<span>RECORRIDO</span><b>01</b><i><em></em></i><small>09</small><strong>Proyectos</strong>`;
+    document.body.append(node);
+    return node;
+  }
+
+  function updateNarrativeProgress(kind,index,count,visible = true) {
+    const node = ensureNarrativeProgress();
+    if (kind === "project") NARRATIVE_STATE.projectCount = count;
+    if (kind === "scene") NARRATIVE_STATE.sceneCount = count;
+    const total = NARRATIVE_STATE.projectCount + NARRATIVE_STATE.sceneCount;
+    const current = kind === "scene" ? NARRATIVE_STATE.projectCount + index + 1 : index + 1;
+    node.querySelector("b").textContent = String(current).padStart(2,"0");
+    node.querySelector("small").textContent = String(total).padStart(2,"0");
+    node.querySelector("strong").textContent = kind === "scene" ? "Cinemática" : "Proyectos";
+    node.querySelector("em").style.height = `${total > 1 ? ((current - 1) / (total - 1)) * 100 : 100}%`;
+    node.classList.toggle("is-visible",visible);
+  }
+
   function createProjectDialog() {
     let dialog = document.getElementById("projectConsoleDialog");
     if (dialog) return dialog;
@@ -187,6 +214,8 @@
   }
 
   function initProjectConsole() {
+    const section = document.getElementById("proyectos-destacados");
+    const shell = section?.querySelector(".project-console__shell");
     const viewport = document.getElementById("projectConsoleViewport");
     const track = document.getElementById("projectConsoleTrack");
     const selected = document.getElementById("projectConsoleSelected");
@@ -197,18 +226,38 @@
     const next = document.getElementById("projectConsoleNext");
     const openButton = document.getElementById("projectConsoleOpen");
     const manageButton = document.getElementById("projectConsoleManage");
-    if (!viewport || !track || !selected || !backdrop) return;
+    const stepsNode = document.getElementById("projectConsoleSteps");
+    if (!section || !shell || !viewport || !track || !selected || !backdrop || !stepsNode) return;
 
     let projects = ensureProjects();
     let activeIndex = 0;
-    let pointerStart = 0;
-    let pointerDelta = 0;
-    let pointerActive = false;
-    let moved = false;
-    let wheelLock = false;
     let editingId = projects[0]?.id || "";
+    let motionCleanup = () => {};
+    let scrollController = null;
+    let resizeTimer = 0;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     viewport.tabIndex = 0;
+    viewport.setAttribute("aria-describedby","projectConsoleTitle");
+
+    function loadProjectImage(index) {
+      const card = track.children[index];
+      const image = card?.querySelector("img[data-project-src]");
+      if (!image || image.dataset.loaded === "true") return;
+      const source = safeUrl(image.dataset.projectSrc);
+      if (!source) return;
+
+      image.dataset.loaded = "true";
+      image.addEventListener("load",() => {
+        card.classList.add("has-image");
+        card.classList.remove("has-image-error");
+      },{once:true});
+      image.addEventListener("error",() => {
+        card.classList.add("has-image-error");
+        image.removeAttribute("src");
+      },{once:true});
+      image.src = source;
+    }
 
     function saveProjects() {
       const api = portal();
@@ -218,60 +267,28 @@
       window.dispatchEvent(new CustomEvent("home:projects-updated",{detail:{count:projects.length}}));
     }
 
-    function renderCards() {
-      track.replaceChildren();
-      projects.forEach((project,index) => {
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = "project-console-card";
-        card.dataset.projectIndex = String(index);
-        card.setAttribute("role","option");
-        card.setAttribute("aria-label",`Abrir ${project.title}`);
-        const rgb = projectColor(index);
-        card.style.setProperty("--project-rgb",rgb.join(","));
-        const image = safeUrl(project.image);
-        card.innerHTML = `
-          <span class="project-console-card__visual">
-            <i>${String(index + 1).padStart(2,"0")}</i>
-            <b>${escapeHtml(project.status)}</b>
-          </span>
-          <span class="project-console-card__body">
-            <small>${escapeHtml(project.category)} · ${escapeHtml(project.year)}</small>
-            <strong>${escapeHtml(project.title)}</strong>
-            <em>Ver proyecto</em>
-          </span>`;
-        if (image) {
-          card.querySelector(".project-console-card__visual").style.backgroundImage =
-            `linear-gradient(180deg,rgba(4,17,35,.05),rgba(4,17,35,.82)),url("${image.replace(/["\\]/g,"\\$&")}")`;
-        }
-        card.addEventListener("click",() => {
-          if (moved) return;
-          setActive(index,true);
-          window.setTimeout(openProject,130);
-        });
-        track.append(card);
-      });
-      totalNode.textContent = String(projects.length).padStart(2,"0");
-      setActive(clamp(activeIndex,0,projects.length - 1),false);
-    }
-
-    function setActive(index,announce = true) {
+    function updateSelectedContent(index,announce = true) {
       activeIndex = clamp(index,0,projects.length - 1);
       const active = projects[activeIndex];
       const rgb = projectColor(activeIndex);
+      if (!active) return;
 
+      loadProjectImage(activeIndex);
+      loadProjectImage(activeIndex + 1);
+
+      const staticMode = section.classList.contains("project-console--static");
       [...track.children].forEach((card,indexValue) => {
-        const offset = indexValue - activeIndex;
-        const distance = Math.abs(offset);
-        card.style.setProperty("--project-offset",String(offset));
-        card.style.setProperty("--project-distance",String(distance));
-        card.style.setProperty("--project-z",String(100 - distance));
-        card.classList.toggle("is-active",indexValue === activeIndex);
-        card.classList.toggle("is-before",offset < 0);
-        card.classList.toggle("is-after",offset > 0);
-        card.classList.toggle("is-far",distance > 3);
-        card.setAttribute("aria-selected",String(indexValue === activeIndex));
-        card.tabIndex = indexValue === activeIndex ? 0 : -1;
+        const isActive = indexValue === activeIndex;
+        card.classList.toggle("is-active",isActive);
+        card.setAttribute("aria-selected",String(isActive));
+        card.setAttribute("aria-hidden",staticMode ? "false" : String(!isActive));
+        card.tabIndex = staticMode || isActive ? 0 : -1;
+        if ("inert" in card) card.inert = staticMode ? false : !isActive;
+      });
+      [...stepsNode.children].forEach((button,indexValue) => {
+        const isActive = indexValue === activeIndex;
+        button.classList.toggle("is-active",isActive);
+        button.setAttribute("aria-current",isActive ? "step" : "false");
       });
 
       currentNode.textContent = String(activeIndex + 1).padStart(2,"0");
@@ -280,10 +297,12 @@
       selected.querySelector("span").textContent = `${active.category.toUpperCase()} · ${active.year}`;
       backdrop.style.setProperty("--project-active-rgb",rgb.join(","));
       backdrop.style.backgroundImage = active.image
-        ? `linear-gradient(90deg,rgba(4,18,38,.94) 0%,rgba(4,18,38,.70) 44%,rgba(4,18,38,.30) 100%),url("${safeUrl(active.image)}")`
+        ? `linear-gradient(90deg,rgba(4,18,38,.96) 0%,rgba(4,18,38,.78) 46%,rgba(4,18,38,.38) 100%),url("${safeUrl(active.image).replace(/["\\]/g,"\\$&")}")`
         : "";
       prev.disabled = activeIndex <= 0;
       next.disabled = activeIndex >= projects.length - 1;
+      section.style.setProperty("--project-progress",projects.length > 1 ? String(activeIndex / (projects.length - 1)) : "1");
+      updateNarrativeProgress("project",activeIndex,projects.length,section.classList.contains("is-scroll-active"));
       if (announce) viewport.setAttribute("aria-label",`${active.title}, ${activeIndex + 1} de ${projects.length}`);
     }
 
@@ -317,10 +336,6 @@
         });
       });
       dialog.showModal();
-    }
-
-    function syncAdminVisibility() {
-      manageButton.hidden = !canManageProjects();
     }
 
     function renderEditorList() {
@@ -418,52 +433,313 @@
       dialog.showModal();
     }
 
-    prev.addEventListener("click",() => setActive(activeIndex - 1));
-    next.addEventListener("click",() => setActive(activeIndex + 1));
+    function syncAdminVisibility() {
+      manageButton.hidden = !canManageProjects();
+    }
+
+    function goToProject(index,behavior = "smooth") {
+      const targetIndex = clamp(index,0,projects.length - 1);
+      if (scrollController?.scrollToStep) {
+        scrollController.scrollToStep(targetIndex,behavior);
+      } else {
+        updateSelectedContent(targetIndex);
+      }
+    }
+
+    function setupStaticLayout(cards) {
+      section.classList.add("project-console--static");
+      updateSelectedContent(0,false);
+      cards.forEach((card,index) => {
+        card.style.removeProperty("transform");
+        card.style.removeProperty("opacity");
+        card.style.removeProperty("z-index");
+        card.tabIndex = 0;
+        card.inert = false;
+        card.setAttribute("aria-hidden","false");
+        if (!card.dataset.staticFocusBound) {
+          card.dataset.staticFocusBound = "true";
+          card.addEventListener("focus",() => updateSelectedContent(index,false));
+        }
+      });
+      return {scrollToStep(index){cards[index]?.scrollIntoView({behavior:"smooth",block:"center"});}};
+    }
+
+    function setupNativeStack(cards) {
+      section.classList.add("project-console--native");
+      section.style.setProperty("--project-count",String(cards.length));
+      let frame = 0;
+      let start = 0;
+      let end = 1;
+      let snapTimer = 0;
+      let snapping = false;
+
+      const measure = () => {
+        start = section.getBoundingClientRect().top + window.scrollY;
+        end = start + Math.max(section.offsetHeight - window.innerHeight,1);
+      };
+
+      const render = () => {
+        frame = 0;
+        const progress = clamp((window.scrollY - start) / Math.max(end - start,1),0,1);
+        const isActive = window.scrollY >= start - 2 && window.scrollY <= end + 2;
+        section.classList.toggle("is-scroll-active",isActive);
+        section.style.setProperty("--project-scroll-progress",progress.toFixed(4));
+        updateNarrativeProgress("project",activeIndex,projects.length,isActive);
+        const exact = progress * Math.max(cards.length - 1,1);
+        const nextActive = Math.round(exact);
+        cards.forEach((card,index) => {
+          const relative = index - exact;
+          const behind = Math.max(relative,0);
+          const passed = Math.max(-relative,0);
+          const y = passed > 0 ? -Math.min(passed,1) * 118 : behind * 18;
+          const x = passed > 0 ? -Math.min(passed,1) * 18 : behind * 5;
+          const scale = passed > 0 ? 1 - Math.min(passed,1) * .06 : 1 - Math.min(behind,5) * .035;
+          const rotate = passed > 0 ? -1.1 * Math.min(passed,1) : Math.min(behind,5) * .24;
+          const opacity = passed >= 1 ? 0 : Math.max(.24,1 - behind * .13);
+          card.style.transform = `translate3d(${x}px,${y}%,0) rotate(${rotate}deg) scale(${scale})`;
+          card.style.opacity = String(opacity);
+          card.style.zIndex = String(cards.length - index);
+          card.setAttribute("aria-hidden",String(opacity < .15));
+        });
+        if (nextActive !== activeIndex) updateSelectedContent(nextActive,false);
+      };
+
+      const snapToNearest = () => {
+        snapTimer = 0;
+        if (snapping || reducedMotion.matches) return;
+        const range = Math.max(end - start,1);
+        const raw = (window.scrollY - start) / range;
+        if (raw <= 0 || raw >= 1) return;
+        const steps = Math.max(cards.length - 1,1);
+        const nearest = Math.round(raw * steps) / steps;
+        if (Math.abs(nearest - raw) < .018) return;
+        snapping = true;
+        window.scrollTo({top:start + range * nearest,behavior:"smooth"});
+        window.setTimeout(() => {snapping = false;},260);
+      };
+      const schedule = () => {
+        if (!frame) frame = requestAnimationFrame(render);
+        clearTimeout(snapTimer);
+        snapTimer = window.setTimeout(snapToNearest,110);
+      };
+      const remeasure = () => {
+        measure();
+        render();
+      };
+      measure();
+      render();
+      requestAnimationFrame(remeasure);
+      window.addEventListener("scroll",schedule,{passive:true});
+      window.addEventListener("resize",remeasure,{passive:true});
+      window.addEventListener("pageshow",remeasure,{passive:true});
+      window.addEventListener("portal:rendered",remeasure,{once:true});
+      return {
+        scrollToStep(index,behavior = "smooth") {
+          const ratio = cards.length > 1 ? index / (cards.length - 1) : 0;
+          window.scrollTo({top:start + (end - start) * ratio,behavior});
+        },
+        destroy() {
+          window.removeEventListener("scroll",schedule);
+          window.removeEventListener("resize",remeasure);
+          window.removeEventListener("pageshow",remeasure);
+          window.removeEventListener("portal:rendered",remeasure);
+          clearTimeout(snapTimer);
+          if (frame) cancelAnimationFrame(frame);
+        }
+      };
+    }
+
+    function setupGsapStack(cards) {
+      const gsap = window.gsap;
+      const ScrollTrigger = window.ScrollTrigger;
+      if (!gsap || !ScrollTrigger) return null;
+      gsap.registerPlugin(ScrollTrigger);
+      section.classList.add("project-console--gsap");
+      const mobile = window.matchMedia("(max-width: 767px)").matches;
+      const lowTier = document.documentElement.dataset.motionTier === "low";
+      const gap = mobile ? 11 : 18;
+      const xGap = mobile || lowTier ? 0 : 5;
+      const scaleStep = mobile ? .026 : .035;
+      const rotationStep = mobile || lowTier ? 0 : .22;
+
+      cards.forEach((card,index) => {
+        gsap.set(card,{
+          y:index * gap,
+          x:index * xGap,
+          scale:1 - Math.min(index,6) * scaleStep,
+          rotation:Math.min(index,6) * rotationStep,
+          opacity:Math.max(.28,1 - index * .12),
+          zIndex:cards.length - index,
+          transformOrigin:"50% 84%",
+          force3D:true
+        });
+      });
+
+      const timeline = gsap.timeline({defaults:{ease:"none"},paused:true});
+      for (let step = 0; step < cards.length - 1; step += 1) {
+        timeline.to(cards[step],{
+          yPercent:mobile ? -92 : -112,
+          xPercent:mobile ? 0 : -4,
+          scale:.94,
+          rotation:mobile || lowTier ? 0 : -1.05,
+          opacity:0,
+          duration:1
+        },step);
+        for (let cardIndex = step + 1; cardIndex < cards.length; cardIndex += 1) {
+          const distance = cardIndex - (step + 1);
+          timeline.to(cards[cardIndex],{
+            y:distance * gap,
+            x:distance * xGap,
+            scale:1 - Math.min(distance,6) * scaleStep,
+            rotation:Math.min(distance,6) * rotationStep,
+            opacity:Math.max(.28,1 - distance * .12),
+            duration:1
+          },step);
+        }
+      }
+
+      const trigger = ScrollTrigger.create({
+        id:"project-stack",
+        trigger:section,
+        start:"top top",
+        end:() => `+=${Math.round(window.innerHeight * (mobile ? .72 : .88) * Math.max(cards.length - 1,1))}`,
+        pin:shell,
+        pinSpacing:true,
+        animation:timeline,
+        scrub:mobile ? .28 : .48,
+        anticipatePin:1,
+        invalidateOnRefresh:true,
+        snap:cards.length > 1 ? {
+          snapTo:ScrollTrigger.snapDirectional
+            ? ScrollTrigger.snapDirectional(1 / (cards.length - 1))
+            : 1 / (cards.length - 1),
+          delay:.04,
+          duration:{min:.10,max:.32},
+          ease:"power1.inOut"
+        } : false,
+        onUpdate:self => {
+          const index = Math.round(self.progress * Math.max(cards.length - 1,1));
+          if (index !== activeIndex) updateSelectedContent(index,false);
+          section.style.setProperty("--project-scroll-progress",self.progress.toFixed(4));
+        },
+        onToggle:self => {
+          section.classList.toggle("is-scroll-active",self.isActive);
+          updateNarrativeProgress("project",activeIndex,projects.length,self.isActive);
+        }
+      });
+
+      return {
+        scrollToStep(index,behavior = "smooth") {
+          const ratio = cards.length > 1 ? index / (cards.length - 1) : 0;
+          window.scrollTo({top:trigger.start + (trigger.end - trigger.start) * ratio,behavior});
+        },
+        destroy() {
+          trigger.kill(true);
+          timeline.kill();
+        }
+      };
+    }
+
+    function setupMotion() {
+      motionCleanup();
+      motionCleanup = () => {};
+      scrollController = null;
+      section.classList.remove("project-console--static","project-console--native","project-console--gsap","is-scroll-active");
+      const cards = [...track.querySelectorAll(".project-console-card")];
+      cards.forEach(card => {
+        card.style.removeProperty("transform");
+        card.style.removeProperty("opacity");
+        card.style.removeProperty("z-index");
+      });
+
+      if (reducedMotion.matches) {
+        scrollController = setupStaticLayout(cards);
+      } else {
+        scrollController = setupGsapStack(cards) || setupNativeStack(cards);
+      }
+      motionCleanup = () => scrollController?.destroy?.();
+      window.ScrollTrigger?.refresh?.(true);
+    }
+
+    function renderCards() {
+      track.replaceChildren();
+      stepsNode.replaceChildren();
+      projects.forEach((project,index) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "project-console-card";
+        card.dataset.projectIndex = String(index);
+        card.setAttribute("role","option");
+        card.setAttribute("aria-label",`Abrir ${project.title}`);
+        const rgb = projectColor(index);
+        card.style.setProperty("--project-rgb",rgb.join(","));
+        const image = safeUrl(project.image);
+        card.innerHTML = `
+          <span class="project-console-card__visual">
+            ${image ? `<img data-project-src="${escapeHtml(image)}" alt="" width="900" height="900" decoding="async">` : ""}
+            <i>${String(index + 1).padStart(2,"0")}</i>
+            <b>${escapeHtml(project.status)}</b>
+          </span>
+          <span class="project-console-card__body">
+            <small>${escapeHtml(project.category)} · ${escapeHtml(project.year)}</small>
+            <strong>${escapeHtml(project.title)}</strong>
+            <span>${escapeHtml(project.description)}</span>
+            <em>Ver proyecto <b aria-hidden="true">↗</b></em>
+          </span>`;
+        card.addEventListener("click",() => {
+          if (index !== activeIndex) {
+            goToProject(index);
+            return;
+          }
+          openProject();
+        });
+        track.append(card);
+
+        const stepButton = document.createElement("button");
+        stepButton.type = "button";
+        stepButton.dataset.projectStep = String(index);
+        stepButton.setAttribute("aria-label",`Ir al proyecto ${index + 1}: ${project.title}`);
+        stepButton.innerHTML = `<span>${String(index + 1).padStart(2,"0")}</span><i aria-hidden="true"></i>`;
+        stepButton.addEventListener("click",() => goToProject(index));
+        stepsNode.append(stepButton);
+      });
+      totalNode.textContent = String(projects.length).padStart(2,"0");
+      activeIndex = clamp(activeIndex,0,projects.length - 1);
+      updateSelectedContent(activeIndex,false);
+      setupMotion();
+    }
+
+    prev.addEventListener("click",() => goToProject(activeIndex - 1));
+    next.addEventListener("click",() => goToProject(activeIndex + 1));
     openButton.addEventListener("click",openProject);
     manageButton.addEventListener("click",openEditor);
 
     viewport.addEventListener("keydown",event => {
-      if (event.key === "ArrowLeft") { event.preventDefault(); setActive(activeIndex - 1); }
-      if (event.key === "ArrowRight") { event.preventDefault(); setActive(activeIndex + 1); }
-      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openProject(); }
+      if (["ArrowDown","ArrowRight","PageDown"].includes(event.key)) {
+        event.preventDefault();
+        goToProject(activeIndex + 1);
+      } else if (["ArrowUp","ArrowLeft","PageUp"].includes(event.key)) {
+        event.preventDefault();
+        goToProject(activeIndex - 1);
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        goToProject(0);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        goToProject(projects.length - 1);
+      } else if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openProject();
+      }
     });
 
-    viewport.addEventListener("wheel",event => {
-      if (wheelLock || Math.abs(event.deltaY) < 12) return;
-      event.preventDefault();
-      wheelLock = true;
-      setActive(activeIndex + (event.deltaY > 0 ? 1 : -1));
-      window.setTimeout(() => { wheelLock = false; },260);
-    },{passive:false});
-
-    viewport.addEventListener("pointerdown",event => {
-      if (event.target.closest("button,a")) return;
-      pointerActive = true;
-      moved = false;
-      pointerStart = event.clientX;
-      pointerDelta = 0;
-      viewport.setPointerCapture?.(event.pointerId);
-      viewport.classList.add("is-dragging");
-    });
-    viewport.addEventListener("pointermove",event => {
-      if (!pointerActive) return;
-      pointerDelta = event.clientX - pointerStart;
-      moved = moved || Math.abs(pointerDelta) > 8;
-      track.style.setProperty("--project-drag",`${clamp(pointerDelta,-110,110)}px`);
-    });
-    const finishPointer = event => {
-      if (!pointerActive) return;
-      pointerActive = false;
-      viewport.releasePointerCapture?.(event.pointerId);
-      viewport.classList.remove("is-dragging");
-      track.style.removeProperty("--project-drag");
-      if (Math.abs(pointerDelta) > 46) setActive(activeIndex + (pointerDelta < 0 ? 1 : -1));
-      window.setTimeout(() => { moved = false; },0);
+    const rebuildMotion = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(setupMotion,180);
     };
-    viewport.addEventListener("pointerup",finishPointer);
-    viewport.addEventListener("pointercancel",finishPointer);
-
+    window.addEventListener("resize",rebuildMotion,{passive:true});
+    window.addEventListener("orientationchange",rebuildMotion,{passive:true});
+    reducedMotion.addEventListener?.("change",setupMotion);
     window.addEventListener("firebase:auth",syncAdminVisibility);
     window.addEventListener("firebase:data",() => {
       projects = ensureProjects();
@@ -471,6 +747,7 @@
       syncAdminVisibility();
     });
     window.addEventListener("focus",syncAdminVisibility);
+    window.addEventListener("pagehide",() => motionCleanup(),{once:true});
 
     renderCards();
     syncAdminVisibility();
@@ -478,6 +755,7 @@
 
   function initCinematic() {
     const section = document.getElementById("san-pedro-cinematica");
+    const stage = section?.querySelector(".san-pedro-cinematic__stage");
     const frames = [...document.querySelectorAll("[data-cinematic-frame]")];
     const railButtons = [...document.querySelectorAll("[data-cinematic-step]")];
     const eyebrow = document.getElementById("cinematicEyebrow");
@@ -485,109 +763,397 @@
     const text = document.getElementById("cinematicText");
     const quote = document.getElementById("cinematicQuote");
     const progressBar = document.getElementById("cinematicProgress");
-    if (!section || !frames.length || !eyebrow || !heading || !text || !quote) return;
+    const copy = document.getElementById("cinematicCopy");
+    const skip = document.getElementById("cinematicSkip");
+    if (!section || !stage || !frames.length || !eyebrow || !heading || !text || !quote || !progressBar) return;
 
-    let currentStory = -1;
-    let ticking = false;
-    let loaded = false;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    section.classList.add("is-loading");
+    stage.tabIndex = 0;
+    stage.setAttribute("aria-label","Recorrido cinematográfico de San Pedro");
+    let activeIndex = -1;
+    let controller = null;
+    let resizeTimer = 0;
 
-    function loadImages() {
-      if (loaded) return;
-      loaded = true;
-      section.querySelectorAll("source[data-srcset]").forEach(source => {
-        source.srcset = source.dataset.srcset;
-        source.removeAttribute("data-srcset");
-      });
-      section.querySelectorAll("img[data-src]").forEach(image => {
-        image.src = image.dataset.src;
-        image.removeAttribute("data-src");
-      });
-    }
-
-    if ("IntersectionObserver" in window) {
-      const imageObserver = new IntersectionObserver(entries => {
-        if (entries.some(entry => entry.isIntersecting)) {
-          loadImages();
-          imageObserver.disconnect();
-        }
-      },{rootMargin:"1200px 0px"});
-      imageObserver.observe(section);
-    } else {
-      loadImages();
-    }
-
-    function writeStory(index) {
-      if (index === currentStory) return;
-      currentStory = index;
-      const story = CINEMATIC_STORIES[index];
+    function writeStory(index,animate = true) {
+      const nextIndex = clamp(index,0,CINEMATIC_STORIES.length - 1);
+      if (nextIndex === activeIndex && animate) return;
+      activeIndex = nextIndex;
+      const story = CINEMATIC_STORIES[nextIndex];
+      const words = story.heading.split(" ");
       eyebrow.textContent = story.eyebrow;
-      heading.innerHTML = `${escapeHtml(story.heading.split(" ").slice(0,-1).join(" "))} <em>${escapeHtml(story.heading.split(" ").at(-1))}</em>`;
+      heading.innerHTML = `${escapeHtml(words.slice(0,-1).join(" "))} <em>${escapeHtml(words.at(-1))}</em>`;
       text.textContent = story.text;
       quote.textContent = story.quote;
-      document.getElementById("cinematicCopy")?.classList.remove("is-entering");
-      requestAnimationFrame(() => document.getElementById("cinematicCopy")?.classList.add("is-entering"));
-      railButtons.forEach((button,buttonIndex) => button.classList.toggle("is-active",buttonIndex === index));
+      railButtons.forEach((button,index) => {
+        const isActive = index === nextIndex;
+        button.classList.toggle("is-active",isActive);
+        button.setAttribute("aria-current",isActive ? "step" : "false");
+      });
+      frames.forEach((frame,index) => frame.classList.toggle("is-active",index === nextIndex));
+      updateNarrativeProgress("scene",nextIndex,frames.length,section.classList.contains("is-scroll-active"));
+      if (animate && !reducedMotion.matches) {
+        copy?.classList.remove("is-entering");
+        requestAnimationFrame(() => copy?.classList.add("is-entering"));
+      }
     }
 
-    function update() {
-      ticking = false;
-      const rect = section.getBoundingClientRect();
-      const scrollable = Math.max(section.offsetHeight - window.innerHeight,1);
-      const progress = clamp(-rect.top / scrollable,0,1);
-      const steps = frames.length;
-      const position = progress * steps;
-      const base = Math.min(steps - 1,Math.floor(position));
-      const local = position - base;
-      const fade = base < steps - 1 ? clamp((local - .56) / .44,0,1) : 0;
-      const storyIndex = Math.min(steps - 1,base + (fade > .5 ? 1 : 0));
-      const motionTier = document.documentElement.dataset.motionTier || "low";
+    function fillStaticCaptions() {
+      frames.forEach((frame,index) => {
+        const story = CINEMATIC_STORIES[index];
+        const caption = frame.querySelector(".san-pedro-cinematic__static-caption");
+        if (!caption) return;
+        caption.innerHTML = `<span>${escapeHtml(story.eyebrow)}</span><h3>${escapeHtml(story.heading)}</h3><p>${escapeHtml(story.text)}</p><blockquote>${escapeHtml(story.quote)}</blockquote>`;
+      });
+    }
+
+    function refreshAfterImages() {
+      const loadFrame = frame => {
+        const image = frame.querySelector("img");
+        if (!image) return Promise.resolve();
+        if (image.complete) {
+          if (!image.naturalWidth) frame.classList.add("has-image-error");
+          return image.decode?.().catch(() => {}) || Promise.resolve();
+        }
+        return new Promise(resolve => {
+          image.addEventListener("load",resolve,{once:true});
+          image.addEventListener("error",() => {
+            frame.classList.add("has-image-error");
+            resolve();
+          },{once:true});
+        });
+      };
+      const firstReady = loadFrame(frames[0]);
+      firstReady.finally(() => {
+        section.classList.remove("is-loading");
+        section.classList.add("is-ready");
+        window.ScrollTrigger?.refresh?.(true);
+      });
+      Promise.all(frames.slice(1).map(loadFrame)).then(() => window.ScrollTrigger?.refresh?.(true));
+    }
+
+    function setupReduced() {
+      section.classList.add("san-pedro-cinematic--reduced");
+      fillStaticCaptions();
+      frames.forEach(frame => {
+        frame.style.removeProperty("transform");
+        frame.style.removeProperty("opacity");
+        frame.style.removeProperty("clip-path");
+      });
+      copy.hidden = true;
+      railButtons.forEach((button,index) => {
+        button.onclick = () => frames[index]?.scrollIntoView({behavior:"auto",block:"center"});
+      });
+      return {destroy(){
+        copy.hidden = false;
+        railButtons.forEach(button => {button.onclick = null;});
+      }};
+    }
+
+    function setupNative() {
+      section.classList.add("san-pedro-cinematic--native");
+      section.style.setProperty("--cinematic-count",String(frames.length));
+      const useMask = window.innerWidth > 767 && document.documentElement.dataset.motionTier !== "low";
+      let frameId = 0;
+      let start = 0;
+      let end = 1;
+      let snapTimer = 0;
+      let snapping = false;
+      const measure = () => {
+        start = section.getBoundingClientRect().top + window.scrollY;
+        end = start + Math.max(section.offsetHeight - window.innerHeight,1);
+      };
+      const render = () => {
+        frameId = 0;
+        const progress = clamp((window.scrollY - start) / Math.max(end - start,1),0,1);
+        const isActive = window.scrollY >= start - 2 && window.scrollY <= end + 2;
+        section.classList.toggle("is-scroll-active",isActive);
+        updateNarrativeProgress("scene",activeIndex < 0 ? 0 : activeIndex,frames.length,isActive);
+        const exact = progress * Math.max(frames.length - 1,1);
+        const base = Math.floor(exact);
+        const local = exact - base;
+        frames.forEach((frame,index) => {
+          let opacity = 0;
+          if (index === base) opacity = 1 - local;
+          if (index === base + 1) opacity = local;
+          if (progress >= .999 && index === frames.length - 1) opacity = 1;
+          const image = frame.querySelector("img");
+          frame.style.opacity = opacity.toFixed(3);
+          frame.style.clipPath = useMask
+            ? `inset(${(1 - opacity) * 10}% ${(1 - opacity) * 8}% round 30px)`
+            : "inset(0% 0% 0% 0% round 24px)";
+          if (image) {
+            const direction = index % 2 === 0 ? -1 : 1;
+            image.style.transform = `translate3d(${direction * local * 2.5}%,${(local - .5) * 1.2}%,0) scale(${1.035 + local * .045})`;
+          }
+        });
+        const index = Math.round(exact);
+        if (index !== activeIndex) writeStory(index);
+        progressBar.style.width = `${(progress * 100).toFixed(2)}%`;
+      };
+      const snapToNearest = () => {
+        snapTimer = 0;
+        if (snapping || reducedMotion.matches) return;
+        const range = Math.max(end - start,1);
+        const raw = (window.scrollY - start) / range;
+        if (raw <= 0 || raw >= 1) return;
+        const steps = Math.max(frames.length - 1,1);
+        const nearest = Math.round(raw * steps) / steps;
+        if (Math.abs(nearest - raw) < .018) return;
+        snapping = true;
+        window.scrollTo({top:start + range * nearest,behavior:"smooth"});
+        window.setTimeout(() => {snapping = false;},280);
+      };
+      const schedule = () => {
+        if (!frameId) frameId = requestAnimationFrame(render);
+        clearTimeout(snapTimer);
+        snapTimer = window.setTimeout(snapToNearest,120);
+      };
+      const remeasure = () => {
+        measure();
+        render();
+      };
+      measure();
+      render();
+      requestAnimationFrame(remeasure);
+      window.addEventListener("scroll",schedule,{passive:true});
+      window.addEventListener("resize",remeasure,{passive:true});
+      window.addEventListener("pageshow",remeasure,{passive:true});
+      window.addEventListener("portal:rendered",remeasure,{once:true});
+      return {
+        scrollToStep(index,behavior = "smooth") {
+          const ratio = frames.length > 1 ? index / (frames.length - 1) : 0;
+          window.scrollTo({top:start + (end - start) * ratio,behavior});
+        },
+        skip() {window.scrollTo({top:end + 2,behavior:"smooth"});},
+        destroy() {
+          window.removeEventListener("scroll",schedule);
+          window.removeEventListener("resize",remeasure);
+          window.removeEventListener("pageshow",remeasure);
+          window.removeEventListener("portal:rendered",remeasure);
+          clearTimeout(snapTimer);
+          if (frameId) cancelAnimationFrame(frameId);
+        }
+      };
+    }
+
+    function setupGsap() {
+      const gsap = window.gsap;
+      const ScrollTrigger = window.ScrollTrigger;
+      if (!gsap || !ScrollTrigger) return null;
+      gsap.registerPlugin(ScrollTrigger);
+      section.classList.add("san-pedro-cinematic--gsap");
+      const mobile = window.matchMedia("(max-width: 767px)").matches;
+      const lowTier = document.documentElement.dataset.motionTier === "low";
+      const useMask = !mobile && !lowTier;
+      const timeline = gsap.timeline({defaults:{ease:"none"},paused:true});
 
       frames.forEach((frame,index) => {
-        let opacity = 0;
-        if (index === base) opacity = 1 - fade;
-        if (index === base + 1) opacity = fade;
-        if (progress >= .999 && index === steps - 1) opacity = 1;
-        frame.style.opacity = opacity.toFixed(3);
-        frame.classList.toggle("is-active",opacity > .45);
-        if (motionTier !== "low") {
-          const relative = index - position;
-          const x = relative * -18;
-          const scale = 1.07 - Math.min(Math.abs(relative),1) * .02;
-          frame.style.setProperty("--cinematic-x",`${x.toFixed(2)}px`);
-          frame.style.setProperty("--cinematic-scale",scale.toFixed(4));
+        const image = frame.querySelector("img");
+        gsap.set(frame,{
+          opacity:index === 0 ? 1 : 0,
+          clipPath:useMask
+            ? (index === 0 ? "inset(0% 0% 0% 0% round 30px)" : "inset(18% 15% 18% 15% round 42px)")
+            : "inset(0% 0% 0% 0% round 24px)",
+          xPercent:index === 0 ? 0 : 4,
+          zIndex:frames.length - index,
+          force3D:true
+        });
+        if (image) gsap.set(image,{scale:1.035,xPercent:index % 2 === 0 ? 0 : 2,yPercent:0,force3D:true});
+      });
+
+      for (let index = 0; index < frames.length - 1; index += 1) {
+        const current = frames[index];
+        const next = frames[index + 1];
+        const currentImage = current.querySelector("img");
+        const nextImage = next.querySelector("img");
+        const position = index;
+        const direction = index % 2 === 0 ? -1 : 1;
+        if (currentImage) {
+          timeline.to(currentImage,{
+            scale:lowTier ? 1.055 : 1.105,
+            xPercent:mobile ? 0 : direction * 2.5,
+            yPercent:index === 1 ? -1.5 : 0,
+            duration:.68
+          },position);
+        }
+        timeline.to(current,{
+          opacity:0,
+          clipPath:useMask ? "inset(10% 8% 10% 8% round 36px)" : "inset(0% 0% 0% 0% round 24px)",
+          xPercent:mobile ? 0 : direction * -3,
+          duration:.32
+        },position + .68);
+        timeline.fromTo(next,{
+          opacity:0,
+          clipPath:useMask ? "inset(18% 15% 18% 15% round 42px)" : "inset(0% 0% 0% 0% round 24px)",
+          xPercent:mobile ? 0 : direction * 4
+        },{
+          opacity:1,
+          clipPath:useMask ? "inset(0% 0% 0% 0% round 30px)" : "inset(0% 0% 0% 0% round 24px)",
+          xPercent:0,
+          duration:.32
+        },position + .68);
+        if (nextImage) {
+          timeline.fromTo(nextImage,{
+            scale:lowTier ? 1.05 : 1.09,
+            xPercent:mobile ? 0 : direction * 2,
+            yPercent:index === 0 ? 1.5 : 0
+          },{
+            scale:1.035,
+            xPercent:0,
+            yPercent:0,
+            duration:.32
+          },position + .68);
+        }
+      }
+      const trigger = ScrollTrigger.create({
+        id:"san-pedro-cinematic",
+        trigger:section,
+        start:"top top",
+        end:() => `+=${Math.round(window.innerHeight * (mobile ? .75 : .96) * Math.max(frames.length - 1,1))}`,
+        pin:stage,
+        pinSpacing:true,
+        animation:timeline,
+        scrub:mobile ? .30 : .55,
+        anticipatePin:1,
+        invalidateOnRefresh:true,
+        snap:frames.length > 1 ? {
+          snapTo:ScrollTrigger.snapDirectional
+            ? ScrollTrigger.snapDirectional(1 / (frames.length - 1))
+            : 1 / (frames.length - 1),
+          delay:.05,
+          duration:{min:.12,max:.38},
+          ease:"power1.inOut"
+        } : false,
+        onUpdate:self => {
+          const index = Math.round(self.progress * Math.max(frames.length - 1,1));
+          if (index !== activeIndex) writeStory(index);
+          progressBar.style.width = `${(self.progress * 100).toFixed(2)}%`;
+          section.style.setProperty("--cinematic-progress",self.progress.toFixed(4));
+        },
+        onToggle:self => {
+          section.classList.toggle("is-scroll-active",self.isActive);
+          updateNarrativeProgress("scene",activeIndex < 0 ? 0 : activeIndex,frames.length,self.isActive);
         }
       });
 
-      progressBar.style.width = `${(progress * 100).toFixed(2)}%`;
-      section.style.setProperty("--cinematic-progress",progress.toFixed(4));
-      writeStory(storyIndex);
+      return {
+        scrollToStep(index,behavior = "smooth") {
+          const ratio = frames.length > 1 ? index / (frames.length - 1) : 0;
+          window.scrollTo({top:trigger.start + (trigger.end - trigger.start) * ratio,behavior});
+        },
+        skip() {window.scrollTo({top:trigger.end + 2,behavior:"smooth"});},
+        destroy() {trigger.kill(true); timeline.kill();}
+      };
     }
 
-    function scheduleUpdate() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(update);
-    }
-
-    railButtons.forEach((button,index) => {
-      button.addEventListener("click",() => {
-        const scrollable = Math.max(section.offsetHeight - window.innerHeight,1);
-        window.scrollTo({
-          top:section.offsetTop + scrollable * (index / Math.max(frames.length - 1,1)),
-          behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
-        });
+    function setup() {
+      controller?.destroy?.();
+      controller = null;
+      section.classList.remove("san-pedro-cinematic--reduced","san-pedro-cinematic--native","san-pedro-cinematic--gsap","is-scroll-active");
+      copy.hidden = false;
+      frames.forEach(frame => {
+        frame.style.removeProperty("opacity");
+        frame.style.removeProperty("clip-path");
+        frame.style.removeProperty("transform");
+        const image = frame.querySelector("img");
+        image?.style.removeProperty("transform");
       });
+      railButtons.forEach(button => {button.onclick = null;});
+      activeIndex = -1;
+      writeStory(0,false);
+      controller = reducedMotion.matches ? setupReduced() : (setupGsap() || setupNative());
+      window.ScrollTrigger?.refresh?.(true);
+    }
+
+    stage.addEventListener("keydown",event => {
+      if (["ArrowDown","ArrowRight","PageDown"].includes(event.key)) {
+        event.preventDefault();
+        controller?.scrollToStep?.(clamp(activeIndex + 1,0,frames.length - 1),reducedMotion.matches ? "auto" : "smooth");
+      } else if (["ArrowUp","ArrowLeft","PageUp"].includes(event.key)) {
+        event.preventDefault();
+        controller?.scrollToStep?.(clamp(activeIndex - 1,0,frames.length - 1),reducedMotion.matches ? "auto" : "smooth");
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        controller?.scrollToStep?.(0,reducedMotion.matches ? "auto" : "smooth");
+      } else if (event.key === "End") {
+        event.preventDefault();
+        controller?.scrollToStep?.(frames.length - 1,reducedMotion.matches ? "auto" : "smooth");
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        controller?.skip?.();
+      }
     });
 
-    window.addEventListener("scroll",scheduleUpdate,{passive:true});
-    window.addEventListener("resize",scheduleUpdate,{passive:true});
-    writeStory(0);
-    update();
+    railButtons.forEach((button,index) => {
+      button.addEventListener("click",() => controller?.scrollToStep?.(index,reducedMotion.matches ? "auto" : "smooth"));
+    });
+    skip?.addEventListener("click",() => controller?.skip?.() || section.nextElementSibling?.scrollIntoView({behavior:reducedMotion.matches ? "auto" : "smooth"}));
+
+    const rebuild = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(setup,180);
+    };
+    window.addEventListener("resize",rebuild,{passive:true});
+    window.addEventListener("orientationchange",rebuild,{passive:true});
+    reducedMotion.addEventListener?.("change",setup);
+    window.addEventListener("pagehide",() => controller?.destroy?.(),{once:true});
+
+    fillStaticCaptions();
+    refreshAfterImages();
+    setup();
+  }
+
+  function setupMediaLifecycle() {
+    const videos = [...document.querySelectorAll("video")];
+    if (!videos.length || !("IntersectionObserver" in window)) return;
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target;
+        if (!entry.isIntersecting || entry.intersectionRatio < .18) {
+          video.pause?.();
+          return;
+        }
+        if (video.hasAttribute("autoplay")) {
+          video.muted = true;
+          video.playsInline = true;
+          video.play?.().catch(() => {});
+        }
+      });
+    },{threshold:[0,.18,.6]});
+    videos.forEach(video => {
+      if (video.hasAttribute("autoplay")) video.muted = true;
+      if (!video.hasAttribute("controls") && !video.hasAttribute("autoplay")) video.controls = true;
+      observer.observe(video);
+    });
+    window.addEventListener("pagehide",() => observer.disconnect(),{once:true});
+  }
+
+  function setupNavigationStability() {
+    if ("scrollRestoration" in history) history.scrollRestoration = "auto";
+    window.ScrollTrigger?.config?.({
+      ignoreMobileResize:true,
+      limitCallbacks:true
+    });
+    const refresh = () => window.setTimeout(() => window.ScrollTrigger?.refresh?.(true),80);
+    window.addEventListener("pageshow",refresh,{passive:true});
+    window.addEventListener("hashchange",refresh,{passive:true});
+    window.addEventListener("popstate",refresh,{passive:true});
+    document.addEventListener("visibilitychange",() => {
+      if (!window.gsap?.ticker) return;
+      if (document.hidden) window.gsap.ticker.sleep();
+      else {
+        window.gsap.ticker.wake();
+        refresh();
+      }
+    },{passive:true});
   }
 
   function init() {
     initProjectConsole();
     initCinematic();
+    setupMediaLifecycle();
+    setupNavigationStability();
     window.dispatchEvent(new CustomEvent("portal:rendered",{detail:{source:"home-experience",build:BUILD}}));
   }
 

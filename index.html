@@ -1,218 +1,187 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Portal especial de Rendición de Cuentas de San Pedro, Valle del Cauca.">
-  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.30-projects-cinematic">
-  <title>Rendición de Cuentas | San Pedro</title>
-</head>
+<meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Portal especial de Rendición de Cuentas de San Pedro, Valle del Cauca." name="description"/>
+<link href="assets/favicon.png" rel="icon"/><link href="manifest.json" rel="manifest"/><link href="styles.css?v=11.31.1-scroll-story" rel="stylesheet"/>
+<title>Rendición de Cuentas | San Pedro</title>
+<link crossorigin="anonymous" href="https://cdn.jsdelivr.net" rel="preconnect"/><link as="image" href="assets/cinematica/monumento-musical-960.avif" media="(max-width: 767px)" rel="preload" type="image/avif"/><link as="image" href="assets/cinematica/monumento-musical-1600.avif" media="(min-width: 768px)" rel="preload" type="image/avif"/></head>
 <body data-page="home">
-  <div id="siteHeader"></div>
-  <main id="main-content">
-    <section class="home-hero" aria-labelledby="homeHeroTitle">
-      <div class="home-hero__visual" aria-hidden="true">
-        <div class="hero-cloud cloud-a"></div>
-        <div class="hero-cloud cloud-b"></div>
-        <div class="sun-disc"></div>
-        <div class="mountain-layer"></div>
-        <div class="lake-layer"></div>
-        <div class="hill-layer"></div>
-        <div class="hero-person">
-          <span class="person-arm arm-left"></span>
-          <span class="person-arm arm-right"></span>
-        </div>
-
-        <div class="hero-adaptive-stage" aria-hidden="true">
-          <span class="hero-adaptive-grid"></span>
-          <span class="hero-adaptive-glow hero-adaptive-glow--cyan"></span>
-          <span class="hero-adaptive-glow hero-adaptive-glow--violet"></span>
-          <span class="hero-adaptive-orbit hero-adaptive-orbit--a"></span>
-          <span class="hero-adaptive-orbit hero-adaptive-orbit--b"></span>
-          <span class="hero-adaptive-sweep"></span>
-          <span class="hero-adaptive-particles"></span>
-          <svg class="hero-adaptive-lines" viewBox="0 0 960 560" preserveAspectRatio="none" focusable="false">
-            <path d="M-40 470 C120 350 245 505 405 368 S700 235 1010 72"></path>
-            <path d="M-55 520 C155 398 280 544 455 410 S735 330 1015 170"></path>
-          </svg>
-        </div>
-        <div class="hero-float-card">
-          <small>Edición destacada</small>
-          <strong id="homeHeroProgress">92%</strong>
-          <span>avance general 2025</span>
-          <i class="hero-progress-line" aria-hidden="true"><b></b></i>
-        </div>
-      </div>
-
-      <div class="site-shell home-hero__grid">
-        <div class="home-hero__copy reveal">
-          <span>PORTAL HISTÓRICO · SAN PEDRO</span>
-          <h1 id="homeHeroTitle">Conozca la gestión.<br>Construyamos <em>confianza.</em></h1>
-          <p>Explore resultados, documentos, videos, compromisos e ideas ciudadanas en una experiencia visual, clara y organizada por vigencias.</p>
-
-          <div class="hero-buttons">
-            <a class="button button-primary" href="rendicion-2025.html">Explorar Rendición 2025 →</a>
-            <a class="button button-secondary" href="vigencias.html">Ver todas las vigencias</a>
-          </div>
-
-          <div class="hero-trust">
-            <div class="avatar-stack" aria-hidden="true">
-              <span>SP</span><span>RC</span><span>✓</span><span>+</span>
-            </div>
-            <p>Información pública organizada para ciudadanos, veedurías y comunidad.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="explorer-bar">
-      <div class="site-shell explorer-panel">
-        <div class="explorer-tabs"><button class="active" type="button"><span aria-hidden="true">▣</span> Vigencias</button><button type="button"><span aria-hidden="true">▤</span> Recursos</button><button type="button"><span aria-hidden="true">✦</span> Ideas ciudadanas</button></div>
-        <form class="explorer-form" id="homeExploreForm" aria-label="Selector de vigencia">
-          <div class="field-box"><label>Vigencia</label><select id="homeYear"></select></div>
-          <div class="field-box"><label>Consulta principal</label><input value="Resumen general de la gestión" readonly></div>
-          <div class="field-box"><label>Contenido</label><input value="Indicadores, documentos y compromisos" readonly></div>
-          <button class="button button-primary">Abrir edición</button>
-        </form>
-      </div>
-    </section>
-
-    <section class="project-console" id="proyectos-destacados" aria-labelledby="projectConsoleTitle">
-      <div class="site-shell project-console__shell">
-        <header class="project-console__head">
-          <div>
-            <span>PORTAFOLIO DE PROYECTOS</span>
-            <h2 id="projectConsoleTitle">Explore los proyectos <em>destacados</em></h2>
-            <p>Desplácese, arrastre o use las flechas para recorrer el portafolio. Cada proyecto abre una ficha con información, fotografías y enlaces relacionados.</p>
-          </div>
-          <div class="project-console__head-actions">
-            <span class="project-console__counter"><b id="projectConsoleCurrent">01</b><i>/</i><small id="projectConsoleTotal">05</small></span>
-            <button class="project-console__manage" id="projectConsoleManage" type="button" hidden>Gestionar proyectos</button>
-          </div>
-        </header>
-
-        <div class="project-console__viewport" id="projectConsoleViewport">
-          <div class="project-console__backdrop" id="projectConsoleBackdrop" aria-hidden="true"></div>
-          <div class="project-console__ambient" aria-hidden="true"><i></i><i></i><i></i></div>
-          <div class="project-console__track" id="projectConsoleTrack" role="listbox" aria-label="Selector de proyectos"></div>
-
-          <button class="project-console__nav project-console__nav--prev" id="projectConsolePrev" type="button" aria-label="Proyecto anterior">←</button>
-          <button class="project-console__nav project-console__nav--next" id="projectConsoleNext" type="button" aria-label="Proyecto siguiente">→</button>
-
-          <div class="project-console__selected" id="projectConsoleSelected" aria-live="polite">
-            <span>PROYECTO SELECCIONADO</span>
-            <h3>Proyecto 01</h3>
-            <p>Espacio preparado para publicar la información del proyecto.</p>
-            <button type="button" id="projectConsoleOpen">Abrir ficha <b aria-hidden="true">↗</b></button>
-          </div>
-
-          <div class="project-console__hint" aria-hidden="true">
-            <i></i><span>Arrastre o deslice para explorar</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="san-pedro-cinematic" id="san-pedro-cinematica" aria-labelledby="cinematicTitle">
-      <div class="san-pedro-cinematic__scroll">
-        <div class="san-pedro-cinematic__stage">
-          <header class="san-pedro-cinematic__intro">
-            <span>RETRATOS DEL MUNICIPIO</span>
-            <h2 id="cinematicTitle">San Pedro se vive como una <em>historia</em></h2>
-            <p>Un recorrido visual por símbolos, arquitectura, memoria y vida pública antes de explorar el territorio por capas.</p>
-          </header>
-
-          <div class="san-pedro-cinematic__frames" id="cinematicFrames">
-            <figure class="san-pedro-cinematic__frame is-active" data-cinematic-frame="0">
-              <picture>
-                <source data-srcset="assets/cinematica/monumento-musical.webp" type="image/webp">
-                <img data-src="assets/cinematica/monumento-musical.jpg" alt="Monumento de músicos en San Pedro al atardecer" decoding="async">
-              </picture>
-              <span class="san-pedro-cinematic__shade"></span>
-            </figure>
-            <figure class="san-pedro-cinematic__frame" data-cinematic-frame="1">
-              <picture>
-                <source data-srcset="assets/cinematica/iglesia-san-pedro.webp" type="image/webp">
-                <img data-src="assets/cinematica/iglesia-san-pedro.jpg" alt="Iglesia de San Pedro bajo un cielo de atardecer" decoding="async">
-              </picture>
-              <span class="san-pedro-cinematic__shade"></span>
-            </figure>
-            <figure class="san-pedro-cinematic__frame" data-cinematic-frame="2">
-              <picture>
-                <source data-srcset="assets/cinematica/parque-himno.webp" type="image/webp">
-                <img data-src="assets/cinematica/parque-himno.jpg" alt="Parque de San Pedro con monumento al himno municipal" decoding="async">
-              </picture>
-              <span class="san-pedro-cinematic__shade"></span>
-            </figure>
-            <figure class="san-pedro-cinematic__frame" data-cinematic-frame="3">
-              <picture>
-                <source data-srcset="assets/cinematica/alcaldia-san-pedro.webp" type="image/webp">
-                <img data-src="assets/cinematica/alcaldia-san-pedro.jpg" alt="Fachada de la Alcaldía Municipal de San Pedro" decoding="async">
-              </picture>
-              <span class="san-pedro-cinematic__shade"></span>
-            </figure>
-          </div>
-
-          <div class="san-pedro-cinematic__copy" id="cinematicCopy" aria-live="polite">
-            <span id="cinematicEyebrow">01 · MEMORIA QUE SUENA</span>
-            <h3 id="cinematicHeading">La música también guarda <em>memoria</em></h3>
-            <p id="cinematicText">En San Pedro, el arte público convierte el paisaje cotidiano en un escenario donde la historia parece seguir sonando.</p>
-            <blockquote id="cinematicQuote">“San Pedro no solo se recorre: se escucha, se mira y se recuerda.”</blockquote>
-          </div>
-
-          <nav class="san-pedro-cinematic__rail" id="cinematicRail" aria-label="Escenas de la cinemática">
-            <button class="is-active" type="button" data-cinematic-step="0"><span>01</span><i></i></button>
-            <button type="button" data-cinematic-step="1"><span>02</span><i></i></button>
-            <button type="button" data-cinematic-step="2"><span>03</span><i></i></button>
-            <button type="button" data-cinematic-step="3"><span>04</span><i></i></button>
-          </nav>
-
-          <div class="san-pedro-cinematic__progress" aria-hidden="true"><i id="cinematicProgress"></i></div>
-          <div class="san-pedro-cinematic__scroll-hint" aria-hidden="true"><i></i><span>Continúe desplazándose</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="home-section home-section--white">
-      <div class="site-shell">
-        <div class="home-section__head"><div><span>EDICIONES DISPONIBLES</span><h2>Explore las vigencias</h2></div><a class="button button-secondary" href="vigencias.html">Ver archivo histórico →</a></div>
-        <div class="editions-carousel" id="featuredYears"></div>
-      </div>
-    </section>
-
-    <section class="home-section home-section--soft home-highlights">
-      <div class="site-shell">
-        <div class="home-section__head"><div><span>PORTADA DE LA GESTIÓN</span><h2>Lo más destacado</h2></div><p>Una mezcla entre periódico digital y portal institucional: historias claras, recursos visuales y acceso rápido a las fuentes.</p></div>
-        <div class="editorial-deals">
-          <article class="editorial-feature reveal"><div><span>INFORME ESPECIAL</span><h3>La gestión explicada sin perder el contexto.</h3><p>Resultados, inversión, cobertura, retos y compromisos en una portada diseñada para comprender.</p><a class="button button-secondary editorial-feature__action" href="rendicion-2025.html"><span>Leer edición 2025</span><b aria-hidden="true">→</b></a></div></article>
-          <div id="editorialCards" style="display:contents"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="home-section home-section--white home-proof">
-      <div class="site-shell trust-strip">
-        <article class="trust-card reveal"><span>✓</span><div><strong>Información verificable</strong><small>Fuentes y documentos relacionados</small></div></article>
-        <article class="trust-card reveal"><span>24/7</span><div><strong>Consulta permanente</strong><small>Repositorio disponible en cualquier momento</small></div></article>
-        <article class="trust-card reveal"><span>▣</span><div><strong>Navegación por vigencias</strong><small>Cada año tiene su propia página</small></div></article>
-        <article class="trust-card reveal"><span>✦</span><div><strong>Participación visible</strong><small>Ideas con estado y respuesta oficial</small></div></article>
-      </div>
-    </section>
-
-    <section class="home-section home-section--soft">
-      <div class="site-shell">
-        <div class="home-section__head"><div><span>LABORATORIO CIUDADANO</span><h2>Lo que propone la comunidad</h2></div><p><b id="homeIdeasCount">0</b> ideas ciudadanas registradas en esta demostración.</p></div>
-        <div class="citizen-layout"><div id="citizenQuotes" style="display:contents"></div><article class="ideas-cta reveal"><span>PARTICIPE</span><h3>Una gran idea puede transformar el municipio.</h3><p>Presente propuestas, apoye iniciativas y consulte la respuesta institucional.</p><a class="button button-secondary" href="ideas.html">Entrar al laboratorio →</a></article></div>
-      </div>
-    </section>
-
-    <section class="newsletter-bar">
-      <div class="site-shell newsletter-box reveal">
-        <div><h2>Reciba nuevas publicaciones</h2><p><b id="homeResourceCount">0</b> recursos se encuentran disponibles actualmente.</p></div>
-        <form id="newsletterForm" aria-label="Suscripción a publicaciones"><input type="email" placeholder="Correo electrónico" required><button class="button button-primary">Suscribirme</button></form>
-      </div>
-    </section>
-  </main>
-  <div id="siteFooter"></div><div id="globalDialogs"></div>
-  <script src="shared.js?v=11.30-projects-cinematic"></script><script src="home.js?v=11.30-projects-cinematic"></script><script src="home-experience.js?v=11.30-projects-cinematic"></script>
+<div id="siteHeader"></div>
+<main id="main-content">
+<section aria-labelledby="homeHeroTitle" class="home-hero">
+<div aria-hidden="true" class="home-hero__visual">
+<div class="hero-cloud cloud-a"></div>
+<div class="hero-cloud cloud-b"></div>
+<div class="sun-disc"></div>
+<div class="mountain-layer"></div>
+<div class="lake-layer"></div>
+<div class="hill-layer"></div>
+<div class="hero-person">
+<span class="person-arm arm-left"></span>
+<span class="person-arm arm-right"></span>
+</div>
+<div aria-hidden="true" class="hero-adaptive-stage">
+<span class="hero-adaptive-grid"></span>
+<span class="hero-adaptive-glow hero-adaptive-glow--cyan"></span>
+<span class="hero-adaptive-glow hero-adaptive-glow--violet"></span>
+<span class="hero-adaptive-orbit hero-adaptive-orbit--a"></span>
+<span class="hero-adaptive-orbit hero-adaptive-orbit--b"></span>
+<span class="hero-adaptive-sweep"></span>
+<span class="hero-adaptive-particles"></span>
+<svg class="hero-adaptive-lines" focusable="false" preserveAspectRatio="none" viewBox="0 0 960 560">
+<path d="M-40 470 C120 350 245 505 405 368 S700 235 1010 72"></path>
+<path d="M-55 520 C155 398 280 544 455 410 S735 330 1015 170"></path>
+</svg>
+</div>
+<div class="hero-float-card">
+<small>Edición destacada</small>
+<strong id="homeHeroProgress">92%</strong>
+<span>avance general 2025</span>
+<i aria-hidden="true" class="hero-progress-line"><b></b></i>
+</div>
+</div>
+<div class="site-shell home-hero__grid">
+<div class="home-hero__copy reveal">
+<span>PORTAL HISTÓRICO · SAN PEDRO</span>
+<h1 id="homeHeroTitle">Conozca la gestión.<br/>Construyamos <em>confianza.</em></h1>
+<p>Explore resultados, documentos, videos, compromisos e ideas ciudadanas en una experiencia visual, clara y organizada por vigencias.</p>
+<div class="hero-buttons">
+<a class="button button-primary" href="rendicion-2025.html">Explorar Rendición 2025 →</a>
+<a class="button button-secondary" href="vigencias.html">Ver todas las vigencias</a>
+</div>
+<div class="hero-trust">
+<div aria-hidden="true" class="avatar-stack">
+<span>SP</span><span>RC</span><span>✓</span><span>+</span>
+</div>
+<p>Información pública organizada para ciudadanos, veedurías y comunidad.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="explorer-bar">
+<div class="site-shell explorer-panel">
+<div class="explorer-tabs"><button class="active" type="button"><span aria-hidden="true">▣</span> Vigencias</button><button type="button"><span aria-hidden="true">▤</span> Recursos</button><button type="button"><span aria-hidden="true">✦</span> Ideas ciudadanas</button></div>
+<form aria-label="Selector de vigencia" class="explorer-form" id="homeExploreForm">
+<div class="field-box"><label>Vigencia</label><select id="homeYear"></select></div>
+<div class="field-box"><label>Consulta principal</label><input readonly="" value="Resumen general de la gestión"/></div>
+<div class="field-box"><label>Contenido</label><input readonly="" value="Indicadores, documentos y compromisos"/></div>
+<button class="button button-primary">Abrir edición</button>
+</form>
+</div>
+</section>
+<section aria-labelledby="projectConsoleTitle" class="project-console" id="proyectos-destacados">
+<div class="site-shell project-console__shell">
+<header class="project-console__head">
+<div>
+<span>PORTAFOLIO DE PROYECTOS</span>
+<h2 id="projectConsoleTitle">Explore los proyectos <em>destacados</em></h2>
+<p>Desplácese, arrastre o use las flechas para recorrer el portafolio. Cada proyecto abre una ficha con información, fotografías y enlaces relacionados.</p>
+</div>
+<div class="project-console__head-actions">
+<span class="project-console__counter"><b id="projectConsoleCurrent">01</b><i>/</i><small id="projectConsoleTotal">05</small></span>
+<button class="project-console__manage" hidden="" id="projectConsoleManage" type="button">Gestionar proyectos</button>
+</div>
+</header>
+<div class="project-console__viewport" id="projectConsoleViewport">
+<div aria-hidden="true" class="project-console__backdrop" id="projectConsoleBackdrop"></div>
+<div aria-hidden="true" class="project-console__ambient"><i></i><i></i><i></i></div>
+<div aria-label="Selector de proyectos" class="project-console__track" id="projectConsoleTrack" role="listbox"></div>
+<button aria-label="Proyecto anterior" class="project-console__nav project-console__nav--prev" id="projectConsolePrev" type="button">←</button>
+<button aria-label="Proyecto siguiente" class="project-console__nav project-console__nav--next" id="projectConsoleNext" type="button">→</button>
+<div aria-live="polite" class="project-console__selected" id="projectConsoleSelected">
+<span>PROYECTO SELECCIONADO</span>
+<h3>Proyecto 01</h3>
+<p>Espacio preparado para publicar la información del proyecto.</p>
+<button id="projectConsoleOpen" type="button">Abrir ficha <b aria-hidden="true">↗</b></button>
+</div>
+<div aria-hidden="true" class="project-console__hint">
+<i></i><span>Desplácese para barajar los proyectos</span>
+</div>
+<nav aria-label="Progreso del portafolio de proyectos" class="project-console__steps" id="projectConsoleSteps"></nav></div>
+</div>
+</section>
+<section aria-labelledby="cinematicTitle" class="san-pedro-cinematic" id="san-pedro-cinematica">
+<div class="san-pedro-cinematic__scroll">
+<div class="san-pedro-cinematic__stage">
+<header class="san-pedro-cinematic__intro">
+<span>RETRATOS DEL MUNICIPIO</span>
+<h2 id="cinematicTitle">San Pedro se vive como una <em>historia</em></h2>
+<p>Un recorrido visual por símbolos, arquitectura, memoria y vida pública antes de explorar el territorio por capas.</p>
+</header>
+<div class="san-pedro-cinematic__frames" id="cinematicFrames">
+<figure class="san-pedro-cinematic__frame is-active" data-cinematic-frame="0">
+<picture><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/monumento-musical-960.avif 960w, assets/cinematica/monumento-musical-1600.avif 1600w" type="image/avif"/><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/monumento-musical-960.webp 960w, assets/cinematica/monumento-musical-1600.webp 1600w" type="image/webp"/><img alt="Monumento de músicos en San Pedro al atardecer" decoding="async" fetchpriority="high" height="900" loading="eager" sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" src="assets/cinematica/monumento-musical-1600.jpg" srcset="assets/cinematica/monumento-musical-960.jpg 960w, assets/cinematica/monumento-musical-1600.jpg 1600w" width="1600"/></picture>
+<span class="san-pedro-cinematic__shade"></span>
+<figcaption class="san-pedro-cinematic__static-caption"></figcaption></figure>
+<figure class="san-pedro-cinematic__frame" data-cinematic-frame="1">
+<picture><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/iglesia-san-pedro-960.avif 960w, assets/cinematica/iglesia-san-pedro-1600.avif 1600w" type="image/avif"/><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/iglesia-san-pedro-960.webp 960w, assets/cinematica/iglesia-san-pedro-1600.webp 1600w" type="image/webp"/><img alt="Iglesia de San Pedro bajo un cielo de atardecer" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" src="assets/cinematica/iglesia-san-pedro-1600.jpg" srcset="assets/cinematica/iglesia-san-pedro-960.jpg 960w, assets/cinematica/iglesia-san-pedro-1600.jpg 1600w" width="1600"/></picture>
+<span class="san-pedro-cinematic__shade"></span>
+<figcaption class="san-pedro-cinematic__static-caption"></figcaption></figure>
+<figure class="san-pedro-cinematic__frame" data-cinematic-frame="2">
+<picture><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/parque-himno-960.avif 960w, assets/cinematica/parque-himno-1600.avif 1600w" type="image/avif"/><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/parque-himno-960.webp 960w, assets/cinematica/parque-himno-1600.webp 1600w" type="image/webp"/><img alt="Parque de San Pedro con monumento al himno municipal" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" src="assets/cinematica/parque-himno-1600.jpg" srcset="assets/cinematica/parque-himno-960.jpg 960w, assets/cinematica/parque-himno-1600.jpg 1600w" width="1600"/></picture>
+<span class="san-pedro-cinematic__shade"></span>
+<figcaption class="san-pedro-cinematic__static-caption"></figcaption></figure>
+<figure class="san-pedro-cinematic__frame" data-cinematic-frame="3">
+<picture><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/alcaldia-san-pedro-960.avif 960w, assets/cinematica/alcaldia-san-pedro-1600.avif 1600w" type="image/avif"/><source sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" srcset="assets/cinematica/alcaldia-san-pedro-960.webp 960w, assets/cinematica/alcaldia-san-pedro-1600.webp 1600w" type="image/webp"/><img alt="Fachada de la Alcaldía Municipal de San Pedro" decoding="async" height="900" loading="lazy" sizes="(max-width: 767px) 92vw, (max-width: 1200px) 76vw, 1120px" src="assets/cinematica/alcaldia-san-pedro-1600.jpg" srcset="assets/cinematica/alcaldia-san-pedro-960.jpg 960w, assets/cinematica/alcaldia-san-pedro-1600.jpg 1600w" width="1600"/></picture>
+<span class="san-pedro-cinematic__shade"></span>
+<figcaption class="san-pedro-cinematic__static-caption"></figcaption></figure>
+</div>
+<div aria-live="polite" class="san-pedro-cinematic__copy" id="cinematicCopy">
+<span id="cinematicEyebrow">01 · MEMORIA QUE SUENA</span>
+<h3 id="cinematicHeading">La música también guarda <em>memoria</em></h3>
+<p id="cinematicText">En San Pedro, el arte público convierte el paisaje cotidiano en un escenario donde la historia parece seguir sonando.</p>
+<blockquote id="cinematicQuote">“San Pedro no solo se recorre: se escucha, se mira y se recuerda.”</blockquote>
+</div>
+<nav aria-label="Escenas de la cinemática" class="san-pedro-cinematic__rail" id="cinematicRail">
+<button aria-label="Ir a la escena Memoria" class="is-active" data-cinematic-step="0" type="button"><span>01</span><i></i><b>Memoria</b></button>
+<button aria-label="Ir a la escena Arquitectura" data-cinematic-step="1" type="button"><span>02</span><i></i><b>Arquitectura</b></button>
+<button aria-label="Ir a la escena Encuentro" data-cinematic-step="2" type="button"><span>03</span><i></i><b>Encuentro</b></button>
+<button aria-label="Ir a la escena Gestión" data-cinematic-step="3" type="button"><span>04</span><i></i><b>Gestión</b></button>
+</nav>
+<div aria-hidden="true" class="san-pedro-cinematic__progress"><i id="cinematicProgress"></i></div>
+<div aria-hidden="true" class="san-pedro-cinematic__scroll-hint"><i></i><span>Continúe desplazándose</span></div>
+<button class="san-pedro-cinematic__skip" id="cinematicSkip" type="button">Omitir recorrido ↓</button></div>
+</div>
+</section>
+<section class="home-section home-section--white">
+<div class="site-shell">
+<div class="home-section__head"><div><span>EDICIONES DISPONIBLES</span><h2>Explore las vigencias</h2></div><a class="button button-secondary" href="vigencias.html">Ver archivo histórico →</a></div>
+<div class="editions-carousel" id="featuredYears"></div>
+</div>
+</section>
+<section class="home-section home-section--soft home-highlights">
+<div class="site-shell">
+<div class="home-section__head"><div><span>PORTADA DE LA GESTIÓN</span><h2>Lo más destacado</h2></div><p>Una mezcla entre periódico digital y portal institucional: historias claras, recursos visuales y acceso rápido a las fuentes.</p></div>
+<div class="editorial-deals">
+<article class="editorial-feature reveal"><div><span>INFORME ESPECIAL</span><h3>La gestión explicada sin perder el contexto.</h3><p>Resultados, inversión, cobertura, retos y compromisos en una portada diseñada para comprender.</p><a class="button button-secondary editorial-feature__action" href="rendicion-2025.html"><span>Leer edición 2025</span><b aria-hidden="true">→</b></a></div></article>
+<div id="editorialCards" style="display:contents"></div>
+</div>
+</div>
+</section>
+<section class="home-section home-section--white home-proof">
+<div class="site-shell trust-strip">
+<article class="trust-card reveal"><span>✓</span><div><strong>Información verificable</strong><small>Fuentes y documentos relacionados</small></div></article>
+<article class="trust-card reveal"><span>24/7</span><div><strong>Consulta permanente</strong><small>Repositorio disponible en cualquier momento</small></div></article>
+<article class="trust-card reveal"><span>▣</span><div><strong>Navegación por vigencias</strong><small>Cada año tiene su propia página</small></div></article>
+<article class="trust-card reveal"><span>✦</span><div><strong>Participación visible</strong><small>Ideas con estado y respuesta oficial</small></div></article>
+</div>
+</section>
+<section class="home-section home-section--soft">
+<div class="site-shell">
+<div class="home-section__head"><div><span>LABORATORIO CIUDADANO</span><h2>Lo que propone la comunidad</h2></div><p><b id="homeIdeasCount">0</b> ideas ciudadanas registradas en esta demostración.</p></div>
+<div class="citizen-layout"><div id="citizenQuotes" style="display:contents"></div><article class="ideas-cta reveal"><span>PARTICIPE</span><h3>Una gran idea puede transformar el municipio.</h3><p>Presente propuestas, apoye iniciativas y consulte la respuesta institucional.</p><a class="button button-secondary" href="ideas.html">Entrar al laboratorio →</a></article></div>
+</div>
+</section>
+<section class="newsletter-bar">
+<div class="site-shell newsletter-box reveal">
+<div><h2>Reciba nuevas publicaciones</h2><p><b id="homeResourceCount">0</b> recursos se encuentran disponibles actualmente.</p></div>
+<form aria-label="Suscripción a publicaciones" id="newsletterForm"><input placeholder="Correo electrónico" required="" type="email"/><button class="button button-primary">Suscribirme</button></form>
+</div>
+</section>
+</main>
+<div id="siteFooter"></div><div id="globalDialogs"></div>
+<script defer="" src="shared.js?v=11.31.1-scroll-story"></script><script defer="" src="home.js?v=11.31.1-scroll-story"></script><script defer="" src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script><script defer="" src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script><script defer="" src="home-experience.js?v=11.31.1-scroll-story"></script>
 </body>
 </html>
