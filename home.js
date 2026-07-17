@@ -3,13 +3,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const years = [...state.years].sort((a,b) => Number(a.year)-Number(b.year));
 
   const selector = document.querySelector("#homeYear");
-  selector.innerHTML = years.map(y => `<option value="${y.year}">${y.year}</option>`).join("");
+  const exploreForm = document.querySelector("#homeExploreForm");
 
-  document.querySelector("#homeExploreForm").addEventListener("submit", event => {
-    event.preventDefault();
-    const year = Number(selector.value);
-    location.href = helpers.yearUrl(year);
-  });
+  if (selector && exploreForm) {
+    selector.innerHTML = years
+      .map(y => `<option value="${y.year}">${y.year}</option>`)
+      .join("");
+
+    exploreForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const year = Number(selector.value);
+      location.href = helpers.yearUrl(year);
+    });
+  }
 
   const grid = document.querySelector("#featuredYears");
   grid.innerHTML = years.slice(0,4).map((year,index) => `

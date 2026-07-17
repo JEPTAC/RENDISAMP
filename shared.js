@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.37-editorial-hero-reset";
+  const PORTAL_BUILD = "11.38-sin-explorador";
 
   /*
    * Arranque visual temprano.
