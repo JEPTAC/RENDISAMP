@@ -1,0 +1,2 @@
+V11.40.9
+Corrección: codificación reversible de arreglos anidados para Firestore.

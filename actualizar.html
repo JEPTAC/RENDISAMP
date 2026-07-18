@@ -9,7 +9,7 @@
   </style>
 </head>
 <body>
-  <main class="card"><div class="mark" aria-hidden="true"></div><h1>Restaurando el acceso</h1><p>Se está eliminando la versión experimental y cargando el inicio de sesión original.</p></main>
+  <main class="card"><div class="mark" aria-hidden="true"></div><h1>Actualizando almacenamiento</h1><p>Se está aplicando la corrección de guardado en Firestore sin alterar el inicio de sesión.</p></main>
   <script>
     (async()=>{
       try{
@@ -27,7 +27,7 @@
         sessionStorage.clear();
       }catch(_error){}
       const target=new URL('index.html',location.href);
-      target.searchParams.set('portal-build','11.40.8-auth-original-restored');
+      target.searchParams.set('portal-build','11.40.9-firestore-nested-arrays');
       target.searchParams.set('_',Date.now().toString());
       location.replace(target.href);
     })();

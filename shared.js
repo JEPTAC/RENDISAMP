@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.40.8-auth-original-restored";
+  const PORTAL_BUILD = "11.40.9-firestore-nested-arrays";
 
   /*
    * Retira definitivamente el service worker experimental de V11.40.2. GitHub Pages no
@@ -2464,7 +2464,7 @@ helpers.showClickEffect = showClickEffect;
   function loadFirebaseService() {
     if (document.querySelector('script[data-firebase-portal]')) return;
     const script = document.createElement("script");
-    script.src = `firebase-auth-v11408.js?v=${PORTAL_BUILD}`;
+    script.src = `firebase-auth-v11409.js?v=${PORTAL_BUILD}`;
     script.dataset.firebasePortal = "true";
     script.onload = () => window.FirebasePortal?.init?.();
     script.onerror = () => helpers.toast("No fue posible cargar la conexión con Firebase.");

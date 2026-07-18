@@ -589,6 +589,65 @@
     return {...target,role,active};
   }
 
+
+  const FIRESTORE_ARRAY_MARKER = "__sp_firestore_array_v1__";
+
+  function isPlainRecord(value) {
+    if (!value || typeof value !== "object") return false;
+    const prototype = Object.getPrototypeOf(value);
+    return prototype === Object.prototype || prototype === null;
+  }
+
+  /*
+   * Firestore no acepta arreglos directamente dentro de otros arreglos.
+   * El estado local sí usa esa estructura (por ejemplo years[].sectors),
+   * por lo que se codifican únicamente esos arreglos anidados como mapas
+   * reversibles antes de guardar. La estructura original se reconstruye
+   * al leer desde la nube.
+   */
+  function encodeFirestoreValue(value, directArrayItem = false) {
+    if (Array.isArray(value)) {
+      const items = value.map(item => encodeFirestoreValue(item, true));
+      return directArrayItem
+        ? {[FIRESTORE_ARRAY_MARKER]:items}
+        : items;
+    }
+
+    if (isPlainRecord(value)) {
+      return Object.fromEntries(
+        Object.entries(value).map(([key,item]) => [
+          key,
+          encodeFirestoreValue(item, false)
+        ])
+      );
+    }
+
+    return value;
+  }
+
+  function decodeFirestoreValue(value) {
+    if (Array.isArray(value)) {
+      return value.map(item => decodeFirestoreValue(item));
+    }
+
+    if (isPlainRecord(value)) {
+      const marker = value[FIRESTORE_ARRAY_MARKER];
+      const keys = Object.keys(value);
+      if (keys.length === 1 && Array.isArray(marker)) {
+        return marker.map(item => decodeFirestoreValue(item));
+      }
+
+      return Object.fromEntries(
+        Object.entries(value).map(([key,item]) => [
+          key,
+          decodeFirestoreValue(item)
+        ])
+      );
+    }
+
+    return value;
+  }
+
   function cloudPayload() {
     const state = portal()?.state;
     if (!state) throw new Error("El estado del portal no está disponible.");
@@ -618,7 +677,7 @@
 
       if (!portalSnapshot.exists()) return false;
 
-      const remote = portalSnapshot.data();
+      const remote = decodeFirestoreValue(portalSnapshot.data());
       const remoteVersion =
         remote.updatedAt?.toMillis?.()
         || Number(remote.updatedAtMs || 0);
@@ -634,7 +693,7 @@
       });
 
       const cloudIdeas =
-        ideasSnapshot.docs.map(item => ({id:item.id,...item.data()}));
+        ideasSnapshot.docs.map(item => ({id:item.id,...decodeFirestoreValue(item.data())}));
       if (cloudIdeas.length) state.ideas = cloudIdeas;
 
       portal().helpers.save({localOnly:true});
@@ -686,7 +745,7 @@
         serverTimestamp,addDoc
       } = runtime.modules.firestore;
 
-      const data = cloudPayload();
+      const data = encodeFirestoreValue(cloudPayload());
       data.updatedAt = serverTimestamp();
       data.updatedAtMs = Date.now();
       data.updatedBy = runtime.user.uid;
@@ -707,7 +766,10 @@
         const {id,...ideaData} = item;
         batch.set(
           doc(runtime.db,"ideas",id),
-          {...ideaData,updatedAt:serverTimestamp()},
+          {
+            ...encodeFirestoreValue(ideaData),
+            updatedAt:serverTimestamp()
+          },
           {merge:true}
         );
       });
@@ -748,7 +810,7 @@
       createdByEmail:runtime.user?.email || "",
       createdAt:serverTimestamp()
     };
-    await setDoc(doc(runtime.db,"ideas",idea.id),payload,{merge:false});
+    await setDoc(doc(runtime.db,"ideas",idea.id),encodeFirestoreValue(payload),{merge:false});
     return payload;
   }
 
