@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD = "11.41.0-firebase-rebuild-projects";
+  const BUILD = "11.42-proyectos-carpetas-motion";
   const MIN_PROJECTS = 5;
   const MAX_PROJECTS = 10;
   const PALETTE = [
@@ -94,7 +94,7 @@
   }
 
   function init() {
-    if (document.body?.dataset.page !== "projects") return;
+    if (!["home","projects"].includes(document.body?.dataset.page || "")) return;
     const root = q("#projectsPsp");
     const shell = q("#proyectos");
     if (!root || !shell || !window.Portal) return;
@@ -111,6 +111,14 @@
     let managerIndex = 0;
     let ambientFrame = 0;
     let ambientVisible = false;
+    let pointerX = 0;
+    let pointerY = 0;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragLastX = 0;
+    let dragPointerId = null;
+    let dragMoved = false;
+    let clickTimer = 0;
 
     const dom = {
       carousel:q("#projectsCarousel",root),
@@ -185,8 +193,10 @@
           aria-label="Seleccionar ${escapeHtml(project.title)}"
           aria-current="${index === currentIndex ? "true" : "false"}"
           style="--folder-color:${escapeHtml(project.color)}">
+          <div class="projects-folder__aura" aria-hidden="true"></div>
           <div class="projects-folder__back"></div>
-          <div class="projects-folder__paper"></div>
+          <div class="projects-folder__paper projects-folder__paper--rear"></div>
+          <div class="projects-folder__paper projects-folder__paper--front"></div>
           <div class="projects-folder__front">
             <div class="projects-folder__top">
               <span class="projects-folder__icon">${escapeHtml(project.icon || "PR")}</span>
@@ -249,14 +259,19 @@
       folders.forEach((folder,index) => {
         const offset = index - rawIndex;
         const abs = Math.abs(offset);
-        const visible = abs <= (mobile ? 2.25 : 3.4);
-        const x = offset * spacing;
-        const y = Math.pow(abs,1.22) * (mobile ? 15 : 20) + (offset < 0 ? -7 : 0);
-        const z = -Math.pow(abs,1.08) * (mobile ? 105 : 150);
-        const ry = clamp(-offset * (mobile ? 15 : 18),-54,54);
-        const rz = clamp(offset * 1.1,-3.2,3.2);
-        const scale = clamp(1 - abs * (mobile ? .085 : .075),.68,1);
-        const opacity = visible ? clamp(1 - Math.max(0,abs - 2.25) * .65,.12,1) : 0;
+        const visible = abs <= (mobile ? 2.35 : 3.55);
+        const focus = clamp(1 - abs,0,1);
+        const proximity = clamp(1 - abs / (mobile ? 2.4 : 3.5),0,1);
+        const x = offset * spacing + pointerX * (10 + proximity * 8);
+        const y = Math.pow(abs,1.18) * (mobile ? 15 : 21) + (offset < 0 ? -7 : 0) + pointerY * (5 + proximity * 5);
+        const z = -Math.pow(abs,1.05) * (mobile ? 105 : 155) + focus * 46;
+        const ry = clamp(-offset * (mobile ? 15 : 18) + pointerX * (4 + focus * 3),-55,55);
+        const rz = clamp(offset * 1.1 + pointerY * 1.25,-3.4,3.4);
+        const scale = clamp(1 - abs * (mobile ? .085 : .073) + focus * .025,.68,1.025);
+        const opacity = visible ? clamp(1 - Math.max(0,abs - 2.2) * .68,.1,1) : 0;
+        const blur = clamp((abs - .35) * 1.25,0,3.4);
+        const saturation = clamp(1.08 - abs * .09,.72,1.08);
+        const open = clamp(focus * 1.08,0,1);
         folder.style.setProperty("--folder-x",`${x.toFixed(2)}px`);
         folder.style.setProperty("--folder-y",`${y.toFixed(2)}px`);
         folder.style.setProperty("--folder-z",`${z.toFixed(2)}px`);
@@ -264,14 +279,62 @@
         folder.style.setProperty("--folder-rz",`${rz.toFixed(2)}deg`);
         folder.style.setProperty("--folder-scale",scale.toFixed(4));
         folder.style.setProperty("--folder-opacity",opacity.toFixed(3));
+        folder.style.setProperty("--folder-focus",focus.toFixed(3));
+        folder.style.setProperty("--folder-proximity",proximity.toFixed(3));
+        folder.style.setProperty("--folder-open",open.toFixed(3));
+        folder.style.setProperty("--folder-blur",`${blur.toFixed(2)}px`);
+        folder.style.setProperty("--folder-saturation",saturation.toFixed(3));
         folder.style.zIndex = String(1000 - Math.round(abs * 100));
         folder.setAttribute("aria-hidden",String(!visible));
       });
     }
 
+    function animateProjectCopy(direction = 1) {
+      if (reduceMotion.matches) return;
+      const targets = [
+        dom.eyebrow,
+        dom.title,
+        dom.description,
+        dom.tags,
+        dom.metric,
+        dom.metricLabel,
+        dom.secondary
+      ].filter(Boolean);
+      targets.forEach((element,index) => {
+        element.getAnimations?.().forEach(animation => animation.cancel());
+        element.animate([
+          {opacity:.18,transform:`translate3d(${direction * 18}px,10px,0)`,filter:"blur(7px)"},
+          {opacity:1,transform:"translate3d(0,0,0)",filter:"blur(0)"}
+        ],{
+          duration:430 + index * 34,
+          delay:index * 24,
+          easing:"cubic-bezier(.2,.82,.2,1)",
+          fill:"both"
+        });
+      });
+    }
+
+    function pulseActiveFolder() {
+      if (reduceMotion.matches) return;
+      const active = q(`.projects-folder[data-project-index="${currentIndex}"]`,dom.carousel);
+      const front = active ? q(".projects-folder__front",active) : null;
+      const paper = active ? q(".projects-folder__paper--front",active) : null;
+      front?.animate([
+        {filter:"brightness(.94)",transform:"translateZ(24px) rotateX(-3deg)"},
+        {filter:"brightness(1.08)",transform:"translateZ(31px) rotateX(-17deg) translateY(3%)"},
+        {filter:"brightness(1)",transform:"translateZ(29px) rotateX(-13deg) translateY(2%)"}
+      ],{duration:620,easing:"cubic-bezier(.18,.84,.2,1)"});
+      paper?.animate([
+        {transform:"translateZ(12px) translateY(-2%)"},
+        {transform:"translateZ(39px) translateY(-17%) rotateX(-3deg)"},
+        {transform:"translateZ(33px) translateY(-14%) rotateX(-2deg)"}
+      ],{duration:660,easing:"cubic-bezier(.18,.84,.2,1)"});
+    }
+
     function setProject(index, force = false) {
       const next = clamp(index,0,projects.length - 1);
       if (!force && next === currentIndex) return;
+      const previousIndex = currentIndex;
       currentIndex = next;
       const project = projects[currentIndex];
       applyTheme(project);
@@ -298,6 +361,10 @@
         const active = category === "Todos" || category === project.category;
         button.classList.toggle("is-active",active && (category !== "Todos" || !qa("[data-project-category].is-active",root).some(node => node !== button)));
       });
+      if (!force) {
+        animateProjectCopy(next >= previousIndex ? 1 : -1);
+        pulseActiveFolder();
+      }
     }
 
     function updateFromScroll(force = false) {
@@ -361,9 +428,11 @@
     }
 
     function updateAdminVisibility() {
+      let localMode = false;
+      try { localMode = sessionStorage.getItem("sp_admin_mode") === "local"; } catch (_) {}
       const adminSession = q("#adminSession");
       const canManage = Boolean(state.admin)
-        || Boolean(window.FirebasePortal?.getStatus?.()?.canWrite)
+        || localMode
         || Boolean(adminSession && !adminSession.hidden);
       dom.manage.hidden = !canManage;
     }
@@ -560,10 +629,25 @@
 
     dom.carousel.addEventListener("click",event => {
       const folder = event.target.closest(".projects-folder");
-      if (!folder) return;
+      if (!folder || dragMoved) return;
+      clearTimeout(clickTimer);
       const index = Number(folder.dataset.projectIndex);
-      if (index === currentIndex) openDetails();
-      else scrollToProject(index);
+      clickTimer = window.setTimeout(() => {
+        scrollToProject(index);
+      },190);
+    });
+
+    dom.carousel.addEventListener("dblclick",event => {
+      const folder = event.target.closest(".projects-folder");
+      if (!folder) return;
+      clearTimeout(clickTimer);
+      const index = Number(folder.dataset.projectIndex);
+      if (index !== currentIndex) {
+        scrollToProject(index,"auto");
+        window.setTimeout(openDetails,220);
+      } else {
+        openDetails();
+      }
     });
 
     dom.carousel.addEventListener("keydown",event => {
@@ -576,6 +660,72 @@
         else scrollToProject(index);
       }
     });
+
+    dom.carousel.addEventListener("pointerdown",event => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      dragPointerId = event.pointerId;
+      dragStartX = dragLastX = event.clientX;
+      dragStartY = event.clientY;
+      dragMoved = false;
+      dom.carousel.setPointerCapture?.(event.pointerId);
+      root.classList.add("is-dragging");
+    });
+
+    dom.carousel.addEventListener("pointermove",event => {
+      if (dragPointerId !== event.pointerId) return;
+      dragLastX = event.clientX;
+      const dx = dragLastX - dragStartX;
+      const dy = event.clientY - dragStartY;
+      if (Math.abs(dx) > 7 && Math.abs(dx) > Math.abs(dy)) {
+        dragMoved = true;
+        event.preventDefault();
+        root.style.setProperty("--projects-drag-x",`${clamp(dx,-120,120)}px`);
+      }
+    });
+
+    function finishDrag(event) {
+      if (dragPointerId !== event.pointerId) return;
+      const dx = dragLastX - dragStartX;
+      try { dom.carousel.releasePointerCapture?.(event.pointerId); } catch (_) {}
+      dragPointerId = null;
+      root.classList.remove("is-dragging");
+      root.style.setProperty("--projects-drag-x","0px");
+      if (dragMoved && Math.abs(dx) > 42) {
+        scrollToProject(currentIndex + (dx < 0 ? 1 : -1));
+      }
+      window.setTimeout(() => { dragMoved = false; },80);
+    }
+    dom.carousel.addEventListener("pointerup",finishDrag);
+    dom.carousel.addEventListener("pointercancel",finishDrag);
+
+    root.addEventListener("pointermove",event => {
+      if (event.pointerType && event.pointerType !== "mouse") return;
+      const rect = root.getBoundingClientRect();
+      pointerX = clamp((event.clientX - rect.left) / Math.max(1,rect.width) - .5,-.5,.5);
+      pointerY = clamp((event.clientY - rect.top) / Math.max(1,rect.height) - .5,-.5,.5);
+      root.style.setProperty("--projects-pointer-x",pointerX.toFixed(3));
+      root.style.setProperty("--projects-pointer-y",pointerY.toFixed(3));
+      updateFolderTransforms(scrollProgress * Math.max(1,projects.length - 1));
+    },{passive:true});
+
+    root.addEventListener("pointerleave",() => {
+      pointerX = 0;
+      pointerY = 0;
+      root.style.setProperty("--projects-pointer-x","0");
+      root.style.setProperty("--projects-pointer-y","0");
+      updateFolderTransforms(scrollProgress * Math.max(1,projects.length - 1));
+    },{passive:true});
+
+    const entranceObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        root.classList.toggle("is-in-view",entry.isIntersecting);
+        if (entry.isIntersecting) {
+          root.classList.add("is-ready");
+          entranceObserver.disconnect();
+        }
+      });
+    },{threshold:.16});
+    entranceObserver.observe(root);
 
     root.addEventListener("keydown",event => {
       if (dom.details.classList.contains("is-open") || dom.manager.classList.contains("is-open")) return;

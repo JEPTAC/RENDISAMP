@@ -27,24 +27,170 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="preload" href="assets/fonts/brother-signature.otf" as="font" type="font/otf" crossorigin>
-  <meta name="description" content="Módulo independiente de proyectos del portal de Rendición de Cuentas de San Pedro.">
+  <meta name="description" content="Proyectos y avances de la gestión pública de San Pedro.">
   <link rel="icon" href="assets/favicon.png">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css?v=11.41.0-firebase-repair">
   <link rel="stylesheet" href="assets/proyectos-banner/banner.css?v=1.0.0">
+  <link rel="stylesheet" href="projects-psp.css?v=11.42.0">
   <title>Proyectos | Rendición de Cuentas de San Pedro</title>
-
   <link rel="preconnect" href="https://accounts.google.com">
 </head>
 <body data-page="projects">
   <div id="siteHeader"></div>
-  <main id="main-content" aria-label="Módulo de proyectos" style="min-height:72vh;background:#fff">
+
+  <main id="main-content" aria-label="Módulo de proyectos">
     <div id="sp-projects-banner" data-sp-projects-banner></div>
+
+    <section id="proyectos" class="projects-psp-shell" aria-labelledby="projectsTitle">
+      <div id="projectsPsp" class="projects-psp" tabindex="0" aria-label="Explorador interactivo de proyectos">
+        <canvas id="projectsAmbientCanvas" class="projects-psp__ambient-canvas" aria-hidden="true"></canvas>
+        <span class="projects-psp__grid" aria-hidden="true"></span>
+        <span class="projects-psp__wash" aria-hidden="true"></span>
+        <span class="projects-psp__wave" aria-hidden="true"></span>
+        <span class="projects-psp__wave projects-psp__wave--two" aria-hidden="true"></span>
+        <span class="projects-psp__noise" aria-hidden="true"></span>
+
+        <div class="projects-psp__layout">
+          <header class="projects-psp__header">
+            <div class="projects-psp__brand">
+              <span class="projects-psp__brand-mark" aria-hidden="true">SP</span>
+              <div>
+                <strong>Archivo de proyectos</strong>
+                <small>Seleccione una carpeta para consultar avances, resultados y evidencias.</small>
+              </div>
+            </div>
+
+            <nav class="projects-psp__xmb" aria-label="Categorías de proyectos">
+              <button type="button" class="is-active" data-project-category="Todos"><span>◎</span><small>Todos</small></button>
+              <button type="button" data-project-category="Infraestructura"><span>▦</span><small>Infraestructura</small></button>
+              <button type="button" data-project-category="Social"><span>◇</span><small>Social</small></button>
+              <button type="button" data-project-category="Cultura"><span>♪</span><small>Cultura</small></button>
+              <button type="button" data-project-category="Ambiente"><span>⌁</span><small>Ambiente</small></button>
+            </nav>
+
+            <div class="projects-psp__status">
+              <div class="projects-psp__status-copy">
+                <strong id="projectsClock">00:00</strong>
+                <small>San Pedro · Colombia</small>
+              </div>
+              <button id="projectsManage" class="projects-psp__manage" type="button" hidden>Administrar proyectos</button>
+            </div>
+          </header>
+
+          <div class="projects-psp__stage">
+            <article class="projects-psp__info" aria-live="polite">
+              <div class="projects-psp__eyebrow"><span id="projectsIndex">01</span><strong id="projectsEyebrow">Proyecto · Carpeta institucional</strong></div>
+              <h2 id="projectsTitle">Proyecto <em>01</em></h2>
+              <p id="projectsDescription">Seleccione una carpeta para conocer el objetivo, los avances, los resultados y las evidencias del proyecto.</p>
+              <div id="projectsTags" class="projects-psp__tags"></div>
+              <button id="projectsOpen" class="projects-psp__open" type="button">
+                <span class="projects-psp__open-icon" aria-hidden="true">↗</span>
+                <span>Abrir carpeta seleccionada</span>
+              </button>
+            </article>
+
+            <div class="projects-psp__carousel-wrap" aria-label="Carpetas de proyectos">
+              <div id="projectsCarousel" class="projects-psp__carousel"></div>
+            </div>
+
+            <aside class="projects-psp__metric" aria-label="Indicador del proyecto seleccionado">
+              <small>Indicador principal</small>
+              <strong id="projectsMetric">—</strong>
+              <span id="projectsMetricLabel">Indicador por registrar</span>
+              <i id="projectsMetricBar" aria-hidden="true"></i>
+              <p id="projectsSecondary">Información disponible dentro de la carpeta.</p>
+            </aside>
+          </div>
+
+          <footer class="projects-psp__footer">
+            <div class="projects-psp__controls">
+              <span><button id="projectsPrev" type="button" aria-label="Proyecto anterior"><b>←</b></button> anterior</span>
+              <span><button id="projectsNext" type="button" aria-label="Proyecto siguiente"><b>→</b></button> siguiente</span>
+              <span><b>↕</b> desplazar</span>
+              <span><b>↔</b> arrastrar</span>
+              <span><b>2×</b> abrir</span>
+            </div>
+            <div class="projects-psp__progress">
+              <span id="projectsProgressText">Proyecto 1 de 5</span>
+              <div aria-hidden="true"><i id="projectsProgressBar"></i></div>
+            </div>
+          </footer>
+        </div>
+
+        <div id="projectsDetails" class="projects-psp__details" aria-hidden="true">
+          <button id="projectsDetailsBackdrop" class="projects-psp__overlay" type="button" aria-label="Cerrar detalle"></button>
+          <article role="dialog" aria-modal="true" aria-labelledby="projectsDetailsTitle">
+            <button id="projectsDetailsClose" class="projects-psp__close" type="button" aria-label="Cerrar">×</button>
+            <div id="projectsDetailsCover" class="projects-psp__details-cover is-empty">
+              <img id="projectsDetailsImage" alt="" hidden>
+            </div>
+            <div class="projects-psp__details-content">
+              <div class="projects-psp__eyebrow"><span id="projectsDetailsIndex">01</span><strong id="projectsDetailsEyebrow">Proyecto</strong></div>
+              <h3 id="projectsDetailsTitle">Proyecto</h3>
+              <p id="projectsDetailsDescription"></p>
+              <div class="projects-psp__details-grid">
+                <div><small>Objetivo</small><strong id="projectsDetailsObjective"></strong></div>
+                <div><small>Resultado</small><strong id="projectsDetailsResult"></strong></div>
+                <div><small>Próximo paso</small><strong id="projectsDetailsNext"></strong></div>
+              </div>
+              <div id="projectsDetailsGallery" class="projects-psp__gallery" aria-label="Galería del proyecto"></div>
+            </div>
+          </article>
+        </div>
+
+        <div id="projectsManager" class="projects-psp__manager" aria-hidden="true">
+          <button id="projectsManagerBackdrop" class="projects-psp__overlay" type="button" aria-label="Cerrar administración"></button>
+          <article role="dialog" aria-modal="true" aria-labelledby="projectsManagerTitle">
+            <button id="projectsManagerClose" class="projects-psp__close" type="button" aria-label="Cerrar">×</button>
+            <aside class="projects-manager__sidebar">
+              <h3 id="projectsManagerTitle">Proyectos</h3>
+              <p>Administre las carpetas visibles en esta sección.</p>
+              <div id="projectsManagerList" class="projects-manager__list"></div>
+              <button id="projectsManagerAdd" class="projects-manager__add" type="button">＋ Crear nueva carpeta</button>
+            </aside>
+
+            <form id="projectsManagerForm" class="projects-manager__form">
+              <h3>Contenido de la carpeta</h3>
+              <p>Los cambios se guardan en el estado general del portal.</p>
+              <input type="hidden" name="id">
+
+              <label>Título<input name="title" required maxlength="90"></label>
+              <label>Categoría<input name="category" maxlength="50"></label>
+              <label>Tipo<input name="type" maxlength="60"></label>
+              <label>Año<input name="year" maxlength="10"></label>
+              <label>Estado<input name="status" maxlength="60"></label>
+              <label>Ícono corto<input name="icon" maxlength="3"></label>
+              <label>Color<input name="color" type="color"></label>
+              <label>Indicador<input name="metric" maxlength="30"></label>
+              <label>Nombre del indicador<input name="metricLabel" maxlength="90"></label>
+              <label>Progreso<input name="progress" type="number" min="0" max="100" step="1"></label>
+              <label class="full">Resumen del indicador<textarea name="secondaryMetric"></textarea></label>
+              <label class="full">Descripción<textarea name="description" required></textarea></label>
+              <label class="full">Etiquetas separadas por coma<input name="tags"></label>
+              <label class="full">Objetivo<textarea name="objective"></textarea></label>
+              <label class="full">Resultado<textarea name="result"></textarea></label>
+              <label class="full">Próximo paso<textarea name="next"></textarea></label>
+              <label class="full">Imagen principal: ruta o URL<input name="image"></label>
+              <label class="full">Galería: una ruta o URL por línea<textarea name="gallery"></textarea></label>
+
+              <div class="projects-manager__actions">
+                <button id="projectsManagerDelete" class="button button-secondary projects-manager__delete" type="button">Eliminar carpeta</button>
+                <div><button class="button button-primary" type="submit">Guardar proyecto</button></div>
+              </div>
+            </form>
+          </article>
+        </div>
+      </div>
+    </section>
   </main>
+
   <div id="siteFooter"></div>
   <div id="globalDialogs"></div>
+
   <script src="portal-core-v11409.js?v=11.41.0-firebase-repair"></script>
   <script src="assets/proyectos-banner/banner-config.js?v=1.0.0"></script>
   <script src="assets/proyectos-banner/banner.js?v=1.0.0" defer></script>
+  <script src="projects-psp.js?v=11.42.0" defer></script>
 </body>
 </html>
