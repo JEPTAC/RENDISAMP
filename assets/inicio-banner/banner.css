@@ -1,4 +1,11 @@
 @font-face{
+  font-family:"Hullgaria";
+  src:local("Hullgaria"),url("../fonts/Hullgaria.otf") format("opentype");
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+}
+@font-face{
   font-family:"Brother Signature";
   src:url("../fonts/brother-signature.otf") format("opentype");
   font-display:swap;
@@ -7,7 +14,7 @@
 /* Todo está encapsulado bajo .spb-banner para no alterar la página anfitriona. */
 .spb-banner{
   --spb-font:"Century Gothic","Avenir Next",Avenir,Montserrat,Arial,sans-serif;
-  --spb-script:"Brother Signature","Segoe Script","Brush Script MT",cursive;
+  --spb-script:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive;
   --spb-ink:#07111f;
   --spb-muted:#68778f;
   --spb-accent:#2f6ee8;
@@ -242,7 +249,7 @@
 
 
 /* V2.1 · Modal fiable y manuscritos sin recortes */
-.spb-banner__modal{--spb-font:"Century Gothic","Avenir Next",Arial,sans-serif;--spb-script:"Brother Signature","Segoe Script","Brush Script MT",cursive;--spb-ease:cubic-bezier(.2,.78,.2,1);pointer-events:none;contain:layout style}
+.spb-banner__modal{--spb-font:"Century Gothic","Avenir Next",Arial,sans-serif;--spb-script:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive;--spb-ease:cubic-bezier(.2,.78,.2,1);pointer-events:none;contain:layout style}
 .spb-banner__modal.is-open{pointer-events:auto}
 .spb-banner__modal-card{max-height:calc(100dvh - 40px);overflow:auto;overscroll-behavior:contain}
 .spb-banner__close{

@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.46.0-ux-polish";
+  const PORTAL_BUILD = "11.47.0-hullgaria";
 
   /*
    * Retira definitivamente el service worker experimental de V11.40.2. GitHub Pages no

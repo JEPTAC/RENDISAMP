@@ -1,0 +1,8 @@
+Coloca en esta carpeta el archivo original que ya tienes:
+
+Hullgaria.otf
+
+Ruta final obligatoria en GitHub:
+assets/fonts/Hullgaria.otf
+
+No cambies las mayúsculas ni el nombre del archivo. GitHub Pages distingue mayúsculas y minúsculas.

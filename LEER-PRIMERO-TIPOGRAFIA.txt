@@ -1,0 +1,11 @@
+CORRECCIÓN TIPOGRÁFICA GLOBAL V11.47
+
+1. Sube el contenido de este paquete a la raíz de RENDISAMP y reemplaza los archivos existentes.
+2. Extrae de tu archivo hullgaria.zip el archivo Hullgaria.otf.
+3. Súbelo manualmente a:
+   assets/fonts/Hullgaria.otf
+4. No subas hullgaria.zip completo: solo el archivo Hullgaria.otf en la ruta indicada.
+5. Espera a que termine GitHub Actions/GitHub Pages y recarga con Ctrl + F5.
+
+La fuente se usa únicamente en títulos principales y palabras destacadas.
+Century Gothic se conserva para párrafos, botones, formularios, menús, tarjetas y panel administrativo.

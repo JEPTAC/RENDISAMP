@@ -1230,7 +1230,7 @@ body.projects-dialog-open{
 .projects-folder__title em{
   display:inline-block!important;overflow:visible!important;max-width:100%!important;
   padding:.1em .13em .28em .06em!important;margin:-.08em -.03em -.2em 0!important;
-  font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive!important;
+  font-family:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive!important;
   font-style:normal!important;font-weight:400!important;line-height:1.06!important;letter-spacing:.01em!important;
   white-space:normal!important;text-shadow:0 1px 0 rgba(255,255,255,.25),0 8px 22px rgba(7,42,74,.2);
 }

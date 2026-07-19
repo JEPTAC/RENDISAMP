@@ -223,13 +223,21 @@
   }
 
   function accentTitleLastWords(root = document) {
-    const headings = root.querySelectorAll(
-      "main h1, main h2, main h3, .site-footer h2, .site-footer h3"
-    );
+    const headings = root.querySelectorAll([
+      "main h1",
+      "main .page-title",
+      "main .home-section__head h2",
+      "main .section-head h2",
+      "main .year-section__head h2",
+      "main .archive-intro h2",
+      "main .ideas-page__head h2",
+      "main .projects-psp__summary-copy h2",
+      ".site-footer h2"
+    ].join(","));
 
     headings.forEach(heading => {
       if (!heading.isConnected) return;
-      if (heading.closest("dialog,.context-editor,.admin-console")) return;
+      if (heading.closest("dialog,.context-editor,.admin-console,.projects-manager,.projects-psp__details,.firebase-google-card,.spb-banner__modal,.edition-card,.deal-card,.resource-card,.news-card,.idea-card,.territory-focus-card,.year-selector-card")) return;
 
       const existing = heading.querySelector(".title-accent-word,em");
       if (existing) {

@@ -12031,7 +12031,7 @@ body.page-home .home-hero__copy h1 em,
 body.claude-page-home .home-hero__copy h1 em,
 body.page-home .title-accent-word,
 body.claude-page-home .title-accent-word{
-  font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive!important;
+  font-family:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive!important;
   font-style:normal!important;font-weight:400!important;letter-spacing:.005em!important;
   line-height:.78!important;text-transform:none!important;transform:translateY(.07em)!important;
 }
@@ -12227,7 +12227,7 @@ main :is(h1,h2,h3) em.title-accent-word,
   padding:.08em .16em .24em .07em!important;
   margin:-.08em -.05em -.18em -.02em!important;
   overflow:visible!important;
-  font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive!important;
+  font-family:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive!important;
   font-style:normal!important;
   font-weight:400!important;
   line-height:1.08!important;
@@ -13330,7 +13330,7 @@ html[data-viewport-tier="large"] body.claude-page-home .site-shell{
 }
 
 .sp-loading-popup__title{
-  font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive!important;
+  font-family:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive!important;
   font-size:36px!important;
   font-weight:400!important;
   line-height:.96!important;
@@ -13870,7 +13870,7 @@ body.claude-page-home .home-hero.home-hero--editorial .home-hero__copy h1 .title
   background-clip:text!important;
   -webkit-text-fill-color:transparent!important;
   color:transparent!important;
-  font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive!important;
+  font-family:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive!important;
   font-size:1.13em!important;
   font-weight:400!important;
   line-height:.88!important;
@@ -14387,7 +14387,7 @@ main :is(h1,h2,h3) :is(.title-accent-word,em),
 .cd-section-mark em{
   overflow:visible!important;max-width:100%!important;
   padding:.12em .16em .3em .08em!important;margin-block:-.1em -.2em!important;
-  font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive!important;
+  font-family:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive!important;
   font-style:normal!important;font-weight:400!important;
   line-height:1.08!important;letter-spacing:.012em!important;text-transform:none!important;
   white-space:normal!important;text-wrap:balance;
@@ -14409,3 +14409,289 @@ main :is(h1,h2,h3) :is(.title-accent-word,em){font-size:1.2em!important;vertical
   .claude-studio :is(.section-kicker,.section-label,.eyebrow),.cd-section-mark em{font-size:clamp(1.5rem,7vw,2.25rem)!important}
   main :is(h1,h2,h3) :is(.title-accent-word,em){font-size:1.12em!important}
 }
+
+/* =========================================================
+   V11.47 · Sistema tipográfico global Hullgaria
+   Jerarquía, contraste, cajas seguras y uso manuscrito selectivo
+   ========================================================= */
+@font-face{
+  font-family:"Hullgaria";
+  src:local("Hullgaria"),url("assets/fonts/Hullgaria.otf") format("opentype");
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+}
+
+:root{
+  --portal-font-ui:"Century Gothic","CenturyGothic","AppleGothic","URW Gothic L","Trebuchet MS",Arial,sans-serif;
+  --portal-font-script:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive;
+  --portal-type-ink:#08274d;
+  --portal-type-copy:#365b7d;
+  --portal-type-muted:#55728e;
+  --portal-type-soft:#eef6fc;
+  --portal-script-color:#a31246;
+  --portal-script-on-dark:#fff7fb;
+  --portal-script-shadow:0 2px 0 rgba(255,255,255,.75),0 10px 26px rgba(75,18,55,.17);
+}
+body[data-page="home"]{--portal-script-color:#a31246}
+body[data-page="projects"]{--portal-script-color:#6d28d9}
+body[data-page="year"],body.page-vigencias{--portal-script-color:#7c1d63}
+body[data-page="news"],body.page-news{--portal-script-color:#c0184b}
+body[data-page="resources"],body.page-resources{--portal-script-color:#6b32b5}
+body[data-page="ideas"],body.page-ideas{--portal-script-color:#981b45}
+
+html,body,
+button,input,select,textarea,
+.admin-console,.context-editor,.dialog,.firebase-google-card,.projects-manager{
+  font-family:var(--portal-font-ui)!important;
+}
+body{color:var(--portal-type-ink)}
+
+/* Etiquetas y datos funcionales se mantienen en la fuente limpia. */
+main :is(.section-kicker,.section-label,.eyebrow,.page-hero__badge,.cd-section-mark,.projects-psp__eyebrow,.projects-psp__summary-label),
+.claude-studio :is(.section-kicker,.section-label,.eyebrow),
+:is(.admin-console,.context-editor,.dialog,.firebase-google-card,.projects-manager) :is(.section-kicker,.section-label,.eyebrow){
+  display:inline-flex!important;
+  align-items:center!important;
+  max-width:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:visible!important;
+  color:#0d68a8!important;
+  background:none!important;
+  -webkit-text-fill-color:currentColor!important;
+  font-family:var(--portal-font-ui)!important;
+  font-size:clamp(.64rem,.59rem + .16vw,.78rem)!important;
+  font-style:normal!important;
+  font-weight:800!important;
+  line-height:1.35!important;
+  letter-spacing:.16em!important;
+  text-transform:uppercase!important;
+  text-shadow:none!important;
+  white-space:normal!important;
+}
+
+/* Solo títulos estructurales reciben el trazo Hullgaria. */
+main :is(h1,h2) .title-accent-word,
+main :is(.page-title,.projects-psp__heading h1,.projects-psp__summary-copy h2) em,
+.site-footer h2 .title-accent-word,
+.spb-banner :is(.spb-banner__script,.spb-banner__caption-script,.spb-banner__discover,.spb-banner__pill),
+.projects-psp :is(.projects-psp__heading h1 em,.projects-psp__summary-copy h2 em,.projects-folder__title em){
+  position:relative!important;
+  z-index:2!important;
+  display:inline-block!important;
+  max-width:100%!important;
+  overflow:visible!important;
+  padding:.13em .18em .34em .09em!important;
+  margin:-.09em -.05em -.24em -.025em!important;
+  color:var(--portal-script-color)!important;
+  background:none!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+  -webkit-text-fill-color:currentColor!important;
+  font-family:var(--portal-font-script)!important;
+  font-size:clamp(1.12em,1.04em + .42vw,1.36em)!important;
+  font-style:normal!important;
+  font-weight:400!important;
+  line-height:1.12!important;
+  letter-spacing:.006em!important;
+  text-transform:none!important;
+  text-shadow:var(--portal-script-shadow)!important;
+  transform:none!important;
+  filter:none!important;
+  vertical-align:-.06em!important;
+  white-space:nowrap!important;
+  text-wrap:nowrap!important;
+}
+
+/* No convertir tarjetas, botones ni rótulos pequeños en manuscritos. */
+main h3 em:not(.title-accent-word),
+main :is(.edition-card,.deal-card,.resource-card,.news-card,.idea-card,.territory-focus-card,.year-selector-card,.publication-card,.dashboard-card) :is(h1,h2,h3) em,
+:is(.admin-console,.context-editor,.dialog,.firebase-google-card,.projects-manager,.projects-psp__details) :is(h1,h2,h3) :is(em,.title-accent-word){
+  display:inline!important;
+  margin:0!important;
+  padding:0!important;
+  color:inherit!important;
+  background:none!important;
+  -webkit-text-fill-color:currentColor!important;
+  font:inherit!important;
+  letter-spacing:inherit!important;
+  line-height:inherit!important;
+  text-shadow:none!important;
+  vertical-align:baseline!important;
+  white-space:normal!important;
+}
+
+/* Cajas seguras: nada de ascendentes o descendentes cortados. */
+main :is(h1,h2,h3,.page-title),
+.site-footer :is(h2,h3),
+:is(.home-section__head,.section-head,.year-section__head,.archive-intro,.page-hero__grid,.ideas-page__head,.projects-psp__heading,.projects-psp__summary-copy,.news-page-hero,.library-page__head){
+  overflow:visible!important;
+}
+main :is(h1,h2,.page-title),.site-footer h2{
+  padding-block:.08em .17em!important;
+  text-wrap:balance!important;
+}
+
+/* Jerarquía tipográfica global y adaptable. */
+.page-hero :is(h1,.page-title),
+.ideas-page__head h1,
+.projects-psp__heading h1{
+  color:var(--portal-type-ink)!important;
+  font-size:clamp(2.65rem,5.35vw,5.65rem)!important;
+  line-height:.98!important;
+  letter-spacing:-.058em!important;
+}
+.home-section__head h2,
+.section-head h2,
+.year-section__head h2,
+.archive-intro h2,
+.projects-psp__summary-copy h2,
+.page-title{
+  color:var(--portal-type-ink)!important;
+  font-size:clamp(2.15rem,3.75vw,4.35rem)!important;
+  line-height:1.02!important;
+  letter-spacing:-.052em!important;
+}
+main :is(.edition-card,.deal-card,.resource-card,.news-card,.idea-card,.territory-focus-card,.publication-card,.dashboard-card) :is(h2,h3){
+  color:var(--portal-type-ink)!important;
+  font-size:clamp(1.08rem,.99rem + .38vw,1.48rem)!important;
+  line-height:1.16!important;
+  letter-spacing:-.025em!important;
+}
+
+/* Texto informativo: nunca microscópico ni deslavado. */
+main :is(.page-hero,.home-section__head,.section-head,.year-section__head,.archive-intro,.ideas-page__head,.projects-psp__summary-copy,.library-page,.news-page,.ideas-page,.archive-page) p,
+main :is(.edition-card,.deal-card,.resource-card,.news-card,.idea-card,.territory-focus-card,.publication-card,.dashboard-card,.year-selector-card) p,
+.dialog p,.context-editor p,.admin-console p,.projects-sheet p{
+  color:var(--portal-type-copy)!important;
+  font-size:clamp(.84rem,.79rem + .18vw,.98rem)!important;
+  line-height:1.68!important;
+}
+main :is(.meta,.caption,small,[class*="__meta"],[class*="__caption"]){
+  color:var(--portal-type-muted);
+}
+.button,button,[role="button"]{
+  text-rendering:optimizeLegibility;
+}
+main .button,
+.dialog button,
+.admin-console button,
+.context-editor button{
+  font-family:var(--portal-font-ui)!important;
+  font-size:clamp(.68rem,.64rem + .12vw,.78rem)!important;
+  line-height:1.25!important;
+}
+:is(.dialog,.admin-console,.context-editor,.firebase-google-card,.projects-manager) :is(label,input,select,textarea){
+  font-family:var(--portal-font-ui)!important;
+  font-size:clamp(.78rem,.74rem + .14vw,.9rem)!important;
+  line-height:1.45!important;
+}
+
+/* Contraste de manuscritos sobre fotografía o fondos oscuros. */
+:is(.year-hero,.editorial-feature,.participation-promo,.resource-feature,.news-feature,.news-card__cover,.story-cover,.resource-card__cover,.publication-modal__media,.territory-stage,.spb-banner__viewport,.projects-folder__front,[class*="media-shade"]) :is(.title-accent-word,.spb-banner__caption-script,.spb-banner__discover,.projects-folder__title em){
+  color:var(--portal-script-on-dark)!important;
+  -webkit-text-fill-color:currentColor!important;
+  text-shadow:0 2px 2px rgba(0,0,0,.88),0 10px 30px rgba(0,0,0,.58),0 0 1px #000!important;
+}
+:is(.year-hero,.editorial-feature,.participation-promo,.resource-feature,.news-feature,.news-card__cover,.story-cover,.resource-card__cover,.publication-modal__media,.territory-stage) :is(h1,h2,h3,p){
+  position:relative;
+  z-index:2;
+}
+
+/* Banner: Hullgaria grande, sólida y colores administrables por escena. */
+.spb-banner{
+  --spb-script:var(--portal-font-script)!important;
+}
+.spb-banner__script{
+  color:var(--spb-cursive-color,var(--spb-accent))!important;
+  font-size:clamp(4.6rem,6.8vw,8.6rem)!important;
+  line-height:1.06!important;
+  padding-block:.13em .34em!important;
+}
+.spb-banner__caption h2{
+  max-width:min(88%,760px)!important;
+  overflow:visible!important;
+  line-height:1.02!important;
+}
+.spb-banner__caption-script{
+  color:var(--spb-cursive-color,var(--spb-accent))!important;
+  font-size:clamp(1.22em,1.08em + .55vw,1.55em)!important;
+  line-height:1.12!important;
+}
+.spb-banner__caption p{
+  max-width:min(76%,680px)!important;
+  color:var(--spb-caption-description,#fff)!important;
+  font-family:var(--portal-font-ui)!important;
+  font-size:clamp(.9rem,.82rem + .22vw,1.05rem)!important;
+  font-weight:700!important;
+  line-height:1.42!important;
+  letter-spacing:-.018em!important;
+  text-shadow:0 2px 3px rgba(0,0,0,.92),0 8px 24px rgba(0,0,0,.55)!important;
+}
+.spb-banner__pill,.spb-banner__discover{
+  color:#fff!important;
+  -webkit-text-fill-color:currentColor!important;
+}
+
+/* Proyectos: color por carpeta, sin perder contraste. */
+.projects-psp__heading h1 em,
+.projects-psp__summary-copy h2 em{
+  color:var(--projects-accent,var(--portal-script-color))!important;
+}
+.projects-folder__title em{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+
+/* Accesibilidad de contraste. */
+body.high-contrast{
+  --portal-type-ink:#000;
+  --portal-type-copy:#111;
+  --portal-type-muted:#222;
+  --portal-script-color:#6b0032;
+  --portal-script-on-dark:#fff;
+}
+body.high-contrast .title-accent-word{
+  text-shadow:none!important;
+  text-decoration:underline 3px currentColor;
+  text-underline-offset:.12em;
+}
+
+@media(max-width:900px){
+  .page-hero :is(h1,.page-title),.ideas-page__head h1,.projects-psp__heading h1{
+    font-size:clamp(2.35rem,8.4vw,4.55rem)!important;
+  }
+  .home-section__head h2,.section-head h2,.year-section__head h2,.archive-intro h2,.projects-psp__summary-copy h2,.page-title{
+    font-size:clamp(2rem,6.8vw,3.65rem)!important;
+  }
+}
+@media(max-width:680px){
+  main :is(h1,h2) .title-accent-word,
+  main :is(.page-title,.projects-psp__heading h1,.projects-psp__summary-copy h2) em,
+  .site-footer h2 .title-accent-word{
+    max-width:100%!important;
+    font-size:clamp(1.08em,1em + 1.4vw,1.25em)!important;
+    line-height:1.15!important;
+    white-space:normal!important;
+    text-wrap:balance!important;
+  }
+  .spb-banner__script{
+    font-size:clamp(4rem,18vw,6.4rem)!important;
+  }
+  .spb-banner__caption h2,.spb-banner__caption p{
+    max-width:100%!important;
+  }
+  .spb-banner__caption-script{
+    font-size:1.22em!important;
+    white-space:normal!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .title-accent-word,.spb-banner__script,.spb-banner__caption-script{
+    transition:none!important;
+    animation:none!important;
+  }
+}
+
