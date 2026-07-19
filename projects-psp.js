@@ -1,20 +1,20 @@
 (() => {
   "use strict";
 
-  const BUILD = "11.42-proyectos-carpetas-motion";
+  const BUILD = "11.43-proyectos-dock";
   const MIN_PROJECTS = 5;
   const MAX_PROJECTS = 10;
   const PALETTE = [
-    ["#1f8bd1","#0d4f8e","31,139,209"],
-    ["#44b9a8","#176d67","68,185,168"],
-    ["#765bd6","#443297","118,91,214"],
-    ["#eb8751","#a54627","235,135,81"],
-    ["#df5d82","#96334f","223,93,130"],
-    ["#4797dc","#205e9b","71,151,220"],
-    ["#53af67","#25733a","83,175,103"],
-    ["#d89e32","#8f6115","216,158,50"],
-    ["#4d79cd","#294a8d","77,121,205"],
-    ["#9a67cf","#613796","154,103,207"]
+    ["#238fd3", "#0c4f86"],
+    ["#42ad9f", "#176d67"],
+    ["#745bd3", "#443397"],
+    ["#df8556", "#9f482b"],
+    ["#d85f82", "#91364f"],
+    ["#3f91d6", "#205e9b"],
+    ["#54aa68", "#28723d"],
+    ["#d39a37", "#865f19"],
+    ["#5378c8", "#2e4a8b"],
+    ["#9869c9", "#633b91"]
   ];
 
   const q = (selector, root = document) => root.querySelector(selector);
@@ -27,422 +27,420 @@
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
-  function defaultProject(index) {
-    const [color, dark, rgb] = PALETTE[index % PALETTE.length];
-    return {
-      id:`project-${String(index + 1).padStart(2,"0")}`,
-      title:`Proyecto ${String(index + 1).padStart(2,"0")}`,
-      category:"Por registrar",
-      type:"Carpeta de proyecto",
-      year:"2026",
-      status:"Información pendiente",
-      icon:"PR",
-      color,
-      dark,
-      rgb,
-      metric:"—",
-      metricLabel:"indicador por registrar",
-      progress:0,
-      secondaryMetric:"Espacio disponible para documentar el proyecto.",
-      description:"Esta carpeta está preparada para registrar la información, fotografías, avances, resultados y compromisos del proyecto.",
-      tags:["Proyecto","Rendición de cuentas"],
-      objective:"Objetivo por registrar.",
-      result:"Resultado por registrar.",
-      next:"Próximo paso por registrar.",
-      image:"",
-      gallery:[]
-    };
-  }
-
-  function normalizeProject(project, index) {
-    const fallback = defaultProject(index);
-    const color = /^#[0-9a-f]{6}$/i.test(String(project?.color || ""))
-      ? project.color
-      : fallback.color;
-    const dark = /^#[0-9a-f]{6}$/i.test(String(project?.dark || ""))
-      ? project.dark
-      : fallback.dark;
-    const rgb = hexToRgb(color) || fallback.rgb;
-    return {
-      ...fallback,
-      ...project,
-      color,
-      dark,
-      rgb,
-      progress:clamp(Number(project?.progress || 0),0,100),
-      tags:Array.isArray(project?.tags)
-        ? project.tags.filter(Boolean).slice(0,6)
-        : String(project?.tags || "").split(",").map(item => item.trim()).filter(Boolean).slice(0,6),
-      gallery:Array.isArray(project?.gallery)
-        ? project.gallery.filter(Boolean).slice(0,8)
-        : String(project?.gallery || "").split(/\r?\n/).map(item => item.trim()).filter(Boolean).slice(0,8)
-    };
-  }
-
   function hexToRgb(hex) {
     const match = String(hex || "").match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-    if (!match) return null;
-    return `${parseInt(match[1],16)},${parseInt(match[2],16)},${parseInt(match[3],16)}`;
+    if (!match) return "35,143,211";
+    return match.slice(1).map(part => parseInt(part, 16)).join(",");
   }
 
-  function italicizeLastWord(text) {
-    const words = String(text || "").trim().split(/\s+/).filter(Boolean);
+  function shadeHex(hex, amount) {
+    const match = String(hex || "").match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+    if (!match) return "#0c4f86";
+    const values = match.slice(1).map(part => clamp(parseInt(part, 16) + amount, 0, 255));
+    return `#${values.map(value => value.toString(16).padStart(2, "0")).join("")}`;
+  }
+
+  function titleMarkup(text) {
+    const words = String(text || "Proyecto").trim().split(/\s+/).filter(Boolean);
     const last = words.pop() || "Proyecto";
     return words.length
       ? `${escapeHtml(words.join(" "))} <em>${escapeHtml(last)}</em>`
       : `<em>${escapeHtml(last)}</em>`;
   }
 
+  function defaultProject(index) {
+    const [color, dark] = PALETTE[index % PALETTE.length];
+    return {
+      id: `project-${String(index + 1).padStart(2, "0")}`,
+      title: `Proyecto ${String(index + 1).padStart(2, "0")}`,
+      category: "Por registrar",
+      type: "Carpeta de proyecto",
+      year: "2026",
+      status: "Información pendiente",
+      icon: "PR",
+      color,
+      dark,
+      metric: "—",
+      metricLabel: "Indicador por registrar",
+      progress: 0,
+      secondaryMetric: "Espacio disponible para documentar el proyecto.",
+      description: "Esta carpeta está preparada para registrar la información, fotografías, avances, resultados y compromisos del proyecto.",
+      tags: ["Proyecto", "Rendición de cuentas"],
+      objective: "Objetivo por registrar.",
+      result: "Resultado por registrar.",
+      next: "Próximo paso por registrar.",
+      image: "",
+      gallery: [],
+      url: ""
+    };
+  }
+
+  function normalizeProject(project, index) {
+    const fallback = defaultProject(index);
+    const color = /^#[0-9a-f]{6}$/i.test(String(project?.color || "")) ? project.color : fallback.color;
+    const dark = /^#[0-9a-f]{6}$/i.test(String(project?.dark || "")) ? project.dark : shadeHex(color, -38);
+    return {
+      ...fallback,
+      ...project,
+      id: String(project?.id || fallback.id),
+      title: String(project?.title || fallback.title).trim(),
+      category: String(project?.category || fallback.category).trim(),
+      type: String(project?.type || fallback.type).trim(),
+      year: String(project?.year || fallback.year).trim(),
+      status: String(project?.status || fallback.status).trim(),
+      icon: String(project?.icon || fallback.icon).trim().slice(0, 3).toUpperCase(),
+      color,
+      dark,
+      rgb: hexToRgb(color),
+      metric: String(project?.metric ?? fallback.metric),
+      metricLabel: String(project?.metricLabel || fallback.metricLabel).trim(),
+      progress: clamp(Number(project?.progress || 0), 0, 100),
+      secondaryMetric: String(project?.secondaryMetric || fallback.secondaryMetric).trim(),
+      description: String(project?.description || fallback.description).trim(),
+      tags: Array.isArray(project?.tags)
+        ? project.tags.map(String).map(item => item.trim()).filter(Boolean).slice(0, 8)
+        : String(project?.tags || "").split(",").map(item => item.trim()).filter(Boolean).slice(0, 8),
+      objective: String(project?.objective || fallback.objective).trim(),
+      result: String(project?.result || fallback.result).trim(),
+      next: String(project?.next || fallback.next).trim(),
+      image: String(project?.image || "").trim(),
+      gallery: Array.isArray(project?.gallery)
+        ? project.gallery.map(String).map(item => item.trim()).filter(Boolean).slice(0, 10)
+        : String(project?.gallery || "").split(/\r?\n/).map(item => item.trim()).filter(Boolean).slice(0, 10),
+      url: String(project?.url || "").trim()
+    };
+  }
+
+  function isSafeUrl(value) {
+    const url = String(value || "").trim();
+    if (!url) return false;
+    if (/^(javascript|data|vbscript):/i.test(url)) return false;
+    return /^(https?:\/\/|\/|\.\/|\.\.\/|[a-z0-9_-]+\.html(?:[?#].*)?$)/i.test(url);
+  }
+
   function init() {
-    if (!["home","projects"].includes(document.body?.dataset.page || "")) return;
     const root = q("#projectsPsp");
-    const shell = q("#proyectos");
-    if (!root || !shell || !window.Portal) return;
-    if (root.dataset.initialized === "true") return;
+    if (!root || root.dataset.initialized === "true" || !window.Portal) return;
     root.dataset.initialized = "true";
 
-    const {state, helpers} = window.Portal;
-    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
-    let projects = ensureProjects(state, helpers);
-    let currentIndex = 0;
-    let scrollProgress = 0;
-    let frame = 0;
-    let snapTimer = 0;
+    const { state, helpers } = window.Portal;
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    const coarsePointer = matchMedia("(pointer: coarse)");
+
+    if (!state.content || typeof state.content !== "object") state.content = {};
+    let projects = Array.isArray(state.content.projects)
+      ? state.content.projects.map(normalizeProject)
+      : [];
+    while (projects.length < MIN_PROJECTS) projects.push(defaultProject(projects.length));
+    projects = projects.slice(0, MAX_PROJECTS).map(normalizeProject);
+    state.content.projects = projects;
+
+    let activeIndex = 0;
+    let activeCategory = "Todos";
+    let visibleIndices = projects.map((_, index) => index);
     let managerIndex = 0;
-    let ambientFrame = 0;
-    let ambientVisible = false;
-    let pointerX = 0;
-    let pointerY = 0;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let dragLastX = 0;
-    let dragPointerId = null;
-    let dragMoved = false;
-    let clickTimer = 0;
+    let pointerMoved = false;
+    let pointerStartX = 0;
+    let lastFocusedBeforeDialog = null;
 
     const dom = {
-      carousel:q("#projectsCarousel",root),
-      index:q("#projectsIndex",root),
-      eyebrow:q("#projectsEyebrow",root),
-      title:q("#projectsTitle",root),
-      description:q("#projectsDescription",root),
-      tags:q("#projectsTags",root),
-      metric:q("#projectsMetric",root),
-      metricLabel:q("#projectsMetricLabel",root),
-      metricBar:q("#projectsMetricBar",root),
-      secondary:q("#projectsSecondary",root),
-      open:q("#projectsOpen",root),
-      progressText:q("#projectsProgressText",root),
-      progressBar:q("#projectsProgressBar",root),
-      clock:q("#projectsClock",root),
-      manage:q("#projectsManage",root),
-      details:q("#projectsDetails",root),
-      detailsBackdrop:q("#projectsDetailsBackdrop",root),
-      detailsClose:q("#projectsDetailsClose",root),
-      detailsCover:q("#projectsDetailsCover",root),
-      detailsImage:q("#projectsDetailsImage",root),
-      detailsIndex:q("#projectsDetailsIndex",root),
-      detailsEyebrow:q("#projectsDetailsEyebrow",root),
-      detailsTitle:q("#projectsDetailsTitle",root),
-      detailsDescription:q("#projectsDetailsDescription",root),
-      detailsObjective:q("#projectsDetailsObjective",root),
-      detailsResult:q("#projectsDetailsResult",root),
-      detailsNext:q("#projectsDetailsNext",root),
-      detailsGallery:q("#projectsDetailsGallery",root),
-      manager:q("#projectsManager",root),
-      managerBackdrop:q("#projectsManagerBackdrop",root),
-      managerClose:q("#projectsManagerClose",root),
-      managerList:q("#projectsManagerList",root),
-      managerAdd:q("#projectsManagerAdd",root),
-      managerForm:q("#projectsManagerForm",root),
-      managerDelete:q("#projectsManagerDelete",root),
-      canvas:q("#projectsAmbientCanvas",root)
+      carousel: q("#projectsCarousel", root),
+      viewport: q("#projectsDockViewport", root),
+      index: q("#projectsIndex", root),
+      eyebrow: q("#projectsEyebrow", root),
+      title: q("#projectsTitle", root),
+      description: q("#projectsDescription", root),
+      tags: q("#projectsTags", root),
+      metric: q("#projectsMetric", root),
+      metricLabel: q("#projectsMetricLabel", root),
+      metricBar: q("#projectsMetricBar", root),
+      secondary: q("#projectsSecondary", root),
+      progressText: q("#projectsProgressText", root),
+      progressBar: q("#projectsProgressBar", root),
+      prev: q("#projectsPrev", root),
+      next: q("#projectsNext", root),
+      manage: q("#projectsManage", root),
+      details: q("#projectsDetails", root),
+      detailsBackdrop: q("#projectsDetailsBackdrop", root),
+      detailsClose: q("#projectsDetailsClose", root),
+      detailsSecondaryClose: q("#projectsDetailsSecondaryClose", root),
+      detailsCover: q("#projectsDetailsCover", root),
+      detailsImage: q("#projectsDetailsImage", root),
+      detailsFallbackIcon: q("#projectsDetailsFallbackIcon", root),
+      detailsIndex: q("#projectsDetailsIndex", root),
+      detailsEyebrow: q("#projectsDetailsEyebrow", root),
+      detailsStatus: q("#projectsDetailsStatus", root),
+      detailsTitle: q("#projectsDetailsTitle", root),
+      detailsYear: q("#projectsDetailsYear", root),
+      detailsDescription: q("#projectsDetailsDescription", root),
+      detailsTags: q("#projectsDetailsTags", root),
+      detailsObjective: q("#projectsDetailsObjective", root),
+      detailsResult: q("#projectsDetailsResult", root),
+      detailsNext: q("#projectsDetailsNext", root),
+      detailsGallery: q("#projectsDetailsGallery", root),
+      detailsMore: q("#projectsDetailsMore", root),
+      manager: q("#projectsManager", root),
+      managerBackdrop: q("#projectsManagerBackdrop", root),
+      managerClose: q("#projectsManagerClose", root),
+      managerList: q("#projectsManagerList", root),
+      managerAdd: q("#projectsManagerAdd", root),
+      managerForm: q("#projectsManagerForm", root),
+      managerDelete: q("#projectsManagerDelete", root)
     };
 
-    function ensureProjects(stateRef, helperRef) {
-      if (!stateRef.content || typeof stateRef.content !== "object") stateRef.content = {};
-      let list = Array.isArray(stateRef.content.projects)
-        ? stateRef.content.projects.map(normalizeProject)
-        : [];
-      while (list.length < MIN_PROJECTS) list.push(defaultProject(list.length));
-      list = list.slice(0,MAX_PROJECTS).map(normalizeProject);
-      stateRef.content.projects = list;
-      helperRef.save({localOnly:true});
-      return list;
-    }
-
-    function saveProjects(message = "Proyectos actualizados.") {
-      state.content.projects = projects.map(normalizeProject);
-      helpers.save();
-      helpers.toast?.(message);
-      window.dispatchEvent(new CustomEvent("portal:rendered",{detail:{source:"projects-psp",build:BUILD}}));
-    }
-
     function applyTheme(project) {
-      root.style.setProperty("--projects-accent",project.color);
-      root.style.setProperty("--projects-accent-dark",project.dark);
-      root.style.setProperty("--projects-accent-rgb",project.rgb);
+      root.style.setProperty("--projects-accent", project.color);
+      root.style.setProperty("--projects-accent-dark", project.dark);
+      root.style.setProperty("--projects-accent-rgb", project.rgb);
     }
 
-    function renderFolders() {
-      dom.carousel.innerHTML = projects.map((project,index) => `
-        <article class="projects-folder"
-          data-project-index="${index}"
-          tabindex="${index === currentIndex ? "0" : "-1"}"
-          role="button"
-          aria-label="Seleccionar ${escapeHtml(project.title)}"
-          aria-current="${index === currentIndex ? "true" : "false"}"
-          style="--folder-color:${escapeHtml(project.color)}">
-          <div class="projects-folder__aura" aria-hidden="true"></div>
-          <div class="projects-folder__back"></div>
-          <div class="projects-folder__paper projects-folder__paper--rear"></div>
-          <div class="projects-folder__paper projects-folder__paper--front"></div>
-          <div class="projects-folder__front">
-            <div class="projects-folder__top">
-              <span class="projects-folder__icon">${escapeHtml(project.icon || "PR")}</span>
-              <span class="projects-folder__index">${String(index + 1).padStart(2,"0")}</span>
-            </div>
-            <div class="projects-folder__content">
-              <span class="projects-folder__category">${escapeHtml(project.category)}</span>
-              <h3 class="projects-folder__title">${italicizeLastWord(project.title)}</h3>
-              <div class="projects-folder__meta"><span>${escapeHtml(project.year)}</span><span>${escapeHtml(project.status)}</span></div>
-            </div>
-          </div>
-        </article>`).join("");
-      shell.style.setProperty("--projects-count",projects.length);
-      setScrollHeight();
-      updateFromScroll(true);
+    function matchesCategory(project, category) {
+      if (category === "Todos") return true;
+      const source = `${project.category} ${project.tags.join(" ")}`.toLowerCase();
+      return source.includes(category.toLowerCase());
     }
 
-    function setScrollHeight() {
-      if (reduceMotion.matches) {
-        shell.style.height = "auto";
-        shell.style.minHeight = "auto";
-        return;
-      }
-      const viewport = Math.max(620,window.innerHeight || 720);
-      const mobile = window.innerWidth <= 820;
-      const step = mobile
-        ? clamp(viewport * .68,420,590)
-        : clamp(viewport * .78,500,720);
-      const headerOffset = mobile ? 0 : Number.parseFloat(getComputedStyle(shell).getPropertyValue("--projects-sticky-top")) || 76;
-      const stageHeight = Math.max(620,viewport - headerOffset);
-      const height = stageHeight + Math.max(0,projects.length - 1) * step;
-      shell.style.height = `${Math.round(height)}px`;
-      shell.style.minHeight = `${Math.round(height)}px`;
+    function currentVisiblePosition() {
+      const position = visibleIndices.indexOf(activeIndex);
+      return position >= 0 ? position : 0;
     }
 
-    function scrollMetrics() {
-      const rect = shell.getBoundingClientRect();
-      const stageHeight = root.offsetHeight || window.innerHeight;
-      const scrollDistance = Math.max(1,shell.offsetHeight - stageHeight);
-      const local = clamp(-rect.top + (parseFloat(getComputedStyle(root).top) || 0),0,scrollDistance);
-      return {rect,scrollDistance,progress:local / scrollDistance};
-    }
+    function renderDock() {
+      visibleIndices = projects
+        .map((project, index) => ({ project, index }))
+        .filter(({ project }) => matchesCategory(project, activeCategory))
+        .map(({ index }) => index);
 
-    function scrollToProject(index, behavior = "smooth") {
-      const next = clamp(index,0,projects.length - 1);
-      const rect = shell.getBoundingClientRect();
-      const absoluteTop = window.scrollY + rect.top;
-      const stageHeight = root.offsetHeight || window.innerHeight;
-      const distance = Math.max(1,shell.offsetHeight - stageHeight);
-      const target = absoluteTop + distance * (next / Math.max(1,projects.length - 1));
-      window.scrollTo({top:target,behavior:reduceMotion.matches ? "auto" : behavior});
-    }
-
-    function updateFolderTransforms(rawIndex) {
-      const width = root.clientWidth;
-      const mobile = width <= 820;
-      const spacing = mobile ? clamp(width * .37,128,176) : clamp(width * .145,150,230);
-      const folders = qa(".projects-folder",dom.carousel);
-
-      folders.forEach((folder,index) => {
-        const offset = index - rawIndex;
-        const abs = Math.abs(offset);
-        const visible = abs <= (mobile ? 2.35 : 3.55);
-        const focus = clamp(1 - abs,0,1);
-        const proximity = clamp(1 - abs / (mobile ? 2.4 : 3.5),0,1);
-        const x = offset * spacing + pointerX * (10 + proximity * 8);
-        const y = Math.pow(abs,1.18) * (mobile ? 15 : 21) + (offset < 0 ? -7 : 0) + pointerY * (5 + proximity * 5);
-        const z = -Math.pow(abs,1.05) * (mobile ? 105 : 155) + focus * 46;
-        const ry = clamp(-offset * (mobile ? 15 : 18) + pointerX * (4 + focus * 3),-55,55);
-        const rz = clamp(offset * 1.1 + pointerY * 1.25,-3.4,3.4);
-        const scale = clamp(1 - abs * (mobile ? .085 : .073) + focus * .025,.68,1.025);
-        const opacity = visible ? clamp(1 - Math.max(0,abs - 2.2) * .68,.1,1) : 0;
-        const blur = clamp((abs - .35) * 1.25,0,3.4);
-        const saturation = clamp(1.08 - abs * .09,.72,1.08);
-        const open = clamp(focus * 1.08,0,1);
-        folder.style.setProperty("--folder-x",`${x.toFixed(2)}px`);
-        folder.style.setProperty("--folder-y",`${y.toFixed(2)}px`);
-        folder.style.setProperty("--folder-z",`${z.toFixed(2)}px`);
-        folder.style.setProperty("--folder-ry",`${ry.toFixed(2)}deg`);
-        folder.style.setProperty("--folder-rz",`${rz.toFixed(2)}deg`);
-        folder.style.setProperty("--folder-scale",scale.toFixed(4));
-        folder.style.setProperty("--folder-opacity",opacity.toFixed(3));
-        folder.style.setProperty("--folder-focus",focus.toFixed(3));
-        folder.style.setProperty("--folder-proximity",proximity.toFixed(3));
-        folder.style.setProperty("--folder-open",open.toFixed(3));
-        folder.style.setProperty("--folder-blur",`${blur.toFixed(2)}px`);
-        folder.style.setProperty("--folder-saturation",saturation.toFixed(3));
-        folder.style.zIndex = String(1000 - Math.round(abs * 100));
-        folder.setAttribute("aria-hidden",String(!visible));
-      });
-    }
-
-    function animateProjectCopy(direction = 1) {
-      if (reduceMotion.matches) return;
-      const targets = [
-        dom.eyebrow,
-        dom.title,
-        dom.description,
-        dom.tags,
-        dom.metric,
-        dom.metricLabel,
-        dom.secondary
-      ].filter(Boolean);
-      targets.forEach((element,index) => {
-        element.getAnimations?.().forEach(animation => animation.cancel());
-        element.animate([
-          {opacity:.18,transform:`translate3d(${direction * 18}px,10px,0)`,filter:"blur(7px)"},
-          {opacity:1,transform:"translate3d(0,0,0)",filter:"blur(0)"}
-        ],{
-          duration:430 + index * 34,
-          delay:index * 24,
-          easing:"cubic-bezier(.2,.82,.2,1)",
-          fill:"both"
+      if (!visibleIndices.length) {
+        activeCategory = "Todos";
+        visibleIndices = projects.map((_, index) => index);
+        qa("[data-project-category]", root).forEach(button => {
+          button.classList.toggle("is-active", button.dataset.projectCategory === "Todos");
         });
-      });
+      }
+      if (!visibleIndices.includes(activeIndex)) activeIndex = visibleIndices[0];
+
+      dom.carousel.innerHTML = visibleIndices.map(index => {
+        const project = projects[index];
+        const active = index === activeIndex;
+        return `
+          <button class="projects-folder ${active ? "is-active" : ""}"
+            type="button"
+            role="listitem"
+            data-project-index="${index}"
+            aria-label="Abrir ficha de ${escapeHtml(project.title)}"
+            aria-current="${active ? "true" : "false"}"
+            style="--folder-color:${escapeHtml(project.color)}">
+            <span class="projects-folder__back" aria-hidden="true"></span>
+            <span class="projects-folder__paper" aria-hidden="true"></span>
+            <span class="projects-folder__front">
+              <span class="projects-folder__top">
+                <span class="projects-folder__icon">${escapeHtml(project.icon)}</span>
+                <span class="projects-folder__index">${String(index + 1).padStart(2, "0")}</span>
+              </span>
+              <span class="projects-folder__content">
+                <span class="projects-folder__category">${escapeHtml(project.category)}</span>
+                <strong class="projects-folder__title">${titleMarkup(project.title)}</strong>
+                <span class="projects-folder__meta"><span>${escapeHtml(project.year)}</span><span>${escapeHtml(project.status)}</span></span>
+              </span>
+            </span>
+          </button>`;
+      }).join("");
+
+      updateSummary(true);
+      resetDockMagnification();
     }
 
-    function pulseActiveFolder() {
-      if (reduceMotion.matches) return;
-      const active = q(`.projects-folder[data-project-index="${currentIndex}"]`,dom.carousel);
-      const front = active ? q(".projects-folder__front",active) : null;
-      const paper = active ? q(".projects-folder__paper--front",active) : null;
-      front?.animate([
-        {filter:"brightness(.94)",transform:"translateZ(24px) rotateX(-3deg)"},
-        {filter:"brightness(1.08)",transform:"translateZ(31px) rotateX(-17deg) translateY(3%)"},
-        {filter:"brightness(1)",transform:"translateZ(29px) rotateX(-13deg) translateY(2%)"}
-      ],{duration:620,easing:"cubic-bezier(.18,.84,.2,1)"});
-      paper?.animate([
-        {transform:"translateZ(12px) translateY(-2%)"},
-        {transform:"translateZ(39px) translateY(-17%) rotateX(-3deg)"},
-        {transform:"translateZ(33px) translateY(-14%) rotateX(-2deg)"}
-      ],{duration:660,easing:"cubic-bezier(.18,.84,.2,1)"});
+    function animateSummary() {
+      if (reducedMotion.matches) return;
+      [dom.eyebrow, dom.title, dom.description, dom.tags, dom.metric, dom.metricLabel, dom.secondary]
+        .filter(Boolean)
+        .forEach((element, index) => {
+          element.getAnimations?.().forEach(animation => animation.cancel());
+          element.animate([
+            { opacity: .2, transform: "translateY(9px)" },
+            { opacity: 1, transform: "translateY(0)" }
+          ], {
+            duration: 340 + index * 24,
+            delay: index * 18,
+            easing: "cubic-bezier(.2,.82,.2,1)",
+            fill: "both"
+          });
+        });
     }
 
-    function setProject(index, force = false) {
-      const next = clamp(index,0,projects.length - 1);
-      if (!force && next === currentIndex) return;
-      const previousIndex = currentIndex;
-      currentIndex = next;
-      const project = projects[currentIndex];
+    function updateSummary(initial = false) {
+      const project = projects[activeIndex];
+      if (!project) return;
       applyTheme(project);
-      dom.index.textContent = String(currentIndex + 1).padStart(2,"0");
+      dom.index.textContent = String(activeIndex + 1).padStart(2, "0");
       dom.eyebrow.textContent = `${project.category} · ${project.type}`;
-      dom.title.innerHTML = italicizeLastWord(project.title);
+      dom.title.innerHTML = titleMarkup(project.title);
       dom.description.textContent = project.description;
       dom.tags.innerHTML = project.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join("");
       dom.metric.textContent = project.metric;
       dom.metricLabel.textContent = project.metricLabel;
-      dom.metricBar.style.setProperty("--metric-value",`${project.progress}%`);
+      dom.metricBar.style.setProperty("--metric-value", `${project.progress}%`);
       dom.secondary.textContent = project.secondaryMetric;
-      dom.progressText.textContent = currentIndex === projects.length - 1
-        ? `Última carpeta · continúa bajando`
-        : `Proyecto ${currentIndex + 1} de ${projects.length}`;
-      qa(".projects-folder",dom.carousel).forEach((folder,folderIndex) => {
-        const active = folderIndex === currentIndex;
-        folder.classList.toggle("is-active",active);
-        folder.setAttribute("aria-current",String(active));
-        folder.tabIndex = active ? 0 : -1;
+
+      qa(".projects-folder", dom.carousel).forEach(folder => {
+        const folderIndex = Number(folder.dataset.projectIndex);
+        const isActive = folderIndex === activeIndex;
+        folder.classList.toggle("is-active", isActive);
+        folder.setAttribute("aria-current", String(isActive));
       });
-      qa("[data-project-category]",root).forEach(button => {
-        const category = button.dataset.projectCategory;
-        const active = category === "Todos" || category === project.category;
-        button.classList.toggle("is-active",active && (category !== "Todos" || !qa("[data-project-category].is-active",root).some(node => node !== button)));
+
+      const position = currentVisiblePosition();
+      const total = visibleIndices.length;
+      dom.progressText.textContent = `Proyecto ${position + 1} de ${total}`;
+      dom.progressBar.style.width = `${total > 1 ? (position / (total - 1)) * 100 : 100}%`;
+      dom.prev.disabled = position <= 0;
+      dom.next.disabled = position >= total - 1;
+      if (!initial) animateSummary();
+    }
+
+    function selectProject(index, { scroll = true, focus = false } = {}) {
+      if (!projects[index]) return;
+      activeIndex = index;
+      updateSummary(false);
+      const folder = q(`.projects-folder[data-project-index="${index}"]`, dom.carousel);
+      if (scroll) folder?.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", inline: "center", block: "nearest" });
+      if (focus) folder?.focus({ preventScroll: true });
+    }
+
+    function moveSelection(direction) {
+      const position = currentVisiblePosition();
+      const nextPosition = clamp(position + direction, 0, visibleIndices.length - 1);
+      selectProject(visibleIndices[nextPosition], { scroll: true, focus: true });
+    }
+
+    function resetDockMagnification() {
+      qa(".projects-folder", dom.carousel).forEach(folder => {
+        const isActive = Number(folder.dataset.projectIndex) === activeIndex;
+        folder.style.setProperty("--dock-scale", isActive ? "1.055" : "1");
+        folder.style.setProperty("--dock-lift", isActive ? "5px" : "0px");
+        folder.style.setProperty("--dock-tilt", "0deg");
+        folder.style.setProperty("--dock-z", isActive ? "8" : "1");
       });
-      if (!force) {
-        animateProjectCopy(next >= previousIndex ? 1 : -1);
-        pulseActiveFolder();
-      }
     }
 
-    function updateFromScroll(force = false) {
-      frame = 0;
-      if (reduceMotion.matches) {
-        updateFolderTransforms(currentIndex);
-        setProject(currentIndex,force);
-        return;
-      }
-      const metrics = scrollMetrics();
-      scrollProgress = metrics.progress;
-      const raw = scrollProgress * Math.max(1,projects.length - 1);
-      const next = clamp(Math.round(raw),0,projects.length - 1);
-      updateFolderTransforms(raw);
-      setProject(next,force);
-      dom.progressBar.style.width = `${scrollProgress * 100}%`;
-      root.dataset.scrollActive = String(metrics.rect.top <= 2 && metrics.rect.bottom >= root.offsetHeight - 2);
+    function magnifyDock(pointerX) {
+      if (coarsePointer.matches || reducedMotion.matches) return;
+      qa(".projects-folder", dom.carousel).forEach(folder => {
+        const rect = folder.getBoundingClientRect();
+        const center = rect.left + rect.width / 2;
+        const distance = Math.abs(pointerX - center);
+        const influence = clamp(1 - distance / 300, 0, 1);
+        const selected = Number(folder.dataset.projectIndex) === activeIndex ? .045 : 0;
+        const scale = 1 + influence * .42 + selected;
+        const lift = influence * 34 + selected * 70;
+        const tilt = clamp((pointerX - center) / 75, -1, 1) * influence * 1.5;
+        folder.style.setProperty("--dock-scale", scale.toFixed(3));
+        folder.style.setProperty("--dock-lift", `${lift.toFixed(1)}px`);
+        folder.style.setProperty("--dock-tilt", `${tilt.toFixed(2)}deg`);
+        folder.style.setProperty("--dock-z", String(10 + Math.round(influence * 90)));
+      });
     }
 
-    function requestUpdate() {
-      if (frame) return;
-      frame = requestAnimationFrame(() => updateFromScroll(false));
-      if (!reduceMotion.matches) {
-        clearTimeout(snapTimer);
-        snapTimer = window.setTimeout(() => {
-          const rect = shell.getBoundingClientRect();
-          const active = rect.top <= 4 && rect.bottom >= root.offsetHeight - 4;
-          if (!active || document.hidden || dom.details.classList.contains("is-open") || dom.manager.classList.contains("is-open")) return;
-          const raw = scrollProgress * Math.max(1,projects.length - 1);
-          if (Math.abs(raw - Math.round(raw)) < .11) return;
-          scrollToProject(Math.round(raw),"smooth");
-        },220);
-      }
-    }
-
-    function openDetails() {
-      const project = projects[currentIndex];
-      dom.detailsCover.style.setProperty("--projects-accent",project.color);
-      dom.detailsCover.style.setProperty("--projects-accent-dark",project.dark);
-      dom.detailsImage.src = project.image || "";
-      dom.detailsImage.alt = project.image ? `Imagen del proyecto ${project.title}` : "";
-      dom.detailsImage.hidden = !project.image;
-      dom.detailsCover.classList.toggle("is-empty",!project.image);
-      dom.detailsIndex.textContent = String(currentIndex + 1).padStart(2,"0");
+    function populateDetails() {
+      const project = projects[activeIndex];
+      applyTheme(project);
+      dom.detailsCover.style.setProperty("--projects-accent", project.color);
+      dom.detailsCover.style.setProperty("--projects-accent-dark", project.dark);
+      dom.detailsFallbackIcon.textContent = project.icon;
+      dom.detailsIndex.textContent = String(activeIndex + 1).padStart(2, "0");
       dom.detailsEyebrow.textContent = `${project.category} · ${project.type}`;
-      dom.detailsTitle.innerHTML = italicizeLastWord(project.title);
+      dom.detailsStatus.textContent = project.status;
+      dom.detailsTitle.textContent = project.title;
+      dom.detailsYear.textContent = project.year;
       dom.detailsDescription.textContent = project.description;
+      dom.detailsTags.innerHTML = project.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join("");
       dom.detailsObjective.textContent = project.objective;
       dom.detailsResult.textContent = project.result;
       dom.detailsNext.textContent = project.next;
-      dom.detailsGallery.innerHTML = project.gallery.map((src,index) => `<img src="${escapeHtml(src)}" alt="Fotografía ${index + 1} de ${escapeHtml(project.title)}" loading="lazy">`).join("");
+
+      dom.detailsImage.hidden = !project.image;
+      dom.detailsCover.classList.toggle("is-empty", !project.image);
+      if (project.image) {
+        dom.detailsImage.src = project.image;
+        dom.detailsImage.alt = `Imagen principal de ${project.title}`;
+      } else {
+        dom.detailsImage.removeAttribute("src");
+        dom.detailsImage.alt = "";
+      }
+
+      dom.detailsGallery.innerHTML = project.gallery.map((src, index) =>
+        `<img src="${escapeHtml(src)}" alt="Fotografía ${index + 1} de ${escapeHtml(project.title)}" loading="lazy">`
+      ).join("");
+
+      const hasUrl = isSafeUrl(project.url);
+      dom.detailsMore.setAttribute("aria-disabled", String(!hasUrl));
+      dom.detailsMore.dataset.url = hasUrl ? project.url : "";
+    }
+
+    function openDetails() {
+      populateDetails();
+      lastFocusedBeforeDialog = document.activeElement;
       dom.details.classList.add("is-open");
-      dom.details.setAttribute("aria-hidden","false");
-      dom.detailsClose.focus({preventScroll:true});
+      dom.details.setAttribute("aria-hidden", "false");
+      document.body.classList.add("projects-dialog-open");
+      window.setTimeout(() => dom.detailsClose.focus({ preventScroll: true }), 30);
     }
 
     function closeDetails() {
       dom.details.classList.remove("is-open");
-      dom.details.setAttribute("aria-hidden","true");
-      q(`.projects-folder[data-project-index="${currentIndex}"]`,dom.carousel)?.focus({preventScroll:true});
+      dom.details.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("projects-dialog-open");
+      lastFocusedBeforeDialog?.focus?.({ preventScroll: true });
+    }
+
+    function openProjectUrl() {
+      const url = dom.detailsMore.dataset.url || "";
+      if (!isSafeUrl(url)) {
+        helpers.toast?.("Este proyecto aún no tiene configurado un enlace completo.");
+        return;
+      }
+      if (/^https?:\/\//i.test(url)) window.open(url, "_blank", "noopener,noreferrer");
+      else window.location.href = url;
+    }
+
+    function trapDialogFocus(event, dialogRoot) {
+      if (event.key !== "Tab") return;
+      const focusable = qa('button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])', dialogRoot)
+        .filter(element => element.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
 
     function updateAdminVisibility() {
       let localMode = false;
       try { localMode = sessionStorage.getItem("sp_admin_mode") === "local"; } catch (_) {}
       const adminSession = q("#adminSession");
-      const canManage = Boolean(state.admin)
-        || localMode
-        || Boolean(adminSession && !adminSession.hidden);
+      const canManage = Boolean(state.admin) || localMode || Boolean(adminSession && !adminSession.hidden);
       dom.manage.hidden = !canManage;
     }
 
+    function saveProjects(message) {
+      state.content.projects = projects.map(normalizeProject);
+      helpers.save();
+      helpers.toast?.(message);
+      window.dispatchEvent(new CustomEvent("portal:rendered", { detail: { source: "projects-psp", build: BUILD } }));
+    }
+
     function renderManager() {
-      managerIndex = clamp(managerIndex,0,projects.length - 1);
-      dom.managerList.innerHTML = projects.map((project,index) => `
+      managerIndex = clamp(managerIndex, 0, projects.length - 1);
+      dom.managerList.innerHTML = projects.map((project, index) => `
         <button type="button" class="projects-manager__item ${index === managerIndex ? "is-active" : ""}" data-manager-index="${index}">
           <span><strong>${escapeHtml(project.title)}</strong><small>${escapeHtml(project.category)} · ${escapeHtml(project.year)}</small></span>
-          <b>${String(index + 1).padStart(2,"0")}</b>
+          <b>${String(index + 1).padStart(2, "0")}</b>
         </button>`).join("");
       dom.managerAdd.disabled = projects.length >= MAX_PROJECTS;
       fillManagerForm();
@@ -450,26 +448,11 @@
 
     function fillManagerForm() {
       const project = projects[managerIndex];
-      if (!project) return;
+      if (!project || !dom.managerForm) return;
       const form = dom.managerForm.elements;
-      form.id.value = project.id;
-      form.title.value = project.title;
-      form.category.value = project.category;
-      form.type.value = project.type;
-      form.year.value = project.year;
-      form.status.value = project.status;
-      form.icon.value = project.icon;
-      form.color.value = project.color;
-      form.metric.value = project.metric;
-      form.metricLabel.value = project.metricLabel;
-      form.progress.value = project.progress;
-      form.secondaryMetric.value = project.secondaryMetric;
-      form.description.value = project.description;
+      ["id", "title", "category", "type", "year", "status", "icon", "color", "metric", "metricLabel", "progress", "secondaryMetric", "description", "objective", "result", "next", "image", "url"]
+        .forEach(name => { if (form[name]) form[name].value = project[name] ?? ""; });
       form.tags.value = project.tags.join(", ");
-      form.objective.value = project.objective;
-      form.result.value = project.result;
-      form.next.value = project.next;
-      form.image.value = project.image;
       form.gallery.value = project.gallery.join("\n");
       dom.managerDelete.disabled = projects.length <= MIN_PROJECTS;
     }
@@ -477,16 +460,19 @@
     function openManager() {
       updateAdminVisibility();
       if (dom.manage.hidden) return;
+      lastFocusedBeforeDialog = document.activeElement;
       renderManager();
       dom.manager.classList.add("is-open");
-      dom.manager.setAttribute("aria-hidden","false");
-      dom.managerClose.focus({preventScroll:true});
+      dom.manager.setAttribute("aria-hidden", "false");
+      document.body.classList.add("projects-dialog-open");
+      window.setTimeout(() => dom.managerClose.focus({ preventScroll: true }), 30);
     }
 
     function closeManager() {
       dom.manager.classList.remove("is-open");
-      dom.manager.setAttribute("aria-hidden","true");
-      dom.manage.focus({preventScroll:true});
+      dom.manager.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("projects-dialog-open");
+      lastFocusedBeforeDialog?.focus?.({ preventScroll: true });
     }
 
     function addProject() {
@@ -494,12 +480,11 @@
         helpers.toast?.("El módulo admite un máximo de 10 proyectos.");
         return;
       }
-      projects.push(defaultProject(projects.length));
+      projects.push(normalizeProject(defaultProject(projects.length), projects.length));
       managerIndex = projects.length - 1;
       saveProjects("Nueva carpeta de proyecto creada.");
-      renderFolders();
+      renderDock();
       renderManager();
-      scrollToProject(managerIndex,"auto");
     }
 
     function deleteProject() {
@@ -508,12 +493,12 @@
         return;
       }
       const project = projects[managerIndex];
-      if (!confirm(`¿Eliminar la carpeta “${project.title}”?`)) return;
-      projects.splice(managerIndex,1);
-      managerIndex = clamp(managerIndex,0,projects.length - 1);
-      currentIndex = clamp(currentIndex,0,projects.length - 1);
+      if (!window.confirm(`¿Eliminar la carpeta “${project.title}”?`)) return;
+      projects.splice(managerIndex, 1);
+      managerIndex = clamp(managerIndex, 0, projects.length - 1);
+      activeIndex = clamp(activeIndex, 0, projects.length - 1);
       saveProjects("Carpeta de proyecto eliminada.");
-      renderFolders();
+      renderDock();
       renderManager();
     }
 
@@ -522,273 +507,126 @@
       const data = new FormData(dom.managerForm);
       const current = projects[managerIndex];
       const color = String(data.get("color") || current.color);
-      const dark = shadeHex(color,-34) || current.dark;
       projects[managerIndex] = normalizeProject({
         ...current,
-        id:String(data.get("id") || current.id),
-        title:String(data.get("title") || current.title).trim(),
-        category:String(data.get("category") || "Por registrar").trim(),
-        type:String(data.get("type") || "Carpeta de proyecto").trim(),
-        year:String(data.get("year") || "2026").trim(),
-        status:String(data.get("status") || "Información pendiente").trim(),
-        icon:String(data.get("icon") || "PR").trim().slice(0,3).toUpperCase(),
+        id: String(data.get("id") || current.id),
+        title: String(data.get("title") || current.title).trim(),
+        category: String(data.get("category") || "Por registrar").trim(),
+        type: String(data.get("type") || "Carpeta de proyecto").trim(),
+        year: String(data.get("year") || "2026").trim(),
+        status: String(data.get("status") || "Información pendiente").trim(),
+        icon: String(data.get("icon") || "PR").trim().slice(0, 3).toUpperCase(),
         color,
-        dark,
-        metric:String(data.get("metric") || "—").trim(),
-        metricLabel:String(data.get("metricLabel") || "indicador por registrar").trim(),
-        progress:Number(data.get("progress") || 0),
-        secondaryMetric:String(data.get("secondaryMetric") || "").trim(),
-        description:String(data.get("description") || "").trim(),
-        tags:String(data.get("tags") || "").split(",").map(item => item.trim()).filter(Boolean),
-        objective:String(data.get("objective") || "").trim(),
-        result:String(data.get("result") || "").trim(),
-        next:String(data.get("next") || "").trim(),
-        image:String(data.get("image") || "").trim(),
-        gallery:String(data.get("gallery") || "").split(/\r?\n/).map(item => item.trim()).filter(Boolean)
-      },managerIndex);
+        dark: shadeHex(color, -38),
+        metric: String(data.get("metric") || "—").trim(),
+        metricLabel: String(data.get("metricLabel") || "Indicador por registrar").trim(),
+        progress: Number(data.get("progress") || 0),
+        secondaryMetric: String(data.get("secondaryMetric") || "").trim(),
+        description: String(data.get("description") || "").trim(),
+        tags: String(data.get("tags") || "").split(",").map(item => item.trim()).filter(Boolean),
+        objective: String(data.get("objective") || "").trim(),
+        result: String(data.get("result") || "").trim(),
+        next: String(data.get("next") || "").trim(),
+        image: String(data.get("image") || "").trim(),
+        gallery: String(data.get("gallery") || "").split(/\r?\n/).map(item => item.trim()).filter(Boolean),
+        url: String(data.get("url") || "").trim()
+      }, managerIndex);
+      activeIndex = managerIndex;
       saveProjects("Proyecto guardado correctamente.");
-      renderFolders();
+      renderDock();
       renderManager();
-      setProject(managerIndex,true);
     }
 
-    function shadeHex(hex,amount) {
-      const match = String(hex || "").match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-      if (!match) return null;
-      const values = match.slice(1).map(part => clamp(parseInt(part,16) + amount,0,255));
-      return `#${values.map(value => value.toString(16).padStart(2,"0")).join("")}`;
-    }
-
-    function updateClock() {
-      dom.clock.textContent = new Intl.DateTimeFormat("es-CO",{hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
-    }
-
-    function initAmbient() {
-      const canvas = dom.canvas;
-      const context = canvas?.getContext?.("2d",{alpha:true});
-      if (!canvas || !context) return;
-      let width = 0;
-      let height = 0;
-      let dpr = 1;
-      let time = 0;
-
-      const resize = () => {
-        const rect = root.getBoundingClientRect();
-        dpr = Math.min(window.devicePixelRatio || 1,1.5);
-        width = Math.max(1,Math.round(rect.width));
-        height = Math.max(1,Math.round(rect.height));
-        canvas.width = Math.round(width * dpr);
-        canvas.height = Math.round(height * dpr);
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-        context.setTransform(dpr,0,0,dpr,0,0);
-      };
-
-      const draw = () => {
-        ambientFrame = 0;
-        if (!ambientVisible || document.hidden || reduceMotion.matches) return;
-        time += .008;
-        context.clearRect(0,0,width,height);
-        context.lineWidth = 1;
-        for (let layer = 0; layer < 3; layer += 1) {
-          context.beginPath();
-          const base = height * (.67 + layer * .07);
-          for (let x = -20; x <= width + 20; x += 18) {
-            const y = base + Math.sin(x * .006 + time + layer * .8) * (18 + layer * 8);
-            if (x === -20) context.moveTo(x,y); else context.lineTo(x,y);
-          }
-          context.strokeStyle = `rgba(${getComputedStyle(root).getPropertyValue("--projects-accent-rgb") || "39,127,218"},${.055 - layer * .01})`;
-          context.stroke();
-        }
-        ambientFrame = requestAnimationFrame(draw);
-      };
-
-      const observer = new IntersectionObserver(entries => {
-        ambientVisible = entries.some(entry => entry.isIntersecting);
-        if (ambientVisible && !ambientFrame) ambientFrame = requestAnimationFrame(draw);
-        if (!ambientVisible && ambientFrame) {
-          cancelAnimationFrame(ambientFrame);
-          ambientFrame = 0;
-        }
-      },{rootMargin:"100px"});
-      observer.observe(root);
-      resize();
-      window.addEventListener("resize",resize,{passive:true});
-    }
-
-    renderFolders();
-    updateClock();
-    window.setInterval(updateClock,30000);
-    updateAdminVisibility();
-    initAmbient();
-
-    window.addEventListener("scroll",requestUpdate,{passive:true});
-    window.addEventListener("resize",() => {setScrollHeight();requestUpdate();},{passive:true});
-    window.addEventListener("orientationchange",() => window.setTimeout(() => {setScrollHeight();requestUpdate();},240),{passive:true});
-    reduceMotion.addEventListener?.("change",() => {setScrollHeight();renderFolders();});
-
-    dom.carousel.addEventListener("click",event => {
-      const folder = event.target.closest(".projects-folder");
-      if (!folder || dragMoved) return;
-      clearTimeout(clickTimer);
-      const index = Number(folder.dataset.projectIndex);
-      clickTimer = window.setTimeout(() => {
-        scrollToProject(index);
-      },190);
+    qa("[data-project-category]", root).forEach(button => {
+      button.addEventListener("click", () => {
+        activeCategory = button.dataset.projectCategory || "Todos";
+        qa("[data-project-category]", root).forEach(item => item.classList.toggle("is-active", item === button));
+        renderDock();
+      });
     });
 
-    dom.carousel.addEventListener("dblclick",event => {
-      const folder = event.target.closest(".projects-folder");
-      if (!folder) return;
-      clearTimeout(clickTimer);
-      const index = Number(folder.dataset.projectIndex);
-      if (index !== currentIndex) {
-        scrollToProject(index,"auto");
-        window.setTimeout(openDetails,220);
-      } else {
-        openDetails();
-      }
+    dom.carousel.addEventListener("pointerdown", event => {
+      pointerMoved = false;
+      pointerStartX = event.clientX;
     });
-
-    dom.carousel.addEventListener("keydown",event => {
+    dom.carousel.addEventListener("pointermove", event => {
+      if (Math.abs(event.clientX - pointerStartX) > 8) pointerMoved = true;
+    });
+    dom.carousel.addEventListener("click", event => {
+      const folder = event.target.closest(".projects-folder");
+      if (!folder || pointerMoved) return;
+      const index = Number(folder.dataset.projectIndex);
+      selectProject(index, { scroll: true });
+      openDetails();
+    });
+    dom.carousel.addEventListener("keydown", event => {
       const folder = event.target.closest(".projects-folder");
       if (!folder) return;
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         const index = Number(folder.dataset.projectIndex);
-        if (index === currentIndex) openDetails();
-        else scrollToProject(index);
+        selectProject(index, { scroll: true });
+        openDetails();
       }
     });
 
-    dom.carousel.addEventListener("pointerdown",event => {
-      if (event.pointerType === "mouse" && event.button !== 0) return;
-      dragPointerId = event.pointerId;
-      dragStartX = dragLastX = event.clientX;
-      dragStartY = event.clientY;
-      dragMoved = false;
-      dom.carousel.setPointerCapture?.(event.pointerId);
-      root.classList.add("is-dragging");
+    dom.viewport.addEventListener("pointermove", event => magnifyDock(event.clientX), { passive: true });
+    dom.viewport.addEventListener("pointerleave", resetDockMagnification, { passive: true });
+    dom.viewport.addEventListener("scroll", resetDockMagnification, { passive: true });
+    dom.prev.addEventListener("click", () => moveSelection(-1));
+    dom.next.addEventListener("click", () => moveSelection(1));
+
+    dom.detailsBackdrop.addEventListener("click", closeDetails);
+    dom.detailsClose.addEventListener("click", closeDetails);
+    dom.detailsSecondaryClose.addEventListener("click", closeDetails);
+    dom.detailsMore.addEventListener("click", openProjectUrl);
+    dom.detailsImage.addEventListener("error", () => {
+      dom.detailsImage.hidden = true;
+      dom.detailsCover.classList.add("is-empty");
     });
+    dom.detailsGallery.addEventListener("error", event => {
+      if (event.target instanceof HTMLImageElement) event.target.remove();
+    }, true);
 
-    dom.carousel.addEventListener("pointermove",event => {
-      if (dragPointerId !== event.pointerId) return;
-      dragLastX = event.clientX;
-      const dx = dragLastX - dragStartX;
-      const dy = event.clientY - dragStartY;
-      if (Math.abs(dx) > 7 && Math.abs(dx) > Math.abs(dy)) {
-        dragMoved = true;
-        event.preventDefault();
-        root.style.setProperty("--projects-drag-x",`${clamp(dx,-120,120)}px`);
-      }
-    });
-
-    function finishDrag(event) {
-      if (dragPointerId !== event.pointerId) return;
-      const dx = dragLastX - dragStartX;
-      try { dom.carousel.releasePointerCapture?.(event.pointerId); } catch (_) {}
-      dragPointerId = null;
-      root.classList.remove("is-dragging");
-      root.style.setProperty("--projects-drag-x","0px");
-      if (dragMoved && Math.abs(dx) > 42) {
-        scrollToProject(currentIndex + (dx < 0 ? 1 : -1));
-      }
-      window.setTimeout(() => { dragMoved = false; },80);
-    }
-    dom.carousel.addEventListener("pointerup",finishDrag);
-    dom.carousel.addEventListener("pointercancel",finishDrag);
-
-    root.addEventListener("pointermove",event => {
-      if (event.pointerType && event.pointerType !== "mouse") return;
-      const rect = root.getBoundingClientRect();
-      pointerX = clamp((event.clientX - rect.left) / Math.max(1,rect.width) - .5,-.5,.5);
-      pointerY = clamp((event.clientY - rect.top) / Math.max(1,rect.height) - .5,-.5,.5);
-      root.style.setProperty("--projects-pointer-x",pointerX.toFixed(3));
-      root.style.setProperty("--projects-pointer-y",pointerY.toFixed(3));
-      updateFolderTransforms(scrollProgress * Math.max(1,projects.length - 1));
-    },{passive:true});
-
-    root.addEventListener("pointerleave",() => {
-      pointerX = 0;
-      pointerY = 0;
-      root.style.setProperty("--projects-pointer-x","0");
-      root.style.setProperty("--projects-pointer-y","0");
-      updateFolderTransforms(scrollProgress * Math.max(1,projects.length - 1));
-    },{passive:true});
-
-    const entranceObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        root.classList.toggle("is-in-view",entry.isIntersecting);
-        if (entry.isIntersecting) {
-          root.classList.add("is-ready");
-          entranceObserver.disconnect();
-        }
-      });
-    },{threshold:.16});
-    entranceObserver.observe(root);
-
-    root.addEventListener("keydown",event => {
-      if (dom.details.classList.contains("is-open") || dom.manager.classList.contains("is-open")) return;
-      if (["ArrowRight","PageDown"].includes(event.key)) {event.preventDefault();scrollToProject(currentIndex + 1);}
-      if (["ArrowLeft","PageUp"].includes(event.key)) {event.preventDefault();scrollToProject(currentIndex - 1);}
-      if (event.key === "Home") {event.preventDefault();scrollToProject(0);}
-      if (event.key === "End") {event.preventDefault();scrollToProject(projects.length - 1);}
-      if (event.key === "Enter" && event.target === root) {event.preventDefault();openDetails();}
-    });
-
-    qa("[data-project-category]",root).forEach(button => {
-      button.addEventListener("click",() => {
-        const category = button.dataset.projectCategory;
-        if (category === "Todos") {scrollToProject(0);return;}
-        const index = projects.findIndex(project => project.category.toLowerCase().includes(category.toLowerCase()));
-        if (index < 0) helpers.toast?.(`Aún no hay proyectos en la categoría ${category}.`);
-        else scrollToProject(index);
-      });
-    });
-
-    q("#projectsPrev",root)?.addEventListener("click",() => scrollToProject(currentIndex - 1));
-    q("#projectsNext",root)?.addEventListener("click",() => scrollToProject(currentIndex + 1));
-    dom.open.addEventListener("click",openDetails);
-    dom.detailsBackdrop.addEventListener("click",closeDetails);
-    dom.detailsClose.addEventListener("click",closeDetails);
-    dom.manage.addEventListener("click",openManager);
-    dom.managerBackdrop.addEventListener("click",closeManager);
-    dom.managerClose.addEventListener("click",closeManager);
-    dom.managerAdd.addEventListener("click",addProject);
-    dom.managerDelete.addEventListener("click",deleteProject);
-    dom.managerForm.addEventListener("submit",saveManagerForm);
-    dom.managerList.addEventListener("click",event => {
+    dom.manage.addEventListener("click", openManager);
+    dom.managerBackdrop.addEventListener("click", closeManager);
+    dom.managerClose.addEventListener("click", closeManager);
+    dom.managerAdd.addEventListener("click", addProject);
+    dom.managerDelete.addEventListener("click", deleteProject);
+    dom.managerForm.addEventListener("submit", saveManagerForm);
+    dom.managerList.addEventListener("click", event => {
       const button = event.target.closest("[data-manager-index]");
       if (!button) return;
       managerIndex = Number(button.dataset.managerIndex);
       renderManager();
     });
 
-    document.addEventListener("keydown",event => {
-      if (event.key !== "Escape") return;
-      if (dom.details.classList.contains("is-open")) closeDetails();
-      if (dom.manager.classList.contains("is-open")) closeManager();
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        if (dom.details.classList.contains("is-open")) closeDetails();
+        else if (dom.manager.classList.contains("is-open")) closeManager();
+      }
+      if (dom.details.classList.contains("is-open")) trapDialogFocus(event, dom.details);
+      if (dom.manager.classList.contains("is-open")) trapDialogFocus(event, dom.manager);
     });
 
-    const adminSession = q("#adminSession");
-    if (adminSession) new MutationObserver(updateAdminVisibility).observe(adminSession,{attributes:true,attributeFilter:["hidden"]});
-    window.addEventListener("portal:datachange",() => {
-      projects = ensureProjects(state,helpers);
-      renderFolders();
-      updateAdminVisibility();
-    });
-    window.addEventListener("portal:adminlogout",updateAdminVisibility);
+    const revealObserver = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        root.classList.add("is-visible");
+        revealObserver.disconnect();
+      }
+    }, { threshold: .13 });
+    revealObserver.observe(root);
 
-    window.ProjectPspModule = {
-      build:BUILD,
-      getProjects:() => projects.map(project => ({...project})),
-      open:index => {scrollToProject(index);window.setTimeout(openDetails,350);},
-      refresh:() => {projects = ensureProjects(state,helpers);renderFolders();}
-    };
+    window.addEventListener("portal:rendered", updateAdminVisibility);
+    window.addEventListener("resize", resetDockMagnification, { passive: true });
+    reducedMotion.addEventListener?.("change", resetDockMagnification);
 
-    window.dispatchEvent(new CustomEvent("portal:rendered",{detail:{source:"projects-psp",build:BUILD}}));
+    renderDock();
+    updateAdminVisibility();
+    window.dispatchEvent(new CustomEvent("portal:rendered", { detail: { source: "projects-psp", build: BUILD } }));
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",init,{once:true});
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();
