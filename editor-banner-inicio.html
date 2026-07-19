@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Editor del banner principal</title>
+  <link rel="stylesheet" href="assets/inicio-banner/banner.css?v=2.0.0">
+  <style>
+    html,body{margin:0;background:#edf2f7;font-family:"Century Gothic",Arial,sans-serif;color:#111827}
+    *{box-sizing:border-box}
+    .toolbar{position:sticky;top:0;z-index:20;display:flex;gap:12px;align-items:center;padding:14px 18px;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid #e3e8ef}
+    .toolbar button{border:0;border-radius:999px;padding:11px 17px;background:#111827;color:#fff;cursor:pointer;font:inherit;font-weight:700}
+    .editor{display:grid;grid-template-columns:390px 1fr;gap:20px;padding:20px}
+    .panel{background:#fff;border-radius:22px;padding:20px;box-shadow:0 18px 50px rgba(22,38,60,.08);align-self:start;position:sticky;top:84px;max-height:calc(100vh - 104px);overflow:auto}
+    .panel h2{margin:0 0 8px}.panel h3{margin:24px 0 8px;font-size:.95rem}.field{display:grid;gap:6px;margin:13px 0}.field label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#6b7280;font-weight:700}.field input,.field textarea,.field select{width:100%;border:1px solid #dce2ea;border-radius:12px;padding:10px 12px;font:inherit;background:#fff}.field textarea{min-height:80px;resize:vertical}.color-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.color-grid input[type=color]{height:44px;padding:4px}.preview{min-width:0}.note{font-size:.78rem;color:#667085;line-height:1.5}.success{color:#087f5b;font-weight:700}.warning{color:#a15c00;font-weight:700}
+    @media(max-width:1050px){.editor{grid-template-columns:1fr}.panel{position:relative;top:auto;max-height:none}}
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <strong>Editor visual del banner del Inicio</strong>
+    <button id="download" type="button">Descargar banner-config.js</button>
+    <span id="status"></span>
+  </div>
+  <div class="editor">
+    <aside class="panel">
+      <h2>Contenido general</h2>
+      <div class="field"><label for="eyebrow">Sección</label><input id="eyebrow"></div>
+      <div class="field"><label for="title1">Título 1</label><input id="title1"></div>
+      <div class="field"><label for="title2">Título 2</label><input id="title2"></div>
+      <div class="field"><label for="script">Palabra cursiva</label><input id="script"></div>
+      <div class="field"><label for="description">Descripción institucional</label><textarea id="description"></textarea></div>
+
+      <h3>Fotografía seleccionada</h3>
+      <div class="field"><label for="slide">Escena</label><select id="slide"></select></div>
+      <div class="field"><label for="slideTitleMain">Palabra sólida</label><input id="slideTitleMain"></div>
+      <div class="field"><label for="slideTitleScript">Palabra cursiva</label><input id="slideTitleScript"></div>
+      <div class="field"><label for="slideTag">Etiqueta izquierda</label><input id="slideTag"></div>
+      <div class="field"><label for="slideYear">Etiqueta derecha</label><input id="slideYear"></div>
+      <div class="field"><label for="slideSubtitle">Descripción blanca sobre la imagen</label><textarea id="slideSubtitle"></textarea></div>
+      <div class="field"><label for="slideStory">Historia del doble clic</label><textarea id="slideStory"></textarea></div>
+      <div class="field"><label for="slideImage">Ruta o URL de la imagen</label><input id="slideImage"></div>
+      <div class="field"><label for="imageFile">Cargar imagen para previsualizar</label><input id="imageFile" type="file" accept="image/*"></div>
+
+      <h3>Colores de esta fotografía</h3>
+      <div class="color-grid">
+        <div class="field"><label for="accent">Acento</label><input id="accent" type="color"></div>
+        <div class="field"><label for="cursiveColor">Cursivas</label><input id="cursiveColor" type="color"></div>
+        <div class="field"><label for="compactColor">Texto compacto</label><input id="compactColor" type="color"></div>
+        <div class="field"><label for="captionTitleColor">Título de foto</label><input id="captionTitleColor" type="color"></div>
+        <div class="field"><label for="captionDescriptionColor">Descripción de foto</label><input id="captionDescriptionColor" type="color"></div>
+        <div class="field"><label for="soft">Color suave</label><input id="soft" type="color"></div>
+      </div>
+      <p class="note">La imagen cargada desde el computador solo sirve para previsualizar. Para publicarla, guárdala dentro de <code>assets/inicio-banner/images/</code>, escribe su ruta y reemplaza el archivo correspondiente en GitHub.</p>
+    </aside>
+    <main class="preview"><div id="sp-home-banner"></div></main>
+  </div>
+
+  <script src="assets/inicio-banner/banner-config.js?v=2.0.0"></script>
+  <script src="assets/inicio-banner/banner.js?v=2.0.0"></script>
+  <script>
+    const cfg=JSON.parse(JSON.stringify(window.SP_HOME_BANNER_CONFIG));
+    let instance;
+    const $=id=>document.getElementById(id);
+    const fields={
+      eyebrow:$("eyebrow"),title1:$("title1"),title2:$("title2"),script:$("script"),description:$("description"),slide:$("slide"),
+      slideTitleMain:$("slideTitleMain"),slideTitleScript:$("slideTitleScript"),slideTag:$("slideTag"),slideYear:$("slideYear"),
+      slideSubtitle:$("slideSubtitle"),slideStory:$("slideStory"),slideImage:$("slideImage"),accent:$("accent"),soft:$("soft"),
+      cursiveColor:$("cursiveColor"),compactColor:$("compactColor"),captionTitleColor:$("captionTitleColor"),captionDescriptionColor:$("captionDescriptionColor")
+    };
+    function currentSlide(){return cfg.slides[Number(fields.slide.value)||0]}
+    function render(){instance=window.SPHomeBanner.mount("sp-home-banner",cfg);instance.goTo(Number(fields.slide.value)||0)}
+    function loadGlobal(){
+      fields.eyebrow.value=cfg.eyebrow||"";fields.title1.value=cfg.titleLine1||"";fields.title2.value=cfg.titleLine2||"";fields.script.value=cfg.scriptWord||"";fields.description.value=cfg.description||"";
+      fields.slide.innerHTML=cfg.slides.map((s,i)=>`<option value="${i}">${i+1}. ${s.title||[s.titleMain,s.titleScript].filter(Boolean).join(" ")}</option>`).join("");
+      loadSlide();
+    }
+    function loadSlide(){
+      const s=currentSlide();
+      fields.slideTitleMain.value=s.titleMain||s.title||"";fields.slideTitleScript.value=s.titleScript||"";fields.slideTag.value=s.tag||"";fields.slideYear.value=s.year||"";
+      fields.slideSubtitle.value=s.subtitle||"";fields.slideStory.value=s.story||"";fields.slideImage.value=s.image||"";
+      fields.accent.value=s.accent||"#2f6ee8";fields.soft.value=s.soft||"#dbe8ff";fields.cursiveColor.value=s.cursiveColor||s.accent||"#2f6ee8";
+      fields.compactColor.value=s.compactColor||"#4d6076";fields.captionTitleColor.value=s.captionTitleColor||"#ffffff";fields.captionDescriptionColor.value=s.captionDescriptionColor||"#ffffff";
+    }
+    function update(){
+      cfg.eyebrow=fields.eyebrow.value;cfg.titleLine1=fields.title1.value;cfg.titleLine2=fields.title2.value;cfg.scriptWord=fields.script.value;cfg.description=fields.description.value;
+      const s=currentSlide();
+      s.titleMain=fields.slideTitleMain.value;s.titleScript=fields.slideTitleScript.value;s.title=[s.titleMain,s.titleScript].filter(Boolean).join(" ");
+      s.tag=fields.slideTag.value;s.year=fields.slideYear.value;s.subtitle=fields.slideSubtitle.value;s.story=fields.slideStory.value;s.image=fields.slideImage.value;
+      s.accent=fields.accent.value;s.soft=fields.soft.value;s.cursiveColor=fields.cursiveColor.value;s.compactColor=fields.compactColor.value;
+      s.captionTitleColor=fields.captionTitleColor.value;s.captionDescriptionColor=fields.captionDescriptionColor.value;
+      render();
+    }
+    Object.entries(fields).forEach(([name,el])=>{
+      if(name==="slide") el.addEventListener("change",()=>{loadSlide();render()});
+      else el.addEventListener(el.type==="color"?"input":"input",update);
+    });
+    $("imageFile").addEventListener("change",event=>{
+      const file=event.target.files[0];if(!file)return;
+      const reader=new FileReader();reader.onload=()=>{fields.slideImage.value=reader.result;update()};reader.readAsDataURL(file);
+    });
+    $("download").addEventListener("click",()=>{
+      const content="window.SP_HOME_BANNER_CONFIG = "+JSON.stringify(cfg,null,2)+";\n";
+      const blob=new Blob([content],{type:"text/javascript"});const link=document.createElement("a");link.href=URL.createObjectURL(blob);link.download="banner-config.js";link.click();URL.revokeObjectURL(link.href);
+      $("status").textContent="Configuración descargada";$("status").className="success";setTimeout(()=>$("status").textContent="",2200);
+    });
+    loadGlobal();render();
+  </script>
+</body>
+</html>

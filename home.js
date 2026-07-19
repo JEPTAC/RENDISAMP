@@ -34,7 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
     </article>`).join("");
 
   const featureYear = helpers.getYear(2025) || years[0];
-  document.querySelector("#homeHeroProgress").textContent = `${featureYear.progress}%`;
+  const legacyHeroProgress = document.querySelector("#homeHeroProgress");
+  if (legacyHeroProgress) legacyHeroProgress.textContent = `${featureYear.progress}%`;
   document.querySelector("#homeResourceCount").textContent = state.resources.length;
   document.querySelector("#homeIdeasCount").textContent = state.ideas.length;
 

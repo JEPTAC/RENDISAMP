@@ -5,12 +5,30 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
-    window.__PORTAL_EXPECTED_BUILD__ = "11.41.0-firebase-rebuild";
+    window.__PORTAL_EXPECTED_BUILD__ = "11.41.0-firebase-repair";
+    (async () => {
+      try {
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(reg => {
+            const urls = [reg.active?.scriptURL, reg.waiting?.scriptURL, reg.installing?.scriptURL].filter(Boolean);
+            return urls.some(url => url.includes("coop-sw.js")) ? reg.unregister() : Promise.resolve(false);
+          }));
+        }
+        if ("caches" in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map(name => caches.delete(name)));
+        }
+      } catch (error) {
+        console.info("[Portal] Limpieza preventiva completada con observaciones.", error);
+      }
+    })();
   </script>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="preload" href="assets/fonts/brother-signature.otf" as="font" type="font/otf" crossorigin>
   <meta name="description" content="Portal especial de Rendición de Cuentas de San Pedro, Valle del Cauca.">
-  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.41.0-firebase-rebuild">
+  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.41.0-firebase-repair">
+  <link rel="stylesheet" href="assets/inicio-banner/banner.css?v=2.0.0">
   <title>Rendición de Cuentas | San Pedro</title>
 
   <link rel="preconnect" href="https://accounts.google.com">
@@ -18,59 +36,8 @@
 <body data-page="home">
   <div id="siteHeader"></div>
   <main id="main-content">
-    <section class="home-hero home-hero--editorial" aria-labelledby="homeHeroTitle">
-      <div class="site-shell home-hero__grid">
-        <div class="home-hero__copy reveal">
-          <span>PORTAL HISTÓRICO · SAN PEDRO</span>
-          <h1 id="homeHeroTitle">Conozca la gestión.<br>Construyamos <em>confianza.</em></h1>
-          <p>Explore resultados, documentos, videos, compromisos e ideas ciudadanas en una experiencia visual, clara y organizada por vigencias.</p>
-
-          <div class="hero-buttons">
-            <a class="button button-primary" href="rendicion-2025.html">Explorar Rendición 2025 →</a>
-            <a class="button button-secondary" href="vigencias.html">Ver todas las vigencias</a>
-          </div>
-
-          <div class="hero-trust">
-            <div class="avatar-stack" aria-hidden="true">
-              <span>SP</span><span>RC</span><span>✓</span><span>+</span>
-            </div>
-            <p>Información pública organizada para ciudadanos, veedurías y comunidad.</p>
-          </div>
-        </div>
-        <div class="home-hero__visual" aria-hidden="true">
-          <div class="hero-cloud cloud-a"></div>
-          <div class="hero-cloud cloud-b"></div>
-          <div class="sun-disc"></div>
-          <div class="mountain-layer"></div>
-          <div class="lake-layer"></div>
-          <div class="hill-layer"></div>
-          <div class="hero-person">
-            <span class="person-arm arm-left"></span>
-            <span class="person-arm arm-right"></span>
-          </div>
-
-          <div class="hero-adaptive-stage" aria-hidden="true">
-            <span class="hero-adaptive-grid"></span>
-            <span class="hero-adaptive-glow hero-adaptive-glow--cyan"></span>
-            <span class="hero-adaptive-glow hero-adaptive-glow--violet"></span>
-            <span class="hero-adaptive-orbit hero-adaptive-orbit--a"></span>
-            <span class="hero-adaptive-orbit hero-adaptive-orbit--b"></span>
-            <span class="hero-adaptive-sweep"></span>
-            <span class="hero-adaptive-particles"></span>
-            <svg class="hero-adaptive-lines" viewBox="0 0 960 560" preserveAspectRatio="none" focusable="false">
-              <path d="M-40 470 C120 350 245 505 405 368 S700 235 1010 72"></path>
-              <path d="M-55 520 C155 398 280 544 455 410 S735 330 1015 170"></path>
-            </svg>
-          </div>
-          <div class="hero-float-card">
-            <small>Edición destacada</small>
-            <strong id="homeHeroProgress">92%</strong>
-            <span>avance general 2025</span>
-            <i class="hero-progress-line" aria-hidden="true"><b></b></i>
-          </div>
-        </div>
-
-      </div>
+    <section class="home-xmb-banner" aria-label="Galería territorial de la gestión">
+      <div id="sp-home-banner" data-sp-home-banner></div>
     </section>
 
     <section class="home-section home-section--white">
@@ -114,6 +81,9 @@
     </section>
   </main>
   <div id="siteFooter"></div><div id="globalDialogs"></div>
-  <script src="portal-core-v11409.js?v=11.41.0-firebase-rebuild"></script><script src="home.js?v=11.41.0-firebase-rebuild"></script>
+  <script src="portal-core-v11409.js?v=11.41.0-firebase-repair"></script>
+  <script src="assets/inicio-banner/banner-config.js?v=2.0.0"></script>
+  <script src="assets/inicio-banner/banner.js?v=2.0.0" defer></script>
+  <script src="home.js?v=11.43.0-home-banner"></script>
 </body>
 </html>

@@ -26,21 +26,47 @@
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="preload" href="assets/fonts/brother-signature.otf" as="font" type="font/otf" crossorigin>
   <meta name="description" content="Proyectos y avances de la gestión pública de San Pedro.">
   <link rel="icon" href="assets/favicon.png">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css?v=11.41.0-firebase-repair">
-  <link rel="stylesheet" href="assets/proyectos-banner/banner.css?v=1.0.0">
   <link rel="stylesheet" href="projects-psp.css?v=11.42.0">
   <title>Proyectos | Rendición de Cuentas de San Pedro</title>
+  <style>
+    /* Reserva temporal: aquí se integrará el próximo banner exclusivo de Proyectos. */
+    .projects-banner-slot{
+      position:relative;
+      width:min(1480px,92vw);
+      min-height:clamp(390px,36vw,570px);
+      margin:clamp(22px,3vw,52px) auto;
+      overflow:hidden;
+      border-radius:clamp(22px,2vw,34px);
+      background:
+        radial-gradient(circle at 18% 20%,rgba(36,158,214,.09),transparent 30%),
+        radial-gradient(circle at 82% 76%,rgba(64,105,204,.08),transparent 28%),
+        linear-gradient(135deg,#f8fbff,#eef5fc);
+      box-shadow:inset 0 0 0 1px rgba(29,83,131,.08);
+    }
+    .projects-banner-slot::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image:radial-gradient(rgba(18,75,125,.11) .75px,transparent .75px);
+      background-size:17px 17px;
+      opacity:.26;
+      pointer-events:none;
+    }
+    @media(max-width:680px){
+      .projects-banner-slot{width:calc(100% - 24px);min-height:320px;margin:20px auto}
+    }
+  </style>
   <link rel="preconnect" href="https://accounts.google.com">
 </head>
 <body data-page="projects">
   <div id="siteHeader"></div>
 
   <main id="main-content" aria-label="Módulo de proyectos">
-    <div id="sp-projects-banner" data-sp-projects-banner></div>
+    <section id="projectsBannerSlot" class="projects-banner-slot" aria-label="Espacio reservado para el nuevo banner de proyectos"></section>
 
     <section id="proyectos" class="projects-psp-shell" aria-labelledby="projectsTitle">
       <div id="projectsPsp" class="projects-psp" tabindex="0" aria-label="Explorador interactivo de proyectos">
@@ -189,8 +215,6 @@
   <div id="globalDialogs"></div>
 
   <script src="portal-core-v11409.js?v=11.41.0-firebase-repair"></script>
-  <script src="assets/proyectos-banner/banner-config.js?v=1.0.0"></script>
-  <script src="assets/proyectos-banner/banner.js?v=1.0.0" defer></script>
   <script src="projects-psp.js?v=11.42.0" defer></script>
 </body>
 </html>
