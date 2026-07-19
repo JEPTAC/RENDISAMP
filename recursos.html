@@ -3,9 +3,26 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
-    window.__PORTAL_EXPECTED_BUILD__ = "11.41.0-firebase-rebuild";
+    window.__PORTAL_EXPECTED_BUILD__ = "11.46.0-ux-polish";
+    (async () => {
+      try {
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(reg => {
+            const urls = [reg.active?.scriptURL, reg.waiting?.scriptURL, reg.installing?.scriptURL].filter(Boolean);
+            return urls.some(url => url.includes("coop-sw.js")) ? reg.unregister() : Promise.resolve(false);
+          }));
+        }
+        if ("caches" in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map(name => caches.delete(name)));
+        }
+      } catch (error) {
+        console.info("[Portal] Limpieza preventiva completada con observaciones.", error);
+      }
+    })();
   </script>
   <link rel="preload" href="assets/fonts/brother-signature.otf" as="font" type="font/otf" crossorigin>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css"><title>Centro de recursos | Rendición de Cuentas</title>
   <link rel="preconnect" href="https://accounts.google.com">
-</head><body data-page="resources"><div id="siteHeader"></div><main id="main-content"><section class="page-hero"><div class="site-shell page-hero__grid"><div><span class="page-hero__badge">BIBLIOTECA DIGITAL</span><h1>Todos los recursos, sin saturar la portada.</h1><p>Busque informes, presentaciones, videos, datos, compromisos y respuestas por vigencia o palabra clave.</p></div><aside class="year-selector-card"><span>REPOSITORIO GENERAL</span><h2><strong id="resourceResultsCount">0</strong> resultados</h2><p>Los recursos se abren en ventanas de detalle para mantener una navegación limpia.</p></aside></div></section><section class="library-page"><div class="site-shell"><div class="library-toolbar"><input id="resourcePageSearch" placeholder="Buscar documento o tema"><select id="resourcePageYear"></select><select id="resourcePageType"><option value="all">Todos los formatos</option><option value="informe">Informes</option><option value="presentacion">Presentaciones</option><option value="video">Videos</option><option value="datos">Datos</option><option value="compromiso">Seguimiento</option><option value="respuesta">Respuestas</option></select><a class="button button-primary" href="vigencias.html">Ver vigencias</a></div><div class="resource-library-grid" id="resourcePageGrid" aria-live="polite"></div></div></section></main><div id="siteFooter"></div><div id="globalDialogs"></div><dialog class="dialog" id="libraryDialog"><button class="dialog-close" data-close-dialog="libraryDialog" aria-label="Cerrar ventana">×</button><div id="libraryDialogContent"></div></dialog><script src="portal-core-v11409.js?v=11.41.0-firebase-rebuild"></script><script src="resources.js"></script></body></html>
+</head><body data-page="resources"><div id="siteHeader"></div><main id="main-content"><section class="page-hero"><div class="site-shell page-hero__grid"><div><span class="page-hero__badge">BIBLIOTECA DIGITAL</span><h1>Todos los recursos, sin saturar la portada.</h1><p>Busque informes, presentaciones, videos, datos, compromisos y respuestas por vigencia o palabra clave.</p></div><aside class="year-selector-card"><span>REPOSITORIO GENERAL</span><h2><strong id="resourceResultsCount">0</strong> resultados</h2><p>Los recursos se abren en ventanas de detalle para mantener una navegación limpia.</p></aside></div></section><section class="library-page"><div class="site-shell"><div class="library-toolbar"><input id="resourcePageSearch" placeholder="Buscar documento o tema"><select id="resourcePageYear"></select><select id="resourcePageType"><option value="all">Todos los formatos</option><option value="informe">Informes</option><option value="presentacion">Presentaciones</option><option value="video">Videos</option><option value="datos">Datos</option><option value="compromiso">Seguimiento</option><option value="respuesta">Respuestas</option></select><a class="button button-primary" href="vigencias.html">Ver vigencias</a></div><div class="resource-library-grid" id="resourcePageGrid" aria-live="polite"></div></div></section></main><div id="siteFooter"></div><div id="globalDialogs"></div><dialog class="dialog" id="libraryDialog"><button class="dialog-close" data-close-dialog="libraryDialog" aria-label="Cerrar ventana">×</button><div id="libraryDialogContent"></div></dialog><script src="portal-core-v11409.js?v=11.46.0-ux-polish"></script><script src="resources.js"></script></body></html>

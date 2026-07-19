@@ -3,9 +3,26 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
-    window.__PORTAL_EXPECTED_BUILD__ = "11.41.0-firebase-rebuild";
+    window.__PORTAL_EXPECTED_BUILD__ = "11.46.0-ux-polish";
+    (async () => {
+      try {
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(reg => {
+            const urls = [reg.active?.scriptURL, reg.waiting?.scriptURL, reg.installing?.scriptURL].filter(Boolean);
+            return urls.some(url => url.includes("coop-sw.js")) ? reg.unregister() : Promise.resolve(false);
+          }));
+        }
+        if ("caches" in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map(name => caches.delete(name)));
+        }
+      } catch (error) {
+        console.info("[Portal] Limpieza preventiva completada con observaciones.", error);
+      }
+    })();
   </script>
   <link rel="preload" href="assets/fonts/brother-signature.otf" as="font" type="font/otf" crossorigin>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css"><title>Archivo histórico | Rendición de Cuentas</title>
   <link rel="preconnect" href="https://accounts.google.com">
-</head><body data-page="year"><div id="siteHeader"></div><main id="main-content"><section class="page-hero"><div class="site-shell page-hero__grid"><div><span class="page-hero__badge">ARCHIVO HISTÓRICO</span><h1>Una página exclusiva para cada vigencia.</h1><p>Seleccione la edición que desea consultar. Cada año abre una experiencia independiente y no aparece acumulado en una sola página extensa.</p></div><aside class="year-selector-card"><span>VIGENCIAS DISPONIBLES</span><h2><strong id="archiveCount">0</strong> ediciones</h2><p>Las vigencias futuras creadas desde el panel también aparecerán en este archivo.</p></aside></div></section><section class="archive-page"><div class="site-shell"><div class="archive-intro"><div><span class="section-kicker">EDICIONES</span><h2 class="page-title">Rendición de Cuentas</h2></div><p>Abra una edición para consultar exclusivamente sus indicadores, historias, documentos y compromisos.</p></div><div class="archive-grid" id="archiveGrid"></div></div></section></main><div id="siteFooter"></div><div id="globalDialogs"></div><script src="portal-core-v11409.js?v=11.41.0-firebase-rebuild"></script><script src="vigencias.js"></script></body></html>
+</head><body data-page="year"><div id="siteHeader"></div><main id="main-content"><section class="page-hero"><div class="site-shell page-hero__grid"><div><span class="page-hero__badge">ARCHIVO HISTÓRICO</span><h1>Una página exclusiva para cada vigencia.</h1><p>Seleccione la edición que desea consultar. Cada año abre una experiencia independiente y no aparece acumulado en una sola página extensa.</p></div><aside class="year-selector-card"><span>VIGENCIAS DISPONIBLES</span><h2><strong id="archiveCount">0</strong> ediciones</h2><p>Las vigencias futuras creadas desde el panel también aparecerán en este archivo.</p></aside></div></section><section class="archive-page"><div class="site-shell"><div class="archive-intro"><div><span class="section-kicker">EDICIONES</span><h2 class="page-title">Rendición de Cuentas</h2></div><p>Abra una edición para consultar exclusivamente sus indicadores, historias, documentos y compromisos.</p></div><div class="archive-grid" id="archiveGrid"></div></div></section></main><div id="siteFooter"></div><div id="globalDialogs"></div><script src="portal-core-v11409.js?v=11.46.0-ux-polish"></script><script src="vigencias.js"></script></body></html>

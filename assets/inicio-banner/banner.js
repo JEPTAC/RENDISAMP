@@ -62,7 +62,7 @@
           </div>
         </section>
       </div>
-      <div class="spb-banner__modal" data-spb-modal aria-hidden="true"><div class="spb-banner__modal-bg" data-spb-close></div><article class="spb-banner__modal-card" role="dialog" aria-modal="true"><button class="spb-banner__close" type="button" data-spb-close aria-label="Cerrar">×</button><div class="spb-banner__modal-image"><img data-spb-modal-image alt=""></div><div class="spb-banner__modal-copy"><small data-spb-modal-tag></small><h3 data-spb-modal-title></h3><p data-spb-modal-story></p></div></article></div>`;
+      <div class="spb-banner__modal" data-spb-modal aria-hidden="true"><div class="spb-banner__modal-bg" data-spb-close></div><article class="spb-banner__modal-card" role="dialog" aria-modal="true" tabindex="-1"><button class="spb-banner__close" type="button" data-spb-close aria-label="Cerrar">×</button><div class="spb-banner__modal-image"><img data-spb-modal-image alt=""></div><div class="spb-banner__modal-copy"><small data-spb-modal-tag></small><h3 data-spb-modal-title></h3><p data-spb-modal-story></p></div></article></div>`;
   }
 
   function mount(target, inputConfig){
@@ -82,6 +82,9 @@
     const soundBtn=root.querySelector('[data-spb-sound]');
     const meter=root.querySelector('[data-spb-meter]');
     const modal=root.querySelector('[data-spb-modal]');
+    const modalCard=modal?.querySelector('.spb-banner__modal-card');
+    const modalClose=modal?.querySelector('.spb-banner__close');
+    if(modal && modal.parentElement!==document.body) document.body.appendChild(modal);
     const currentEl=root.querySelector('[data-spb-current]');
     const totalEl=root.querySelector('[data-spb-total]');
     const tagEl=root.querySelector('[data-spb-tag]');
@@ -97,7 +100,7 @@
     totalEl.textContent=String(slides.length).padStart(2,'0');
 
     let active=0, playing=config.autoplay !== false, soundEnabled=config.soundEnabled !== false;
-    let timer=0, raf=0, start=0, audioContext=null, audioUnlocked=false, wheelLock=false, clickTimer=0;
+    let timer=0, raf=0, start=0, audioContext=null, audioUnlocked=false, wheelLock=false, clickTimer=0, modalReturnFocus=null, previousBodyOverflow="";
     const circumference=100.53;
 
     function readableRgb(hex, fallback=[47,110,232]){
@@ -114,6 +117,11 @@
       root.style.setProperty('--spb-compact-color',slide.compactColor || '#4d6076');
       root.style.setProperty('--spb-caption-title',slide.captionTitleColor || '#ffffff');
       root.style.setProperty('--spb-caption-description',slide.captionDescriptionColor || '#ffffff');
+      if(modal){
+        modal.style.setProperty('--spb-accent',accent);
+        modal.style.setProperty('--spb-accent-rgb',readableRgb(accent).join(','));
+        modal.style.setProperty('--spb-cursive-color',slide.cursiveColor || accent);
+      }
     }
     function updateText(){
       const slide=slides[active]; if(!slide) return;
@@ -160,11 +168,29 @@
       setTimeout(()=>{oldEl.className='spb-banner__scene';newEl.className='spb-banner__scene is-active';},930);
     }
     function openModal(){
-      const slide=slides[active]; if(!slide)return;
+      const slide=slides[active]; if(!slide||!modal)return;
+      modalReturnFocus=document.activeElement;
+      previousBodyOverflow=document.body.style.overflow;
       modalImage.src=asset(config,slide.image);modalImage.alt=slide.alt||slide.title||'';modalTag.textContent=slide.tag||'';modalTitle.textContent=slide.title || [slide.titleMain,slide.titleScript].filter(Boolean).join(' ');modalStory.textContent=slide.story||'';
       modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';clearTimeout(timer);cancelAnimationFrame(raf);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>modalClose?.focus({preventScroll:true})));
     }
-    function closeModal(){modal.classList.remove('is-open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';schedule();}
+    function closeModal(event){
+      event?.preventDefault?.();event?.stopPropagation?.();
+      if(!modal||!modal.classList.contains('is-open'))return;
+      modal.classList.remove('is-open');modal.setAttribute('aria-hidden','true');document.body.style.overflow=previousBodyOverflow;
+      modalReturnFocus?.focus?.({preventScroll:true});modalReturnFocus=null;schedule();
+    }
+    function handleModalKeydown(event){
+      if(!modal?.classList.contains('is-open'))return;
+      if(event.key==='Escape'){closeModal(event);return;}
+      if(event.key!=='Tab')return;
+      const focusable=[...modal.querySelectorAll('button:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null);
+      if(!focusable.length)return;
+      const first=focusable[0],last=focusable[focusable.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
     function setPlaying(value){playing=value;transport.classList.toggle('is-paused',!playing);progress.classList.toggle('is-paused',!playing);transport.setAttribute('aria-label',playing?'Pausar reproducción automática':'Reanudar reproducción automática');progress.setAttribute('aria-label',playing?'Pausar reproducción automática':'Reanudar reproducción automática');schedule();}
 
     thumbs.forEach((thumb,i)=>thumb.addEventListener('click',()=>go(i,i>active?1:-1,true)));
@@ -175,7 +201,11 @@
     viewport.addEventListener('dblclick',()=>{clearTimeout(clickTimer);if(config.openHistoryOnDoubleClick!==false)openModal()});
     if(config.wheelNavigation!==false) viewport.addEventListener('wheel',e=>{if(Math.abs(e.deltaY)<10||wheelLock)return;e.preventDefault();wheelLock=true;go((active+(e.deltaY>0?1:-1)+slides.length)%slides.length,e.deltaY>0?1:-1,true);setTimeout(()=>wheelLock=false,520)},{passive:false});
     root.addEventListener('keydown',e=>{if(config.keyboardNavigation===false)return;if(e.key==='ArrowRight'){e.preventDefault();go((active+1)%slides.length,1,true)}else if(e.key==='ArrowLeft'){e.preventDefault();go((active-1+slides.length)%slides.length,-1,true)}else if(e.key==='Enter'){e.preventDefault();openModal()}else if(e.key===' '){e.preventDefault();setPlaying(!playing)}else if(e.key==='Escape'){closeModal()}});
-    root.querySelectorAll('[data-spb-close]').forEach(el=>el.addEventListener('click',closeModal));
+    modal?.addEventListener('click',event=>{if(event.target.closest('[data-spb-close]'))closeModal(event)});
+    modalClose?.addEventListener('pointerup',event=>closeModal(event));
+    modalClose?.addEventListener('click',event=>closeModal(event));
+    modalCard?.addEventListener('click',event=>event.stopPropagation());
+    document.addEventListener('keydown',handleModalKeydown,true);
     viewport.addEventListener('mousemove',e=>{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const r=viewport.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;consoleEl.style.transform=`rotateX(${y*-2.2}deg) rotateY(${x*3.2}deg) translate3d(${x*3}px,${y*2}px,0)`});
     viewport.addEventListener('mouseleave',()=>consoleEl.style.transform='');
     const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){if(playing)schedule()}else{clearTimeout(timer);cancelAnimationFrame(raf)}})},{threshold:.15}); observer.observe(root);
@@ -185,7 +215,7 @@
       getConfig:()=>deepClone(config),
       goTo:index=>go(Math.max(0,Math.min(index,slides.length-1)),index>active?1:-1,true),
       update:newConfig=>mount(root,newConfig),
-      destroy(){clearTimeout(timer);cancelAnimationFrame(raf);observer.disconnect();root.innerHTML='';root.classList.remove('spb-banner');mounted.delete(root)}
+      destroy(){clearTimeout(timer);cancelAnimationFrame(raf);observer.disconnect();document.removeEventListener('keydown',handleModalKeydown,true);if(modal?.classList.contains('is-open'))document.body.style.overflow=previousBodyOverflow;modal?.remove();root.innerHTML='';root.classList.remove('spb-banner');mounted.delete(root)}
     };
     mounted.set(root,instance); return instance;
   }

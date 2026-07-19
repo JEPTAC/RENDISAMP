@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD = "11.45-proyectos-interaccion-total";
+  const BUILD = "11.46-proyectos-motion-audio";
   const MIN_PROJECTS = 5;
   const MAX_PROJECTS = 10;
   const PALETTE = [
@@ -149,6 +149,11 @@
     let dockPointerInside = false;
     let dockPointerX = null;
     let dockAnimationFrame = 0;
+    let dockScrollAnimationFrame = 0;
+    let selectionAnimationTimer = 0;
+    let audioContext = null;
+    let audioUnlocked = false;
+    let lastSelectionSoundAt = 0;
     let wheelAccumulator = 0;
     let wheelResetTimer = 0;
     let wheelPageLockTimer = 0;
@@ -328,6 +333,73 @@
       if (!initial) animateSummary();
     }
 
+    function unlockSelectionAudio() {
+      if (audioUnlocked && audioContext) return audioContext;
+      try {
+        audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === "suspended") audioContext.resume?.();
+        audioUnlocked = true;
+      } catch (_) {
+        audioUnlocked = false;
+      }
+      return audioContext;
+    }
+
+    function playSelectionSound(direction = 1, source = "program") {
+      if (source === "program" || source === "filter" || !audioUnlocked) return;
+      const context = unlockSelectionAudio();
+      if (!context) return;
+      const nowMs = performance.now();
+      if (nowMs - lastSelectionSoundAt < 70) return;
+      lastSelectionSoundAt = nowMs;
+      const now = context.currentTime;
+      const master = context.createGain();
+      master.gain.setValueAtTime(.0001, now);
+      master.gain.exponentialRampToValueAtTime(.018, now + .008);
+      master.gain.exponentialRampToValueAtTime(.0001, now + .14);
+      master.connect(context.destination);
+      const base = direction >= 0 ? 520 : 620;
+      [
+        {type:"sine", start:base, end:base * 1.18, gain:1},
+        {type:"triangle", start:base * 1.5, end:base * 1.36, gain:.26}
+      ].forEach(({type,start,end,gain}) => {
+        const oscillator = context.createOscillator();
+        const voiceGain = context.createGain();
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(start,now);
+        oscillator.frequency.exponentialRampToValueAtTime(end,now + .11);
+        voiceGain.gain.value = gain;
+        oscillator.connect(voiceGain).connect(master);
+        oscillator.start(now);
+        oscillator.stop(now + .15);
+      });
+    }
+
+    function animateDockSelection(previousIndex, nextIndex, direction = 1, source = "program") {
+      window.clearTimeout(selectionAnimationTimer);
+      const folders = qa(".projects-folder",dom.carousel);
+      root.classList.remove("is-selection-transition");
+      void root.offsetWidth;
+      root.classList.add("has-selection","is-selection-transition");
+      folders.forEach(folder => {
+        const index = Number(folder.dataset.projectIndex);
+        const visiblePosition = visibleIndices.indexOf(index);
+        const nextPosition = visibleIndices.indexOf(nextIndex);
+        const distance = Math.abs(visiblePosition - nextPosition);
+        folder.classList.remove("is-selection-entering","is-selection-leaving","is-selection-neighbor");
+        folder.style.setProperty("--selection-direction",String(direction || 1));
+        folder.style.setProperty("--selection-distance",String(Math.min(distance,3)));
+        if (index === nextIndex) folder.classList.add("is-selection-entering");
+        else if (index === previousIndex) folder.classList.add("is-selection-leaving");
+        else if (distance <= 2) folder.classList.add("is-selection-neighbor");
+      });
+      selectionAnimationTimer = window.setTimeout(() => {
+        root.classList.remove("is-selection-transition");
+        folders.forEach(folder => folder.classList.remove("is-selection-entering","is-selection-leaving","is-selection-neighbor"));
+      },820);
+      if (previousIndex !== nextIndex) playSelectionSound(direction,source);
+    }
+
     function triggerSelectionBounce(folder, source = "program") {
       if (!folder || reducedMotion.matches) return;
       folder.classList.remove("is-selection-bounce");
@@ -339,26 +411,47 @@
 
     function centerFolderInViewport(folder, behavior = "smooth") {
       if (!folder) return;
+      if (dockScrollAnimationFrame) cancelAnimationFrame(dockScrollAnimationFrame);
       const maxScroll = Math.max(0, dom.viewport.scrollWidth - dom.viewport.clientWidth);
-      const targetLeft = folder.offsetLeft + folder.offsetWidth / 2 - dom.viewport.clientWidth / 2;
-      dom.viewport.scrollTo({
-        left: clamp(targetLeft, 0, maxScroll),
-        top: 0,
-        behavior
-      });
+      const target = clamp(folder.offsetLeft + folder.offsetWidth / 2 - dom.viewport.clientWidth / 2,0,maxScroll);
+      const startLeft = dom.viewport.scrollLeft;
+      const distance = target - startLeft;
+      if (behavior === "auto" || Math.abs(distance) < 1) {
+        dom.viewport.scrollLeft = target;
+        return;
+      }
+      const startedAt = performance.now();
+      const duration = clamp(420 + Math.abs(distance) * .38,460,720);
+      const ease = value => 1 - Math.pow(1 - value,4);
+      const frame = now => {
+        const progress = clamp((now - startedAt) / duration,0,1);
+        dom.viewport.scrollLeft = startLeft + distance * ease(progress);
+        if (progress < 1) dockScrollAnimationFrame = requestAnimationFrame(frame);
+        else dockScrollAnimationFrame = 0;
+      };
+      dockScrollAnimationFrame = requestAnimationFrame(frame);
     }
 
     function selectProject(index, { scroll = true, focus = false, animate = true, source = "program" } = {}) {
       if (!projects[index]) return;
-      const changed = activeIndex !== index;
+      const previousIndex = activeIndex;
+      const changed = previousIndex !== index;
+      const previousPosition = visibleIndices.indexOf(previousIndex);
+      const nextPosition = visibleIndices.indexOf(index);
+      const direction = nextPosition === previousPosition ? 0 : nextPosition > previousPosition ? 1 : -1;
       activeIndex = index;
       updateSummary(false);
       const folder = q(`.projects-folder[data-project-index="${index}"]`, dom.carousel);
       if (scroll) centerFolderInViewport(folder, reducedMotion.matches ? "auto" : "smooth");
       if (focus) folder?.focus({ preventScroll: true });
-      if (animate && (changed || source === "keyboard" || source === "wheel" || source === "button")) triggerSelectionBounce(folder, source);
-      if (dockPointerInside && Number.isFinite(dockPointerX)) scheduleDockMagnification(dockPointerX);
-      else resetDockMagnification();
+      if (animate && (changed || source === "keyboard" || source === "wheel" || source === "button")) {
+        animateDockSelection(previousIndex,index,direction || 1,source);
+        triggerSelectionBounce(folder, source);
+      }
+      window.setTimeout(() => {
+        if (dockPointerInside && Number.isFinite(dockPointerX)) scheduleDockMagnification(dockPointerX);
+        else resetDockMagnification();
+      },changed ? 70 : 0);
     }
 
     function moveSelection(direction, source = "button") {
@@ -383,8 +476,8 @@
       qa(".projects-folder", dom.carousel).forEach(folder => {
         const isActive = Number(folder.dataset.projectIndex) === activeIndex;
         const hasFocus = document.activeElement === folder;
-        folder.style.setProperty("--dock-scale", hasFocus ? "1.16" : isActive ? "1.105" : "1");
-        folder.style.setProperty("--dock-lift", hasFocus ? "20px" : isActive ? "13px" : "0px");
+        folder.style.setProperty("--dock-scale", hasFocus ? "1.255" : isActive ? "1.19" : ".965");
+        folder.style.setProperty("--dock-lift", hasFocus ? "38px" : isActive ? "30px" : "0px");
         folder.style.setProperty("--dock-shift-x", "0px");
         folder.style.setProperty("--dock-tilt", "0deg");
         folder.style.setProperty("--dock-z", hasFocus ? "30" : isActive ? "18" : "1");
@@ -406,11 +499,11 @@
         const nearInfluence = influence * influence * (3 - 2 * influence);
         const isActive = Number(folder.dataset.projectIndex) === activeIndex;
         const hasFocus = document.activeElement === folder;
-        const selected = hasFocus ? .13 : isActive ? .075 : 0;
-        const scale = 1 + nearInfluence * .43 + selected;
-        const lift = nearInfluence * 45 + selected * 105;
+        const selected = hasFocus ? .2 : isActive ? .14 : 0;
+        const scale = .965 + nearInfluence * .46 + selected;
+        const lift = nearInfluence * 52 + selected * 120;
         const pushDirection = signedDistance === 0 ? 0 : Math.sign(signedDistance);
-        const shift = pushDirection * nearInfluence * 31;
+        const shift = pushDirection * nearInfluence * 38;
         const tilt = clamp((pointerX - center) / 92, -1, 1) * nearInfluence * 1.7;
         folder.style.setProperty("--dock-scale", scale.toFixed(3));
         folder.style.setProperty("--dock-lift", `${lift.toFixed(1)}px`);
@@ -447,6 +540,7 @@
 
     function handleDockNavigationKey(event) {
       const target = event.target;
+      if (["ArrowLeft","ArrowRight","Home","End"].includes(event.key)) unlockSelectionAudio();
       if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return false;
       if (dom.details.classList.contains("is-open") || dom.manager.classList.contains("is-open")) return false;
       const insideDock = dom.viewport.contains(document.activeElement) || dom.carousel.contains(document.activeElement) || dockPointerInside;
@@ -785,6 +879,7 @@
 
     dom.viewport.addEventListener("pointerdown", event => {
       if (event.button !== 0 || detailOpening) return;
+      unlockSelectionAudio();
       pointerMoved = false;
       pointerStartX = event.clientX;
       pointerStartY = event.clientY;
@@ -846,6 +941,7 @@
     });
 
     function handleDockWheel(event) {
+      unlockSelectionAudio();
       const path = event.composedPath?.() || [];
       const overDock = dockPointerInside || path.includes(dom.viewport) || path.includes(dom.carousel);
       if (!overDock || event.ctrlKey || dom.details.classList.contains("is-open") || dom.manager.classList.contains("is-open")) return;
@@ -854,18 +950,7 @@
       event.preventDefault();
       event.stopPropagation();
       dockPointerInside = true;
-      if (!document.body.classList.contains("projects-dock-wheel-lock")) {
-        wheelPageScrollY = Number.isFinite(dockPageScrollAnchor) ? dockPageScrollAnchor : (window.scrollY || document.documentElement.scrollTop || 0);
-        document.body.classList.add("projects-dock-wheel-lock");
-        document.body.style.top = `-${wheelPageScrollY}px`;
-      }
-      window.clearTimeout(wheelPageLockTimer);
-      wheelPageLockTimer = window.setTimeout(() => {
-        document.body.classList.remove("projects-dock-wheel-lock");
-        document.body.style.removeProperty("top");
-        window.scrollTo({ top: wheelPageScrollY, left: 0, behavior: "auto" });
-        dockPageScrollAnchor = wheelPageScrollY;
-      }, 360);
+      dockPageScrollAnchor = window.scrollY || document.documentElement.scrollTop || 0;
       wheelAccumulator += delta;
       window.clearTimeout(wheelResetTimer);
       wheelResetTimer = window.setTimeout(() => { wheelAccumulator = 0; wheelNavigationLocked = false; }, 180);
@@ -876,7 +961,7 @@
       moveSelection(direction, "wheel");
       window.setTimeout(() => { wheelNavigationLocked = false; }, 145);
     }
-    window.addEventListener("wheel", handleDockWheel, { passive: false, capture: true });
+    dom.viewport.addEventListener("wheel", handleDockWheel, { passive: false });
 
     dom.carousel.addEventListener("click", event => {
       const folder = event.target.closest(".projects-folder");
@@ -937,6 +1022,12 @@
     dom.manage.addEventListener("click", openManager);
     dom.managerBackdrop.addEventListener("click", closeManager);
     dom.managerClose.addEventListener("click", closeManager);
+    document.addEventListener("click", event => {
+      const detailClose = event.target.closest?.("#projectsDetailsClose,#projectsDetailsSecondaryClose,#projectsDetailsBackdrop");
+      if (detailClose) { event.preventDefault(); event.stopPropagation(); closeDetails(); return; }
+      const managerClose = event.target.closest?.("#projectsManagerClose,#projectsManagerBackdrop");
+      if (managerClose) { event.preventDefault(); event.stopPropagation(); closeManager(); }
+    },true);
     dom.managerAdd.addEventListener("click", addProject);
     dom.managerDelete.addEventListener("click", deleteProject);
     dom.managerForm.addEventListener("submit", saveManagerForm);

@@ -14376,3 +14376,36 @@ body.claude-page-home .explorer-panel{
 @media (prefers-reduced-motion:reduce){
   .firebase-google-layer,.firebase-google-card,.firebase-google-close{transition:none!important}
 }
+
+
+/* =========================================================
+   V11.46 · Legibilidad global de tipografías manuscritas
+   ========================================================= */
+:root{--portal-handwriting-light:#f8fdff;--portal-handwriting-dark:#0b5f98}
+main :is(h1,h2,h3) :is(.title-accent-word,em),
+.claude-studio :is(.section-kicker,.section-label,.eyebrow),
+.cd-section-mark em{
+  overflow:visible!important;max-width:100%!important;
+  padding:.12em .16em .3em .08em!important;margin-block:-.1em -.2em!important;
+  font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive!important;
+  font-style:normal!important;font-weight:400!important;
+  line-height:1.08!important;letter-spacing:.012em!important;text-transform:none!important;
+  white-space:normal!important;text-wrap:balance;
+  color:var(--portal-handwriting-dark)!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.82),0 8px 24px rgba(8,65,106,.16)!important;
+  -webkit-text-fill-color:currentColor!important;background:none!important;
+}
+main :is(h1,h2,h3) :is(.title-accent-word,em){font-size:1.2em!important;vertical-align:-.04em!important}
+.claude-studio :is(.section-kicker,.section-label,.eyebrow),.cd-section-mark em{
+  display:inline-block!important;font-size:clamp(1.65rem,2.25vw,2.75rem)!important;
+}
+:is(.year-hero,.news-card__cover,.news-feature__media,.story-cover,.resource-card__cover,.publication-modal__media,.territory-stage,[class*="hero__visual"],[class*="media-shade"]) :is(.title-accent-word,.section-kicker,.section-label,.eyebrow,em){
+  color:var(--portal-handwriting-light)!important;
+  text-shadow:0 2px 3px rgba(0,0,0,.86),0 8px 28px rgba(0,0,0,.58),0 0 1px #000!important;
+  -webkit-text-fill-color:currentColor!important;
+}
+:is(h1,h2,h3,.section-kicker,.section-label,.eyebrow,.cd-section-mark){overflow:visible!important}
+@media(max-width:680px){
+  .claude-studio :is(.section-kicker,.section-label,.eyebrow),.cd-section-mark em{font-size:clamp(1.5rem,7vw,2.25rem)!important}
+  main :is(h1,h2,h3) :is(.title-accent-word,em){font-size:1.12em!important}
+}

@@ -1,5 +1,5 @@
 /* =========================================================
-   V11.43 · Proyectos · Dock de carpetas y ficha de proyecto
+   V11.46 · Proyectos · Dock de carpetas y ficha de proyecto
    ========================================================= */
 
 .projects-page-flow{
@@ -1159,4 +1159,102 @@ body.projects-dialog-open{
     transition-duration:.01ms!important;
   }
   .projects-folder{transform:none!important}
+}
+
+
+/* =========================================================
+   V11.46 · Dock cinematográfico, foco inequívoco y cierres
+   ========================================================= */
+.projects-folder{
+  transition:transform .42s cubic-bezier(.16,.88,.2,1),filter .46s ease,opacity .4s ease!important;
+  transform-style:preserve-3d;
+}
+.projects-psp.has-selection .projects-folder:not(.is-active):not(:hover):not(:focus-visible){
+  opacity:.7;filter:saturate(.72) brightness(.94) blur(.22px);
+}
+.projects-folder.is-active{
+  opacity:1!important;filter:saturate(1.12) brightness(1.035) drop-shadow(0 22px 27px rgba(var(--projects-accent-rgb),.2))!important;
+}
+.projects-folder.is-selection-entering .projects-folder__front{
+  animation:projectsSelectionEnter .78s cubic-bezier(.16,.9,.18,1.15) both;
+}
+.projects-folder.is-selection-entering .projects-folder__paper{
+  animation:projectsSelectionPaper .78s cubic-bezier(.16,.9,.18,1.1) both;
+}
+.projects-folder.is-selection-entering::before{
+  content:"";position:absolute;z-index:-1;left:50%;bottom:-38px;width:118%;height:46%;
+  border-radius:50%;background:radial-gradient(ellipse,rgba(var(--projects-accent-rgb),.34),transparent 67%);
+  transform:translateX(-50%);animation:projectsSelectionGlow .8s ease-out both;
+}
+.projects-folder.is-selection-leaving .projects-folder__front{
+  animation:projectsSelectionLeave .64s cubic-bezier(.2,.75,.2,1) both;
+}
+.projects-folder.is-selection-neighbor{
+  animation:projectsNeighborWave .72s cubic-bezier(.2,.82,.2,1) both;
+  animation-delay:calc(var(--selection-distance) * 34ms);
+}
+.projects-psp.is-selection-transition .projects-psp__ambient--one{
+  animation:projectsAmbientPulse .82s cubic-bezier(.2,.82,.2,1) both;
+}
+@keyframes projectsSelectionEnter{
+  0%{transform:perspective(700px) translateY(15px) scale(.9) rotateY(calc(var(--selection-direction) * 9deg));filter:brightness(.88)}
+  42%{transform:perspective(700px) translateY(-15px) scale(1.055) rotateY(calc(var(--selection-direction) * -2.5deg));filter:brightness(1.12)}
+  70%{transform:perspective(700px) translateY(3px) scale(.99) rotateY(.5deg)}
+  100%{transform:none;filter:none}
+}
+@keyframes projectsSelectionPaper{
+  0%{transform:translateY(-3px) scale(.95);opacity:.72}
+  48%{transform:translateY(-30px) scale(1.045);opacity:1}
+  72%{transform:translateY(-9px) scale(.995)}
+  100%{transform:translateY(-12px) scale(1);opacity:1}
+}
+@keyframes projectsSelectionLeave{
+  0%{transform:translateY(-4px) scale(1.02);filter:brightness(1.06)}
+  100%{transform:translateY(7px) scale(.94) rotateY(calc(var(--selection-direction) * -4deg));filter:brightness(.9)}
+}
+@keyframes projectsNeighborWave{
+  0%,100%{filter:none}
+  42%{filter:brightness(1.035);transform:translateY(calc((3 - var(--selection-distance)) * -4px))}
+}
+@keyframes projectsSelectionGlow{
+  0%{opacity:0;transform:translateX(-50%) scale(.55)}
+  44%{opacity:1;transform:translateX(-50%) scale(1.08)}
+  100%{opacity:0;transform:translateX(-50%) scale(1.32)}
+}
+@keyframes projectsAmbientPulse{
+  0%,100%{transform:scale(1);opacity:.78}
+  48%{transform:scale(1.12) translate3d(-2%,2%,0);opacity:1}
+}
+.projects-psp__heading h1 em,
+.projects-psp__summary-copy h2 em,
+.projects-folder__title em{
+  display:inline-block!important;overflow:visible!important;max-width:100%!important;
+  padding:.1em .13em .28em .06em!important;margin:-.08em -.03em -.2em 0!important;
+  font-family:"Brother Signature","Segoe Script","Brush Script MT",cursive!important;
+  font-style:normal!important;font-weight:400!important;line-height:1.06!important;letter-spacing:.01em!important;
+  white-space:normal!important;text-shadow:0 1px 0 rgba(255,255,255,.25),0 8px 22px rgba(7,42,74,.2);
+}
+.projects-psp__heading h1 em{font-size:1.25em!important;color:var(--projects-accent)!important}
+.projects-psp__summary-copy h2 em{font-size:1.26em!important;color:var(--projects-accent)!important}
+.projects-folder__title{overflow:visible!important;-webkit-line-clamp:unset!important;display:block!important;padding-bottom:5px}
+.projects-folder__title em{font-size:1.35em!important;color:#fff!important;text-shadow:0 3px 12px rgba(0,0,0,.34)!important}
+.projects-psp__close{
+  z-index:90!important;pointer-events:auto!important;touch-action:manipulation!important;
+  display:grid!important;place-items:center!important;cursor:pointer!important;
+}
+.projects-psp__close:hover,.projects-psp__close:focus-visible{
+  transform:scale(1.08) rotate(3deg)!important;outline:3px solid rgba(var(--projects-accent-rgb),.25)!important;outline-offset:2px!important;
+}
+.projects-psp__details,.projects-psp__manager{position:fixed!important;inset:0!important;display:grid!important;place-items:center!important}
+.projects-psp__details:not(.is-open),.projects-psp__manager:not(.is-open){pointer-events:none!important}
+@media(max-width:720px){
+  .projects-folder{transition-duration:.34s!important}
+  .projects-psp.has-selection .projects-folder:not(.is-active){filter:saturate(.8) brightness(.96);opacity:.78}
+  .projects-psp__heading h1 em,.projects-psp__summary-copy h2 em{font-size:1.16em!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .projects-folder.is-selection-entering .projects-folder__front,
+  .projects-folder.is-selection-entering .projects-folder__paper,
+  .projects-folder.is-selection-leaving .projects-folder__front,
+  .projects-folder.is-selection-neighbor,.projects-psp.is-selection-transition .projects-psp__ambient--one{animation:none!important}
 }

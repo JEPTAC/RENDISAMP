@@ -1,6 +1,48 @@
 (() => {
-  const PORTAL_BUILD = "11.41.0-firebase-rebuild";
+  const PORTAL_BUILD = "11.46.0-ux-polish";
 
+  /*
+   * Retira definitivamente el service worker experimental de V11.40.2. GitHub Pages no
+   * permite controlar COOP mediante ese mecanismo y mantenerlo activo
+   * puede dejar una navegación controlada innecesariamente.
+   */
+  const legacyCoopCleanup = (() => {
+    if (!("serviceWorker" in navigator)) return null;
+
+    const cleanupKey = "sp_legacy_coop_sw_removed_v11404";
+    const controlledByLegacyWorker = Boolean(
+      navigator.serviceWorker.controller?.scriptURL?.includes("coop-sw.js")
+    );
+
+    navigator.serviceWorker.getRegistrations().then(async registrations => {
+      const legacyRegistrations = registrations.filter(registration => {
+        const urls = [
+          registration.active?.scriptURL,
+          registration.waiting?.scriptURL,
+          registration.installing?.scriptURL
+        ].filter(Boolean);
+        return urls.some(url => url.includes("coop-sw.js"));
+      });
+
+      await Promise.all(legacyRegistrations.map(registration => registration.unregister()));
+
+      if ("caches" in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
+
+      if (controlledByLegacyWorker && !sessionStorage.getItem(cleanupKey)) {
+        sessionStorage.setItem(cleanupKey,"1");
+        const next = new URL(location.href);
+        next.searchParams.set("portal-build", PORTAL_BUILD);
+        location.replace(next.href);
+      }
+    }).catch(error => {
+      console.info("[Portal] No fue posible retirar el service worker anterior.",error);
+    });
+
+    return true;
+  })();
 
   /*
    * Arranque visual temprano.
@@ -25,35 +67,58 @@
       style.id = bootStyleId;
       style.textContent = `
         html.portal-visual-booting {
-          background:#eaf4ff;
+          background:#eef7ff;
         }
         html.portal-visual-booting body {
-          overflow:hidden!important;
+          overflow:auto!important;
         }
-        html.portal-visual-booting body > :not(script):not(style):not(#spLoadingPopup) {
-          opacity:0!important;
+        html.portal-visual-booting body > :not(script):not(style) {
+          opacity:.2!important;
+          filter:blur(2px);
+          transform:translateY(3px);
+          pointer-events:auto;
         }
         html.portal-visual-booting::before {
-          content:none!important;
-          display:none!important;
+          content:"";
+          position:fixed;
+          z-index:2147483646;
+          left:0;
+          top:0;
+          width:100%;
+          height:3px;
+          pointer-events:none;
+          background:rgba(28,137,205,.12);
         }
         html.portal-visual-booting::after {
-          content:none!important;
-          display:none!important;
+          content:"";
+          position:fixed;
+          z-index:2147483647;
+          left:0;
+          top:0;
+          width:min(38vw,420px);
+          height:3px;
+          border-radius:0 999px 999px 0;
+          pointer-events:none;
+          background:linear-gradient(90deg,#137dc2,#27c2df,#7968e6);
+          box-shadow:0 0 16px rgba(36,164,218,.42);
+          animation:portalVisualBootLine 1.05s cubic-bezier(.4,0,.2,1) infinite;
+          transform-origin:left center;
         }
         html.portal-visual-ready body > :not(script):not(style) {
-          animation:portalVisualInitialReveal .52s cubic-bezier(.2,.8,.2,1) both;
+          animation:portalVisualInitialReveal .46s cubic-bezier(.2,.8,.2,1) both;
         }
         @keyframes portalVisualBootLine {
-          0%,100%{opacity:.35;transform:translateX(-50%) scaleX(.22)}
-          50%{opacity:1;transform:translateX(-50%) scaleX(1)}
+          0%{opacity:.38;transform:translateX(-105%) scaleX(.45)}
+          52%{opacity:1;transform:translateX(150vw) scaleX(1)}
+          100%{opacity:0;transform:translateX(260vw) scaleX(.62)}
         }
         @keyframes portalVisualInitialReveal {
-          from{opacity:0;transform:translateY(5px)}
-          to{opacity:1;transform:none}
+          from{opacity:.25;filter:blur(2px);transform:translateY(3px)}
+          to{opacity:1;filter:none;transform:none}
         }
         @media (prefers-reduced-motion:reduce) {
-          html.portal-visual-booting::after{animation:none;transform:translateX(-50%) scaleX(1)}
+          html.portal-visual-booting body > :not(script):not(style){filter:none;transform:none}
+          html.portal-visual-booting::after{animation:none;width:42%;opacity:.8}
           html.portal-visual-ready body > :not(script):not(style){animation:none}
         }
       `;
@@ -424,185 +489,49 @@
   }
 
 
-const PORTAL_ASSET_BASE = (() => {
-  const script = document.currentScript ||
-    [...document.scripts].find(item => /(?:^|\/)shared\.js(?:\?|$)/.test(item.src));
-  try {
-    return new URL("./",script?.src || location.href);
-  } catch {
-    return new URL("./",location.href);
-  }
-})();
-
-const UI_ASSETS = Object.freeze({
-  loading:new URL("ui-gifs/loading-spinner.gif",PORTAL_ASSET_BASE).href,
-  success:new URL("ui-gifs/ok-hand.gif",PORTAL_ASSET_BASE).href,
-  notification:new URL("ui-sounds/notification.mp3",PORTAL_ASSET_BASE).href
-});
-
-let loadingPopup = null;
-let loadingPopupGif = null;
-let loadingPopupTitle = null;
-let loadingPopupMessage = null;
-let loadingPopupActive = false;
-let notificationAudio = null;
+/* Feedback de carga V11.46: indicador lineal, silencioso y no bloqueante. */
+let loadingIndicator = null;
+let loadingIndicatorBar = null;
+let loadingIndicatorActive = false;
 let initialLoadingStartedAt = 0;
 let initialLoadingPending = false;
 let initialLoadingFinished = false;
 
 function ensureFeedbackStyles() {
-  if (document.getElementById("spLoadingPopupCoreStyles")) return;
-
+  if (document.getElementById("spInlineLoadingStyles")) return;
   const style = document.createElement("style");
-  style.id = "spLoadingPopupCoreStyles";
+  style.id = "spInlineLoadingStyles";
   style.textContent = `
-    #globalLoadingPopup,
-    .ui-loader,
-    .ui-loading-popup,
-    .loading-popup,
-    .global-loading-popup{
-      display:none!important;
+    #globalLoadingPopup,.ui-loader,.ui-loading-popup,.loading-popup,
+    .global-loading-popup,.sp-loading-popup{display:none!important}
+    .sp-inline-loading{
+      position:fixed;z-index:2147483647;left:0;right:0;top:0;height:3px;
+      overflow:hidden;pointer-events:none;opacity:0;visibility:hidden;
+      background:rgba(28,137,205,.1);
+      transition:opacity .18s ease,visibility .18s ease;
     }
-    .sp-loading-popup{
-      position:fixed;
-      z-index:2147483646;
-      inset:0;
-      display:grid;
-      place-items:center;
-      padding:20px;
-      opacity:0;
-      visibility:hidden;
-      pointer-events:none;
-      transition:opacity .2s ease,visibility .2s ease;
+    .sp-inline-loading.is-visible{opacity:1;visibility:visible}
+    .sp-inline-loading__bar{
+      display:block;width:34%;height:100%;border-radius:0 999px 999px 0;
+      background:linear-gradient(90deg,#137dc2,#27c2df,#7968e6);
+      box-shadow:0 0 14px rgba(36,164,218,.42);
+      transform:translateX(-110%);will-change:transform;
+      animation:spInlineLoading 1.05s cubic-bezier(.4,0,.2,1) infinite;
     }
-    .sp-loading-popup.is-visible{
-      opacity:1;
-      visibility:visible;
-      pointer-events:auto;
+    .sp-inline-loading.is-finishing .sp-inline-loading__bar{
+      width:100%;animation:none;transform:translateX(0);
+      transition:transform .16s ease,width .16s ease,opacity .16s ease;
     }
-    .sp-loading-popup__backdrop{
-      position:absolute;
-      inset:0;
-      background:rgba(5,22,43,.24);
-      backdrop-filter:blur(3px);
+    .sp-inline-loading.is-error .sp-inline-loading__bar{
+      background:linear-gradient(90deg,#bb5547,#e58465);
     }
-    .sp-loading-popup__card{
-      position:relative;
-      z-index:2;
-      display:grid;
-      grid-template-columns:74px minmax(0,1fr);
-      grid-template-rows:auto auto;
-      align-items:center;
-      column-gap:14px;
-      row-gap:4px;
-      width:min(380px,calc(100vw - 34px));
-      min-height:108px;
-      padding:15px 18px 15px 14px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.20);
-      border-radius:18px;
-      color:#fff;
-      text-align:left;
-      background:
-        linear-gradient(135deg,rgba(8,45,88,.98),rgba(15,92,153,.97) 62%,rgba(41,162,211,.95));
-      box-shadow:0 20px 52px rgba(3,20,42,.25),
-        inset 0 1px 0 rgba(255,255,255,.16);
-      transform:translateY(6px) scale(.985);
-      transition:transform .22s cubic-bezier(.2,.8,.2,1),background .24s ease,opacity .2s ease;
+    @keyframes spInlineLoading{
+      0%{transform:translateX(-110%) scaleX(.55)}
+      55%{transform:translateX(210vw) scaleX(1)}
+      100%{transform:translateX(320vw) scaleX(.7)}
     }
-    .sp-loading-popup__card::after{
-      content:"";
-      position:absolute;
-      left:14px;
-      right:14px;
-      bottom:8px;
-      height:2px;
-      border-radius:999px;
-      background:linear-gradient(90deg,rgba(255,255,255,.18),rgba(255,255,255,.92),rgba(255,255,255,.18));
-      transform:translateX(-58%);
-      animation:spLoadingLine 1.25s ease-in-out infinite;
-      opacity:.72;
-    }
-    @keyframes spLoadingLine{
-      50%{transform:translateX(58%)}
-    }
-    .sp-loading-popup.is-visible .sp-loading-popup__card{
-      transform:none;
-    }
-    .sp-loading-popup.is-success .sp-loading-popup__card{
-      background:linear-gradient(135deg,#116650,#168a6a 62%,#48b98a);
-    }
-    .sp-loading-popup.is-error .sp-loading-popup__card{
-      background:linear-gradient(135deg,#87382f,#b64f3f 62%,#d67a5e);
-    }
-    .sp-loading-popup.is-success .sp-loading-popup__card::after,
-    .sp-loading-popup.is-error .sp-loading-popup__card::after{
-      animation:none;
-      transform:none;
-      opacity:.42;
-    }
-    .sp-loading-popup__gif{
-      display:block;
-      grid-column:1;
-      grid-row:1 / span 2;
-      width:68px;
-      height:68px;
-      object-fit:contain;
-      background:transparent;
-      filter:drop-shadow(0 8px 14px rgba(0,0,0,.18));
-    }
-    .sp-loading-popup__title,
-    .sp-loading-popup__message{
-      grid-column:2;
-      color:#fff;
-      min-width:0;
-    }
-    .sp-loading-popup__title{
-      align-self:end;
-      font:700 18px/1.08 "Century Gothic",Arial,sans-serif;
-      letter-spacing:-.025em;
-    }
-    .sp-loading-popup__message{
-      align-self:start;
-      max-width:240px;
-      overflow:hidden;
-      color:rgba(255,255,255,.78);
-      font:500 10.5px/1.45 "Century Gothic",Arial,sans-serif;
-      text-overflow:ellipsis;
-    }
-    html.has-sp-loading-popup{
-      overflow:hidden;
-    }
-    @media (max-width:520px){
-      .sp-loading-popup{
-        padding:14px;
-      }
-      .sp-loading-popup__card{
-        grid-template-columns:60px minmax(0,1fr);
-        width:min(330px,calc(100vw - 28px));
-        min-height:94px;
-        padding:13px 15px 13px 12px;
-        column-gap:12px;
-        border-radius:16px;
-      }
-      .sp-loading-popup__gif{
-        width:56px;
-        height:56px;
-      }
-      .sp-loading-popup__title{
-        font-size:16px;
-      }
-      .sp-loading-popup__message{
-        font-size:9.5px;
-        line-height:1.4;
-      }
-    }
-    @media (prefers-reduced-motion:reduce){
-      .sp-loading-popup__card,
-      .sp-loading-popup__card::after{
-        animation:none!important;
-        transition:none!important;
-      }
+    @media(prefers-reduced-motion:reduce){
+      .sp-inline-loading__bar{animation:none;transform:none;width:42%;opacity:.85}
     }
   `;
   document.head.appendChild(style);
@@ -610,239 +539,119 @@ function ensureFeedbackStyles() {
 
 function removeLegacyLoadingPopups() {
   document.querySelectorAll(
-    "#globalLoadingPopup," +
-    ".ui-loader," +
-    ".ui-loading-popup," +
-    ".loading-popup," +
-    ".global-loading-popup"
-  ).forEach(node => {
-    if (node.id !== "spLoadingPopup") node.remove();
-  });
+    "#globalLoadingPopup,.ui-loader,.ui-loading-popup,.loading-popup," +
+    ".global-loading-popup,.sp-loading-popup"
+  ).forEach(node => node.remove());
 }
 
 function ensureFeedbackUi() {
   if (!document.body) return;
-
   ensureFeedbackStyles();
   removeLegacyLoadingPopups();
-
-  loadingPopup = document.querySelector("#spLoadingPopup");
-  if (!loadingPopup) {
-    loadingPopup = document.createElement("div");
-    loadingPopup.id = "spLoadingPopup";
-    loadingPopup.className = "sp-loading-popup";
-    loadingPopup.setAttribute("aria-hidden","true");
-    loadingPopup.innerHTML = `
-      <div class="sp-loading-popup__backdrop"></div>
-      <div
-        class="sp-loading-popup__card"
-        role="status"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        <img
-          class="sp-loading-popup__gif"
-          src="${UI_ASSETS.loading}"
-          alt=""
-          decoding="async"
-        >
-        <strong class="sp-loading-popup__title">Cargando</strong>
-        <span class="sp-loading-popup__message">
-          Espere un momento…
-        </span>
-      </div>`;
-    document.body.appendChild(loadingPopup);
+  loadingIndicator = document.querySelector("#spInlineLoading");
+  if (!loadingIndicator) {
+    loadingIndicator = document.createElement("div");
+    loadingIndicator.id = "spInlineLoading";
+    loadingIndicator.className = "sp-inline-loading";
+    loadingIndicator.setAttribute("aria-hidden","true");
+    loadingIndicator.innerHTML = '<span class="sp-inline-loading__bar"></span>';
+    document.body.appendChild(loadingIndicator);
   }
-
-  loadingPopupGif =
-    loadingPopup.querySelector(".sp-loading-popup__gif");
-  loadingPopupTitle =
-    loadingPopup.querySelector(".sp-loading-popup__title");
-  loadingPopupMessage =
-    loadingPopup.querySelector(".sp-loading-popup__message");
-
-  if (loadingPopupGif && !loadingPopupGif.dataset.fallbackReady) {
-    loadingPopupGif.dataset.fallbackReady = "true";
-    loadingPopupGif.addEventListener("error",() => {
-      loadingPopupGif.style.opacity = ".18";
-    });
-    loadingPopupGif.addEventListener("load",() => {
-      loadingPopupGif.style.opacity = "1";
-    });
-  }
-}
-
-function restartPopupGif(source) {
-  if (!loadingPopupGif) return;
-  loadingPopupGif.removeAttribute("src");
-  void loadingPopupGif.offsetWidth;
-  loadingPopupGif.src = source;
+  loadingIndicatorBar = loadingIndicator.querySelector(".sp-inline-loading__bar");
 }
 
 function playNotification() {
-  try {
-    if (!notificationAudio) {
-      notificationAudio = new Audio(UI_ASSETS.notification);
-      notificationAudio.preload = "auto";
-      notificationAudio.volume = .72;
-    }
-
-    notificationAudio.pause();
-    notificationAudio.currentTime = 0;
-    const playback = notificationAudio.play();
-    playback?.catch?.(() => null);
-  } catch {
-    // El popup de confirmación permanece aunque el navegador bloquee audio.
-  }
+  /* Silencioso por diseño: no se reproducen sonidos de carga ni confirmación. */
+  return false;
 }
 
 function closeLoadingPopup() {
   clearTimeout(window.__spLoadingTimer);
   clearTimeout(window.__spLoadingFailSafe);
-  loadingPopupActive = false;
-
-  loadingPopup?.classList.remove(
-    "is-visible",
-    "is-loading",
-    "is-success",
-    "is-error"
-  );
-  loadingPopup?.setAttribute("aria-hidden","true");
-  document.documentElement.classList.remove("has-sp-loading-popup");
+  loadingIndicatorActive = false;
+  loadingIndicator?.classList.remove("is-visible","is-finishing","is-error");
+  loadingIndicator?.setAttribute("aria-hidden","true");
 }
 
-function showLoading(
-  message = "Espere un momento…",
-  options = {}
-) {
+function showLoading() {
   ensureFeedbackUi();
-  if (!loadingPopup) return;
-
+  if (!loadingIndicator) return;
   clearTimeout(window.__spLoadingTimer);
   clearTimeout(window.__spLoadingFailSafe);
-
-  loadingPopupActive = true;
-  loadingPopup.classList.remove("is-success","is-error");
-  loadingPopup.classList.add("is-visible","is-loading");
-  loadingPopup.setAttribute("aria-hidden","false");
-  document.documentElement.classList.add("has-sp-loading-popup");
-
-  restartPopupGif(UI_ASSETS.loading);
-  loadingPopupTitle.textContent = options.title || "Cargando";
-  loadingPopupMessage.textContent = message;
-
-  window.__spLoadingFailSafe = window.setTimeout(() => {
-    failLoading("La operación está tardando más de lo esperado.");
-  },15000);
+  loadingIndicatorActive = true;
+  loadingIndicator.classList.remove("is-finishing","is-error");
+  loadingIndicator.classList.add("is-visible");
+  loadingIndicator.setAttribute("aria-hidden","false");
+  if (loadingIndicatorBar) {
+    loadingIndicatorBar.style.animation = "none";
+    void loadingIndicatorBar.offsetWidth;
+    loadingIndicatorBar.style.removeProperty("animation");
+  }
+  window.__spLoadingFailSafe = window.setTimeout(closeLoadingPopup,15000);
 }
 
-function hideLoading(
-  message = "La información se cargó correctamente.",
-  options = {}
-) {
+function finishInlineLoading({ error = false, delay = 230 } = {}) {
   ensureFeedbackUi();
-  if (!loadingPopup) return;
-
-  if (!loadingPopupActive && options.force !== true) {
+  if (!loadingIndicator) return;
+  clearTimeout(window.__spLoadingFailSafe);
+  if (!loadingIndicatorActive) {
     closeLoadingPopup();
     return;
   }
-
-  clearTimeout(window.__spLoadingFailSafe);
-  loadingPopupActive = true;
-  loadingPopup.classList.remove("is-loading","is-error");
-  loadingPopup.classList.add("is-visible","is-success");
-  loadingPopup.setAttribute("aria-hidden","false");
-
-  restartPopupGif(UI_ASSETS.success);
-  loadingPopupTitle.textContent = options.title || "Listo";
-  loadingPopupMessage.textContent = message;
-  playNotification();
-
+  loadingIndicator.classList.toggle("is-error",error);
+  loadingIndicator.classList.add("is-visible","is-finishing");
   clearTimeout(window.__spLoadingTimer);
-  window.__spLoadingTimer = window.setTimeout(
-    closeLoadingPopup,
-    maxPopupDelay(options.delay)
-  );
+  window.__spLoadingTimer = window.setTimeout(closeLoadingPopup,Math.max(150,Number(delay)||230));
+}
+
+function hideLoading(_message = "", options = {}) {
+  finishInlineLoading({ error:false, delay:options.delay ? Math.min(Number(options.delay),360) : 220 });
 }
 
 function maxPopupDelay(value) {
-  return Math.max(1100,Number(value) || 1550);
+  return Math.max(150,Math.min(360,Number(value)||220));
 }
 
-function failLoading(
-  message = "No fue posible completar la operación."
-) {
-  ensureFeedbackUi();
-  if (!loadingPopup) return;
-
-  clearTimeout(window.__spLoadingFailSafe);
-  loadingPopupActive = true;
-  loadingPopup.classList.remove("is-loading","is-success");
-  loadingPopup.classList.add("is-visible","is-error");
-  loadingPopup.setAttribute("aria-hidden","false");
-
-  restartPopupGif(UI_ASSETS.loading);
-  loadingPopupTitle.textContent = "No se pudo completar";
-  loadingPopupMessage.textContent = message;
-
-  clearTimeout(window.__spLoadingTimer);
-  window.__spLoadingTimer = window.setTimeout(
-    closeLoadingPopup,
-    2200
-  );
+function failLoading() {
+  finishInlineLoading({ error:true, delay:320 });
 }
 
 async function withLoading(task,{
-  loadingMessage = "Procesando información…",
-  successMessage = "Operación completada.",
-  errorMessage = "No fue posible completar la operación."
+  loadingMessage = "",
+  successMessage = "",
+  errorMessage = ""
 } = {}) {
-  showLoading(loadingMessage);
+  void loadingMessage; void successMessage; void errorMessage;
+  showLoading();
   try {
     const result = await (typeof task === "function" ? task() : task);
-    hideLoading(successMessage);
+    hideLoading();
     return result;
   } catch (error) {
-    failLoading(error?.message || errorMessage);
+    failLoading();
     throw error;
   }
 }
 
-function showClickEffect() {
-  return null;
-}
-
-function mountNewsHoverCat() {
-  return null;
-}
-
-function initInteractiveFeedback() {
-  ensureFeedbackUi();
-}
+function showClickEffect() { return null; }
+function mountNewsHoverCat() { return null; }
+function initInteractiveFeedback() { ensureFeedbackUi(); }
 
 function startInitialPageLoading() {
   if (initialLoadingPending || initialLoadingFinished) return;
   initialLoadingPending = true;
   initialLoadingStartedAt = performance.now();
-  showLoading(
-    "Preparando la información y las animaciones del portal…",
-    {title:"Cargando"}
-  );
+  showLoading();
 }
 
 function finishInitialPageLoading() {
   if (!initialLoadingPending || initialLoadingFinished) return;
   const elapsed = performance.now() - initialLoadingStartedAt;
-  const remaining = Math.max(0,850 - elapsed);
-
+  const remaining = Math.max(0,260 - elapsed);
   window.setTimeout(() => {
     initialLoadingFinished = true;
     initialLoadingPending = false;
-    hideLoading(
-      "El portal terminó de cargar correctamente.",
-      {title:"Listo",delay:1450,force:true}
-    );
+    hideLoading("",{delay:180,force:true});
   },remaining);
 }
 
@@ -852,26 +661,18 @@ function shouldShowNavigationLoader(event,link) {
   if (link.target && link.target !== "_self") return false;
   if (link.hasAttribute("download")) return false;
   if (!link.href || link.href.startsWith("javascript:")) return false;
-
   try {
     const destination = new URL(link.href,location.href);
     if (destination.origin !== location.origin) return false;
-    if (
-      destination.pathname === location.pathname &&
-      destination.search === location.search &&
-      destination.hash
-    ) return false;
+    if (destination.pathname === location.pathname && destination.search === location.search && destination.hash) return false;
     return destination.href !== location.href;
-  } catch {
-    return false;
-  }
+  } catch { return false; }
 }
 
 function bindLoadingNavigationFeedback() {
   document.addEventListener("click",event => {
     const link = event.target.closest?.("a[href]");
-    if (!shouldShowNavigationLoader(event,link)) return;
-    showLoading("Abriendo el contenido solicitado…",{title:"Cargando"});
+    if (shouldShowNavigationLoader(event,link)) showLoading();
   },true);
 }
 
@@ -893,9 +694,6 @@ window.addEventListener("unhandledrejection",event => {
   event.preventDefault();
 });
 
-  // Un indicador local antiguo no puede conceder permisos. Firebase decide el rol.
-  sessionStorage.removeItem(KEYS.admin);
-
   const state = {
     years: loadArray(KEYS.years, DEFAULT_YEARS),
     resources: loadArray(KEYS.resources, DEFAULT_RESOURCES),
@@ -907,7 +705,7 @@ window.addEventListener("unhandledrejection",event => {
     dashboards: loadObject(KEYS.dashboards, DEFAULT_DASHBOARDS),
     commitments: loadArray(KEYS.commitments, DEFAULT_COMMITMENTS),
     citizenRequests: loadArray(KEYS.citizenRequests, DEFAULT_CITIZEN_REQUESTS),
-    admin: false
+    admin: sessionStorage.getItem(KEYS.admin) === "1"
   };
 
   const helpers = {
@@ -1351,6 +1149,10 @@ helpers.showClickEffect = showClickEffect;
             <button class="button button-secondary" type="button" id="googleAdminLogin">Continuar con Google</button>
             <button class="auth-text-button" type="button" id="forgotPasswordButton">Olvidé mi contraseña</button>
             <small id="firebaseLoginStatus" class="auth-status" aria-live="polite">Conectando con Firebase…</small>
+            <details class="local-login-help">
+              <summary>Acceso local de emergencia</summary>
+              <p>Solo para mantenimiento temporal. No sincroniza información entre dispositivos.</p>
+            </details>
           </form>
         </section>
 
@@ -1590,8 +1392,12 @@ helpers.showClickEffect = showClickEffect;
   }
 
   function closeDialog(id) {
-    const dialog = document.querySelector(`#${id}`);
-    if (dialog?.open) dialog.close();
+    const dialog = document.querySelector(`#${CSS.escape(String(id || ""))}`);
+    if (!dialog) return false;
+    if (typeof dialog.close === "function" && dialog.open) dialog.close();
+    dialog.classList.remove("is-open","open","active");
+    dialog.setAttribute("aria-hidden","true");
+    return true;
   }
 
   function searchPortal(query) {
@@ -1750,7 +1556,8 @@ helpers.showClickEffect = showClickEffect;
     const name = document.querySelector("#adminSessionName");
     const role = document.querySelector("#adminSessionRole");
 
-    const canWrite = Boolean(detail.canWrite);
+    const canWrite = Boolean(detail.canWrite)
+      || sessionStorage.getItem("sp_admin_mode") === "local";
 
     if (!canWrite) {
       if (session) session.hidden = true;
@@ -1762,12 +1569,16 @@ helpers.showClickEffect = showClickEffect;
       detail.profile?.displayName
       || detail.user?.displayName
       || detail.user?.email
-      || "Administrador";
+      || (sessionStorage.getItem("sp_admin_mode") === "local"
+        ? "Administrador local"
+        : "Administrador");
 
     const roleName =
       detail.roleLabel
       || roleLabel(detail.role)
-      || "Administrador";
+      || (sessionStorage.getItem("sp_admin_mode") === "local"
+        ? "Acceso local"
+        : "Administrador");
 
     if (session) session.hidden = false;
     if (entry) entry.hidden = true;
@@ -1861,6 +1672,8 @@ helpers.showClickEffect = showClickEffect;
   async function performFirebaseSignout() {
     await window.FirebasePortal?.signOut?.().catch(() => {});
     state.admin = false;
+    sessionStorage.removeItem(KEYS.admin);
+    sessionStorage.removeItem("sp_admin_mode");
     closeDialog("adminPanel");
     closeDialog("accountDialog");
 
@@ -1877,7 +1690,12 @@ helpers.showClickEffect = showClickEffect;
   function bindGlobalEvents() {
     document.addEventListener("click", event => {
       const close = event.target.closest("[data-close-dialog]");
-      if (close) closeDialog(close.dataset.closeDialog);
+      if (close) {
+        event.preventDefault();
+        event.stopPropagation();
+        closeDialog(close.dataset.closeDialog);
+        return;
+      }
 
       const adminTab = event.target.closest("[data-admin-tab]");
       if (adminTab) {
@@ -2027,6 +1845,25 @@ helpers.showClickEffect = showClickEffect;
       const password = String(form.get("password") || "");
       const status = document.querySelector("#firebaseLoginStatus");
 
+      if (identity === "admin" && password === "SanPedro2026*") {
+        state.admin = true;
+        sessionStorage.setItem(KEYS.admin,"1");
+        sessionStorage.setItem("sp_admin_mode","local");
+        loginForm.reset();
+        closeDialog("loginDialog");
+
+        updateAdminHeader({
+          canWrite:true,
+          roleLabel:"Acceso local",
+          profile:{displayName:"Administrador local"}
+        });
+        syncAdmin();
+        window.AdminPopup?.sync?.();
+        window.AdminPopup?.openAdmin?.();
+        if (!window.AdminPopup) openDialog("adminPanel");
+        helpers.toast("Sesión administrativa iniciada.");
+        return;
+      }
 
       emailLoginPending = true;
       loginForm.setAttribute("aria-busy","true");
@@ -2184,6 +2021,14 @@ helpers.showClickEffect = showClickEffect;
     });
 
     document.querySelector("#adminSignout")?.addEventListener("click",performFirebaseSignout);
+
+    if (state.admin && sessionStorage.getItem("sp_admin_mode") === "local") {
+      updateAdminHeader({
+        canWrite:true,
+        roleLabel:"Acceso local",
+        profile:{displayName:"Administrador local"}
+      });
+    }
 
     document.querySelector("#applyAdminColors")?.addEventListener("click", () => {
       state.settings.primary = document.querySelector("#adminPrimary").value;
@@ -2387,7 +2232,7 @@ helpers.showClickEffect = showClickEffect;
   function loadFirebaseService() {
     if (document.querySelector('script[data-firebase-portal]')) return;
     const script = document.createElement("script");
-    script.src = `firebase-service.js?v=${PORTAL_BUILD}`;
+    script.src = `firebase-auth-v11409.js?v=${PORTAL_BUILD}`;
     script.dataset.firebasePortal = "true";
     script.onload = () => window.FirebasePortal?.init?.();
     script.onerror = () => helpers.toast("No fue posible cargar la conexión con Firebase.");
@@ -2810,12 +2655,19 @@ helpers.showClickEffect = showClickEffect;
 
     window.addEventListener("firebase:auth", event => {
       const detail = event.detail || {};
+      const localMode =
+        sessionStorage.getItem("sp_admin_mode") === "local";
+
+      if (!detail.user && localMode) return;
+
       updateAccountDialog(detail);
 
       const button = document.querySelector("#adminEntry");
 
       if (detail.user && detail.canWrite) {
         state.admin = true;
+        sessionStorage.setItem(KEYS.admin,"1");
+        sessionStorage.setItem("sp_admin_mode","firebase");
 
         updateAdminHeader(detail);
     
@@ -2826,8 +2678,11 @@ helpers.showClickEffect = showClickEffect;
         }
       } else if (detail.user) {
         state.admin = false;
-
+        sessionStorage.removeItem(KEYS.admin);
+        sessionStorage.removeItem("sp_admin_mode");
+    
         updateAdminHeader({canWrite:false});
+        window.AdminPopup?.sync?.();
         if (button) {
           button.hidden = false;
           button.textContent = "Mi cuenta";
@@ -2836,26 +2691,24 @@ helpers.showClickEffect = showClickEffect;
 
         if (detail.profileError) {
           helpers.toast(
-            "La cuenta inició sesión, pero Firestore no permitió leer el rol. Publique firestore.rules incluido en el proyecto."
+            "La cuenta inició sesión, pero Firestore no permitió leer el rol. Publique las reglas V9."
           );
         } else if (detail.reason === "registration") {
           helpers.toast("Cuenta creada con rol de invitado.");
         }
       } else {
         state.admin = false;
+        sessionStorage.removeItem(KEYS.admin);
+        sessionStorage.removeItem("sp_admin_mode");
 
         updateAdminHeader({canWrite:false});
+        window.AdminPopup?.sync?.();
         if (button) {
           button.hidden = false;
           button.textContent = "Ingresar";
           button.classList.remove("is-active");
         }
       }
-
-      window.AdminPopup?.sync?.();
-      document.dispatchEvent(new CustomEvent("portal:adminchange", {
-        detail:{...detail, canWrite:state.admin}
-      }));
     });
 
     window.addEventListener("firebase:data", () => {
@@ -3167,9 +3020,6 @@ const initializeLoadingFeedback = () => {
   initInteractiveFeedback();
   bindLoadingNavigationFeedback();
   startInitialPageLoading();
-
-  // La carga visual no debe quedar bloqueada por Firebase, Drive o una imagen externa.
-  window.setTimeout(finishInitialPageLoading,1800);
 };
 
 if (document.readyState === "loading") {

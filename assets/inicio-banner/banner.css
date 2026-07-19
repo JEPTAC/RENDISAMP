@@ -239,3 +239,36 @@
   .spb-banner__caption-script{font-size:1em}
   .spb-banner__caption p{max-width:96%;font-size:.82rem;line-height:1.2}
 }
+
+
+/* V2.1 · Modal fiable y manuscritos sin recortes */
+.spb-banner__modal{--spb-font:"Century Gothic","Avenir Next",Arial,sans-serif;--spb-script:"Brother Signature","Segoe Script","Brush Script MT",cursive;--spb-ease:cubic-bezier(.2,.78,.2,1);pointer-events:none;contain:layout style}
+.spb-banner__modal.is-open{pointer-events:auto}
+.spb-banner__modal-card{max-height:calc(100dvh - 40px);overflow:auto;overscroll-behavior:contain}
+.spb-banner__close{
+  z-index:30!important;display:grid!important;place-items:center!important;
+  pointer-events:auto!important;touch-action:manipulation!important;
+  color:#102b4b!important;font-family:Arial,sans-serif!important;font-weight:700!important;
+  transition:transform .2s ease,background .2s ease,box-shadow .2s ease!important;
+}
+.spb-banner__close:hover,.spb-banner__close:focus-visible{
+  transform:scale(1.08) rotate(3deg);background:#eef7ff!important;
+  box-shadow:0 12px 28px rgba(17,67,110,.18)!important;outline:3px solid rgba(var(--spb-accent-rgb),.24);outline-offset:2px;
+}
+.spb-banner__script,.spb-banner__caption-script,.spb-banner__discover,.spb-banner__modal-copy small{
+  overflow:visible!important;max-width:100%!important;padding:.12em .14em .28em .08em!important;
+  line-height:1.02!important;white-space:normal!important;text-wrap:balance;
+  text-shadow:0 2px 2px rgba(255,255,255,.32),0 7px 22px rgba(5,24,45,.32)!important;
+}
+.spb-banner__script{font-size:clamp(4.5rem,6.7vw,8.25rem)!important;margin-block:-.04em .08em!important}
+.spb-banner__caption-script{font-size:1.28em!important;line-height:1.05!important;transform:translateY(.03em) rotate(-1deg)!important}
+.spb-banner__discover{font-size:clamp(1.5rem,2vw,2.25rem)!important}
+.spb-banner__modal-copy small{font-size:clamp(1.9rem,2.5vw,2.8rem)!important;color:var(--spb-cursive-color,var(--spb-accent))!important}
+.spb-banner__caption h2,.spb-banner__modal-copy{overflow:visible!important}
+.spb-banner__pill{font-size:clamp(1.25rem,1.65vw,2rem)!important;line-height:1.18!important;padding-block:12px 14px!important}
+@media(max-width:680px){
+  .spb-banner__script{font-size:clamp(4.2rem,18vw,6.3rem)!important}
+  .spb-banner__caption-script{font-size:1.16em!important}
+  .spb-banner__modal-card{max-height:calc(100dvh - 24px)}
+  .spb-banner__modal-copy small{font-size:clamp(1.75rem,8vw,2.35rem)!important}
+}
