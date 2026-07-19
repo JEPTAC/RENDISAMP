@@ -30,7 +30,7 @@
   <link rel="icon" href="assets/favicon.png">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css?v=11.41.0-firebase-repair">
-  <link rel="stylesheet" href="projects-psp.css?v=11.43.0-dock">
+  <link rel="stylesheet" href="projects-psp.css?v=11.45.0-interaccion-total">
   <title>Proyectos | Rendición de Cuentas de San Pedro</title>
   <link rel="preconnect" href="https://accounts.google.com">
 </head>
@@ -92,14 +92,14 @@
 
           <div class="projects-psp__dock-region" aria-label="Carpetas de proyectos">
             <button id="projectsPrev" class="projects-psp__dock-arrow projects-psp__dock-arrow--prev" type="button" aria-label="Proyecto anterior">←</button>
-            <div id="projectsDockViewport" class="projects-psp__dock-viewport">
+            <div id="projectsDockViewport" class="projects-psp__dock-viewport" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="Explorador de carpetas. Use las flechas izquierda y derecha, la rueda del mouse o arrastre horizontalmente.">
               <div id="projectsCarousel" class="projects-psp__dock" role="list"></div>
             </div>
             <button id="projectsNext" class="projects-psp__dock-arrow projects-psp__dock-arrow--next" type="button" aria-label="Proyecto siguiente">→</button>
           </div>
 
           <footer class="projects-psp__footer">
-            <p><span aria-hidden="true">↗</span> Pase el cursor para ampliar · haga clic para abrir la ficha.</p>
+            <p><span aria-hidden="true">↗</span> Pase el cursor para ampliar · use la rueda o las flechas · haga clic y la hoja saldrá de la carpeta.</p>
             <div class="projects-psp__progress" aria-label="Posición actual">
               <span id="projectsProgressText">Proyecto 1 de 5</span>
               <div aria-hidden="true"><i id="projectsProgressBar"></i></div>
@@ -213,6 +213,6 @@
   <div id="globalDialogs"></div>
 
   <script src="portal-core-v11409.js?v=11.41.0-firebase-repair"></script>
-  <script src="projects-psp.js?v=11.43.0-dock" defer></script>
+  <script src="projects-psp.js?v=11.45.0-interaccion-total" defer></script>
 </body>
 </html>
