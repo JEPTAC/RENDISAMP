@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Proyectos destacados · San Pedro</title>
+<!-- Integración RENDISAMP V11.50 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:"Hullgaria";
+  src:url("./assets/fonts/Hullgaria.otf") format("opentype");
+  font-display:swap;
+  font-style:normal;
+  font-weight:400;
+}
+:root{
+  --font-ui:"Century Gothic","Apple Gothic","Trebuchet MS",Arial,sans-serif;
+  --font-script:"Hullgaria","Satisfy","Segoe Script","Brush Script MT",cursive;
+  --page:#f3f7fc;
+  --ink:#071327;
+  --muted:#60718a;
+  --accent:#2f6ff2;
+  --accent-rgb:47,111,242;
+  --accent-soft:#b9d1ff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--page);font-family:var(--font-ui);color:var(--ink)}
+button{font:inherit}
+body{display:grid;place-items:start center;padding:10px 0 18px;overflow-x:hidden}
+.fp{
+  position:relative;
+  width:min(1600px,calc(100vw - 20px));
+  height:clamp(520px,47vw,760px);
+  max-height:calc(100svh - 20px);
+  min-height:500px;
+  overflow:hidden;
+  border-radius:34px;
+  isolation:isolate;
+  background:
+    radial-gradient(circle at 78% 10%,rgba(var(--accent-rgb),.08),transparent 26%),
+    radial-gradient(circle at 5% 88%,rgba(var(--accent-rgb),.055),transparent 24%),
+    linear-gradient(125deg,#f8fbff 0%,#f4f8fd 54%,#f2f7fc 100%);
+}
+.fp::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;
+  background:linear-gradient(115deg,rgba(255,255,255,.70),rgba(255,255,255,0) 38%);
+}
+.fp__line{
+  position:absolute;inset:auto -8% 13% -9%;height:1px;opacity:.36;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.45),transparent);
+  transform:rotate(-2.4deg);
+}
+.fp__header{
+  height:84px;padding:20px clamp(26px,3.5vw,58px) 10px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.fp__brand{display:flex;align-items:center;gap:13px;min-width:0}
+.fp__brand-mark{
+  width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:0 0 auto;
+  background:rgba(255,255,255,.76);box-shadow:0 12px 30px rgba(20,48,88,.10),inset 0 0 0 1px rgba(255,255,255,.84)
+}
+.fp__brand-mark svg{width:22px;height:22px;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fp__brand-text{font-size:12px;letter-spacing:.20em;font-weight:700;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp__status{display:flex;align-items:center;gap:9px;color:#6a7a91;font-size:11px;letter-spacing:.11em;text-transform:uppercase}
+.fp__status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 5px rgba(var(--accent-rgb),.10)}
+.fp__layout{
+  height:calc(100% - 84px);
+  display:grid;grid-template-columns:minmax(300px,31%) minmax(0,1fr);
+  gap:0;padding:0 clamp(26px,3.5vw,58px) clamp(24px,3.2vw,48px);
+}
+.fp__intro{
+  position:relative;z-index:4;display:flex;flex-direction:column;justify-content:center;
+  padding:16px clamp(32px,4.6vw,76px) 26px 0;
+}
+.fp__intro::after{
+  content:"";position:absolute;z-index:-1;top:0;right:-96px;bottom:0;width:210px;pointer-events:none;
+  background:linear-gradient(90deg,rgba(246,250,255,.95),rgba(246,250,255,.52) 48%,transparent);
+}
+.fp__overline{font-size:11px;font-weight:700;letter-spacing:.23em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.fp__title{margin:0;font-size:clamp(44px,4.15vw,74px);line-height:.92;letter-spacing:-.058em;font-weight:700;max-width:560px}
+.fp__title-script{display:block;margin-top:10px;color:var(--accent);font-family:var(--font-script);font-weight:400;font-size:1.04em;letter-spacing:0;line-height:.94;transform:rotate(-1deg);text-shadow:0 7px 26px rgba(var(--accent-rgb),.12)}
+.fp__title-script::after{content:none;display:none}
+.fp__desc{max-width:470px;margin:26px 0 0;color:var(--muted);font-size:clamp(13px,1.05vw,16px);line-height:1.72}
+.fp__meta{margin-top:24px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.fp__counter,.fp__mode,.fp__icon-btn{
+  border:0;background:rgba(255,255,255,.72);box-shadow:0 12px 30px rgba(20,48,88,.08),inset 0 0 0 1px rgba(255,255,255,.84);backdrop-filter:blur(12px)
+}
+.fp__counter{min-height:48px;border-radius:18px;padding:0 16px;display:flex;align-items:center;gap:7px;font-size:12px;color:#718198}
+.fp__counter strong{font-size:18px;color:var(--ink)}
+.fp__mode{min-height:48px;border-radius:18px;padding:0 16px;display:flex;align-items:center;gap:9px;color:#62738b;font-size:12px;cursor:pointer}
+.fp__mode svg{width:15px;height:15px;fill:var(--accent)}
+.fp__icon-btn{width:48px;height:48px;border-radius:17px;display:grid;place-items:center;cursor:pointer;color:var(--ink)}
+.fp__icon-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fp__mode:hover,.fp__icon-btn:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(20,48,88,.12),inset 0 0 0 1px rgba(var(--accent-rgb),.17)}
+.fp__visual{
+  position:relative;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) clamp(116px,10.5vw,154px);gap:16px;align-items:center;
+  margin-left:-54px;padding-left:54px;
+}
+.fp__stage-wrap{position:relative;min-width:0;display:flex;align-items:center;height:100%}
+.fp__stack{position:relative;width:100%;aspect-ratio:16/9;max-height:100%;isolation:isolate}
+.fp__peek{
+  position:absolute;left:3.5%;right:3.5%;height:100%;border-radius:27px;background-size:cover;background-position:center;
+  box-shadow:0 18px 45px rgba(18,37,67,.11);transition:background-image .3s ease,transform .45s cubic-bezier(.2,.8,.2,1),opacity .35s ease;
+}
+.fp__peek--2{top:23px;z-index:0;opacity:.18;transform:scale(.94)}
+.fp__peek--1{top:12px;z-index:1;opacity:.33;transform:scale(.97)}
+.fp__card{
+  position:absolute;inset:0;z-index:3;overflow:hidden;border-radius:27px;background:#dbe5f0;
+  box-shadow:0 28px 70px rgba(17,39,72,.17),0 0 0 1px rgba(var(--accent-rgb),.34),inset 0 0 0 1px rgba(255,255,255,.42);
+  cursor:grab;touch-action:none;user-select:none
+}
+.fp__card.is-dragging{cursor:grabbing}
+.fp__image,.fp__image-next{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.001)}
+.fp__image-next{opacity:0}
+.fp__image.is-entering{animation:imageIn .55s cubic-bezier(.2,.75,.2,1)}
+@keyframes imageIn{0%{opacity:.30;transform:scale(1.035)}100%{opacity:1;transform:scale(1.001)}}
+.fp__shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,12,26,.10) 0%,rgba(3,12,26,.02) 42%,rgba(2,8,20,.82) 100%)}
+.fp__chips{position:absolute;left:20px;right:20px;top:18px;display:flex;justify-content:space-between;gap:12px;pointer-events:none}
+.fp__chip{min-height:30px;display:flex;align-items:center;gap:8px;padding:0 13px;border-radius:999px;color:#fff;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;background:rgba(6,15,31,.55);backdrop-filter:blur(12px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.fp__chip-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(var(--accent-rgb),.13)}
+.fp__open{
+  position:absolute;right:21px;top:62px;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.48);color:#fff;
+  background:rgba(7,16,31,.22);backdrop-filter:blur(12px);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.14),inset 0 0 0 1px rgba(255,255,255,.13)
+}
+.fp__open svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.fp__open:hover{transform:scale(1.045);background:rgba(7,16,31,.38)}
+.fp__copy{
+  position:absolute;left:19px;bottom:18px;max-width:min(62%,540px);padding:14px 17px 15px;border-radius:19px;
+  background:linear-gradient(135deg,rgba(5,14,29,.56),rgba(5,14,29,.23));backdrop-filter:blur(16px) saturate(1.1);
+  color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15),0 12px 32px rgba(0,0,0,.15)
+}
+.fp__kicker{margin:0 0 3px;font-size:9px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.fp__copy h2{margin:0;font-family:var(--font-script);font-size:clamp(31px,3.1vw,54px);font-weight:400;line-height:.93;letter-spacing:.005em;text-shadow:0 5px 16px rgba(0,0,0,.18)}
+.fp__copy p:last-child{margin:9px 0 0;max-width:44ch;font-family:var(--font-script);font-size:clamp(14px,1.08vw,18px);font-weight:400;font-style:normal;line-height:1.34;letter-spacing:.01em;color:#fff;text-align:left;text-wrap:pretty;overflow-wrap:break-word;word-break:normal;hyphens:none;text-shadow:0 2px 10px rgba(0,0,0,.62),0 1px 2px rgba(0,0,0,.75);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.fp__metrics{position:absolute;right:19px;bottom:18px;display:flex;align-items:center;gap:7px}
+.fp__metric{min-width:72px;padding:9px 11px;border-radius:15px;color:#fff;background:rgba(6,15,31,.38);backdrop-filter:blur(12px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.13)}
+.fp__metric span{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.13em;color:rgba(255,255,255,.60)}
+.fp__metric strong{display:block;margin-top:3px;font-size:12px;font-weight:700}
+.fp__reel{position:relative;height:min(78%,470px);min-height:330px;display:flex;align-items:center}
+.fp__reel::before,.fp__reel::after{content:"";position:absolute;left:0;right:0;height:56px;z-index:4;pointer-events:none}
+.fp__reel::before{top:0;background:linear-gradient(var(--page),transparent)}
+.fp__reel::after{bottom:0;background:linear-gradient(transparent,var(--page))}
+.fp__reel-viewport{position:relative;width:100%;height:100%;overflow:hidden;padding:0 3px}
+.fp__reel-track{position:absolute;left:0;right:0;top:0;display:grid;gap:11px;will-change:transform;transition:transform .58s cubic-bezier(.22,.72,.18,1)}
+.fp__reel-item{
+  position:relative;width:100%;aspect-ratio:16/9;border:0;padding:0;overflow:hidden;border-radius:15px;background:#dce6f1;cursor:pointer;
+  opacity:.45;transform:scale(.93);transition:opacity .28s ease,transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease;
+  box-shadow:0 8px 22px rgba(20,43,76,.09),inset 0 0 0 1px rgba(255,255,255,.62)
+}
+.fp__reel-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.78) brightness(.95);transition:filter .3s ease,transform .45s ease}
+.fp__reel-item::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(3,10,24,.70));pointer-events:none}
+.fp__reel-item.is-active{opacity:1;transform:scale(1);box-shadow:0 15px 35px rgba(var(--accent-rgb),.24),0 0 0 2px rgba(var(--accent-rgb),.75)}
+.fp__reel-item.is-active img{filter:none;transform:scale(1.025)}
+.fp__reel-index{position:absolute;z-index:2;left:9px;top:8px;width:20px;height:20px;border-radius:8px;display:grid;place-items:center;font-size:8px;font-weight:700;color:#fff;background:rgba(4,13,28,.46);backdrop-filter:blur(8px)}
+.fp__reel-title{position:absolute;z-index:2;left:9px;right:7px;bottom:8px;color:#fff;font-family:var(--font-script);font-size:clamp(12px,1.08vw,17px);line-height:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 10px rgba(0,0,0,.35)}
+.fp__reel-marker{position:absolute;z-index:5;left:-8px;top:50%;width:4px;height:42px;border-radius:99px;background:var(--accent);transform:translateY(-50%);box-shadow:0 0 18px rgba(var(--accent-rgb),.48)}
+.fp__hint{position:absolute;right:0;bottom:2px;display:flex;align-items:center;gap:8px;color:#78879c;font-size:10px;letter-spacing:.04em}
+.fp__hint svg{width:15px;height:15px;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fp-dialog{width:min(1120px,92vw);padding:0;border:0;border-radius:26px;overflow:hidden;background:#081326;color:#fff;box-shadow:0 36px 120px rgba(0,0,0,.38)}
+.fp-dialog::backdrop{background:rgba(5,10,18,.65);backdrop-filter:blur(12px)}
+.fp-dialog__image{width:100%;max-height:68vh;object-fit:contain;background:#02060d;display:block}
+.fp-dialog__body{padding:21px 24px 25px;display:flex;justify-content:space-between;gap:24px;align-items:flex-end}
+.fp-dialog__eyebrow{margin:0 0 6px;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#94a5bc}
+.fp-dialog h3{margin:0;font-family:var(--font-script);font-size:42px;font-weight:400;line-height:1}
+.fp-dialog__desc{margin:10px 0 0;max-width:52ch;font-family:var(--font-script);font-size:clamp(18px,1.45vw,23px);font-weight:400;font-style:normal;line-height:1.42;letter-spacing:.01em;color:#fff;text-align:left;text-wrap:pretty;overflow-wrap:break-word;word-break:normal;hyphens:none;text-shadow:0 2px 10px rgba(0,0,0,.55)}
+.fp-dialog__close{border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;border-radius:14px;padding:11px 15px;cursor:pointer}
+@media (max-width:1120px){
+  .fp{height:clamp(520px,58vw,700px)}
+  .fp__header{height:72px;padding-top:15px}.fp__layout{height:calc(100% - 72px);grid-template-columns:minmax(260px,32%) minmax(0,1fr)}
+  .fp__visual{grid-template-columns:minmax(0,1fr) 108px;gap:12px;margin-left:-34px;padding-left:34px}
+  .fp__intro{padding-right:42px}.fp__title{font-size:clamp(40px,4.6vw,60px)}
+  .fp__metrics{display:none}.fp__copy{max-width:72%}.fp__reel{min-height:300px}
+}
+@media (max-width:760px){
+  body{padding:0}.fp{width:100vw;min-height:720px;height:auto;max-height:none;border-radius:0;padding-bottom:22px}
+  .fp__header{height:68px;padding:13px 18px 7px}.fp__status{display:none}.fp__brand-text{font-size:10px}
+  .fp__layout{height:auto;display:block;padding:0 16px}.fp__intro{padding:24px 4px 20px;display:block}.fp__intro::after{display:none}
+  .fp__title{font-size:47px;max-width:100%}.fp__desc{margin-top:18px;font-size:13px;line-height:1.58}.fp__meta{margin-top:18px}
+  .fp__visual{display:block;margin:0;padding:0}.fp__stack{width:100%;aspect-ratio:4/3}.fp__copy{max-width:82%;padding:12px 14px}.fp__copy h2{font-size:36px}.fp__chips{left:13px;right:13px;top:12px}.fp__chip{font-size:7px;padding:0 9px}.fp__open{right:14px;top:51px;width:42px;height:42px}
+  .fp__reel{height:auto;min-height:0;margin-top:38px}.fp__reel::before,.fp__reel::after,.fp__reel-marker{display:none}.fp__reel-viewport{height:auto;overflow-x:auto;overflow-y:hidden;padding:3px 2px 11px;scrollbar-width:none}.fp__reel-viewport::-webkit-scrollbar{display:none}
+  .fp__reel-track{position:relative;display:flex;gap:10px;transform:none!important}.fp__reel-item{flex:0 0 128px;opacity:.65;transform:none}.fp__reel-item.is-active{transform:translateY(-2px)}.fp__hint{position:relative;justify-content:center;margin-top:8px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Editor y estado vacío */
+.fp__admin-actions{display:flex;align-items:center;gap:8px}
+.fp__admin-btn{height:38px;border:0;border-radius:13px;padding:0 12px;display:flex;align-items:center;gap:7px;color:#667991;background:rgba(255,255,255,.70);box-shadow:0 10px 25px rgba(20,48,88,.07),inset 0 0 0 1px rgba(255,255,255,.86);backdrop-filter:blur(12px);cursor:pointer;font-size:10px;font-weight:700;letter-spacing:.03em;transition:.2s ease}
+.fp__admin-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fp__admin-btn:hover:not(:disabled){transform:translateY(-1px);color:var(--accent);box-shadow:0 13px 30px rgba(20,48,88,.11),inset 0 0 0 1px rgba(var(--accent-rgb),.18)}
+.fp__admin-btn--primary{color:#fff;background:var(--accent);box-shadow:0 11px 28px rgba(var(--accent-rgb),.22)}
+.fp__admin-btn--primary:hover:not(:disabled){color:#fff;filter:brightness(1.04)}
+.fp__admin-btn:disabled{opacity:.36;cursor:not-allowed}
+.fp__empty{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;border-radius:27px;background:linear-gradient(145deg,rgba(255,255,255,.79),rgba(238,245,253,.64));box-shadow:inset 0 0 0 1px rgba(255,255,255,.92),0 22px 58px rgba(20,48,88,.10);backdrop-filter:blur(20px)}
+.fp__empty[hidden]{display:none}
+.fp__empty-icon{width:66px;height:66px;border-radius:22px;display:grid;place-items:center;color:var(--accent);background:rgba(255,255,255,.72);box-shadow:0 14px 34px rgba(20,48,88,.11),inset 0 0 0 1px rgba(var(--accent-rgb),.12)}
+.fp__empty-icon svg{width:31px;height:31px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.fp__empty-overline{margin:18px 0 7px;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.fp__empty h2{margin:0;font-size:clamp(27px,2.5vw,43px);letter-spacing:-.045em;line-height:1}
+.fp__empty h2 span{font-family:var(--font-script);font-weight:400;color:var(--accent);letter-spacing:0}
+.fp__empty>p:last-of-type{max-width:430px;margin:15px 0 0;color:var(--muted);font-size:12px;line-height:1.65}
+.fp__empty-add{margin-top:20px;border:0;border-radius:16px;padding:12px 17px;color:#fff;background:var(--accent);box-shadow:0 13px 30px rgba(var(--accent-rgb),.24);cursor:pointer;font-weight:700;font-size:11px}
+.fp__empty-add span{font-size:17px;vertical-align:-1px;margin-right:4px}
+.fp__visual.is-empty{grid-template-columns:minmax(0,1fr)}
+.fp__visual.is-empty .fp__reel,.fp__visual.is-empty .fp__hint{display:none}
+.fp__visual.is-empty .fp__stage-wrap{max-width:860px;width:100%;justify-self:center}
+.fp__visual.is-empty .fp__card,.fp__visual.is-empty .fp__peek{visibility:hidden}
+.fp-editor{width:min(760px,calc(100vw - 24px));max-height:calc(100svh - 24px);padding:0;border:0;border-radius:24px;background:#f7faff;color:var(--ink);box-shadow:0 32px 100px rgba(4,18,42,.30);overflow:hidden}
+.fp-editor::backdrop{background:rgba(5,14,28,.50);backdrop-filter:blur(10px)}
+.fp-editor__panel{display:flex;flex-direction:column;max-height:calc(100svh - 24px)}
+.fp-editor__header{padding:19px 22px 15px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid rgba(33,67,111,.08)}
+.fp-editor__header p{margin:0 0 3px;color:var(--accent);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}.fp-editor__header h2{margin:0;font-size:25px;letter-spacing:-.035em}
+.fp-editor__x{border:0;width:36px;height:36px;border-radius:12px;background:#fff;color:#63758c;font-size:25px;line-height:1;cursor:pointer;box-shadow:0 8px 20px rgba(20,48,88,.07)}
+.fp-editor__body{padding:18px 22px 22px;overflow:auto}
+.fp-upload{position:relative;height:210px;border-radius:20px;overflow:hidden;display:grid;place-items:center;background:#eaf1f9;border:1px dashed rgba(var(--accent-rgb),.36);cursor:pointer;transition:.2s ease}
+.fp-upload:hover,.fp-upload.is-dragging{border-color:var(--accent);background:#e5eef9}.fp-upload input{position:absolute;width:1px;height:1px;opacity:0}.fp-upload img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}.fp-upload.has-image img{display:block}.fp-upload.has-image::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(3,12,27,.50))}
+.fp-upload__placeholder{display:flex;flex-direction:column;align-items:center;text-align:center;color:#61738b;position:relative;z-index:2}.fp-upload.has-image .fp-upload__placeholder{display:none}
+.fp-upload__icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;color:var(--accent);background:#fff;box-shadow:0 9px 24px rgba(20,48,88,.09);margin-bottom:10px}.fp-upload__icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.fp-upload__placeholder strong{font-size:12px}.fp-upload__placeholder small{margin-top:5px;font-size:10px;color:#8392a6}
+.fp-upload__change{position:absolute;z-index:3;right:12px;bottom:12px;display:none;padding:8px 11px;border-radius:11px;color:#fff;background:rgba(4,13,28,.65);backdrop-filter:blur(10px);font-size:9px;font-weight:700}.fp-upload.has-image .fp-upload__change{display:block}
+.fp-editor__grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-top:17px}.fp-editor__grid label{display:flex;flex-direction:column;gap:6px}.fp-editor__grid label>span{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#718198}.fp-editor__grid input,.fp-editor__grid textarea{width:100%;border:1px solid rgba(31,66,111,.11);border-radius:12px;background:#fff;color:var(--ink);padding:11px 12px;font:12px var(--font-ui);outline:0;transition:.18s}.fp-editor__grid textarea{resize:vertical;min-height:78px}.fp-editor__grid input:focus,.fp-editor__grid textarea:focus{border-color:rgba(var(--accent-rgb),.65);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.09)}.fp-editor__grid input[type=color]{height:40px;padding:5px}.fp-editor__wide{grid-column:1/-1}
+.fp-editor__footer{padding:14px 22px 17px;border-top:1px solid rgba(33,67,111,.08);display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.56)}.fp-editor__spacer{flex:1}.fp-editor__footer button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:700;font-size:10px}.fp-editor__delete{color:#b33b4a;background:#fff0f2}.fp-editor__cancel{color:#60718a;background:#edf2f8}.fp-editor__save{color:#fff;background:var(--accent);box-shadow:0 8px 22px rgba(var(--accent-rgb),.20)}
+.fp__reel-empty{padding:16px 8px;text-align:center;color:#8392a7;font-size:10px;line-height:1.5}
+@media(max-width:980px){.fp__admin-btn span{display:none}.fp__admin-btn{width:38px;padding:0;justify-content:center}.fp-editor__grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.fp__admin-actions{gap:5px}.fp__admin-btn{width:34px;height:34px;border-radius:11px}.fp-editor__body{padding:14px}.fp-editor__header,.fp-editor__footer{padding-left:14px;padding-right:14px}.fp-upload{height:170px}.fp-editor__grid{grid-template-columns:1fr}.fp-editor__wide{grid-column:auto}.fp-editor__footer{flex-wrap:wrap}.fp-editor__delete{order:3;width:100%}}
+
+</style>
+</head>
+<body>
+<section class="fp" id="featuredProjects" aria-label="Proyectos destacados de San Pedro">
+  <div class="fp__line" aria-hidden="true"></div>
+  <header class="fp__header">
+    <div class="fp__brand">
+      <span class="fp__brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4.2c2.1 0 3.8 1.7 3.8 3.8 0 1.8-1.2 3.3-2.9 3.7V7.3a.9.9 0 0 0-1.8 0v4.4A3.8 3.8 0 0 1 12 4.2Z"/><path d="M19.8 12c0 2.1-1.7 3.8-3.8 3.8-1.8 0-3.3-1.2-3.7-2.9h4.4a.9.9 0 1 0 0-1.8h-4.4a3.8 3.8 0 0 1 7.5.9Z"/><path d="M12 19.8A3.8 3.8 0 0 1 8.2 16c0-1.8 1.2-3.3 2.9-3.7v4.4a.9.9 0 1 0 1.8 0v-4.4a3.8 3.8 0 0 1-.9 7.5Z"/><path d="M4.2 12c0-2.1 1.7-3.8 3.8-3.8 1.8 0 3.3 1.2 3.7 2.9H7.3a.9.9 0 1 0 0 1.8h4.4a3.8 3.8 0 0 1-7.5-.9Z"/></svg></span>
+      <span class="fp__brand-text">Rendición de cuentas · San Pedro</span>
+    </div>
+    <div class="fp__admin-actions" aria-label="Edición del banner">
+      <button class="fp__admin-btn fp__admin-btn--primary" id="fpAddProject" type="button" title="Agregar un proyecto">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Agregar proyecto</span>
+      </button>
+      <button class="fp__admin-btn" id="fpEditProject" type="button" title="Editar proyecto actual" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-.8 4 4-.8L18.4 8a2.1 2.1 0 0 0-3-3L4 16Z"/><path d="m13.8 6.6 3.6 3.6"/></svg><span>Editar</span>
+      </button>
+      <button class="fp__admin-btn" id="fpExport" type="button" title="Descargar una copia HTML con los proyectos guardados">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4"/><path d="M5 20h14"/></svg><span>Guardar HTML</span>
+      </button>
+    </div>
+  </header>
+  <div class="fp__layout">
+    <aside class="fp__intro">
+      <div class="fp__overline">Portafolio público</div>
+      <h1 class="fp__title">Proyectos <span class="fp__title-script">destacados</span></h1>
+      <p class="fp__desc">Agrega las fotografías y la información de cada iniciativa. El carrete se construye automáticamente y puede recorrerse hacia abajo.</p>
+      <div class="fp__meta">
+        <div class="fp__counter"><strong id="fpCurrent">01</strong><span>/</span><span id="fpTotal">06</span></div>
+        <button class="fp__mode" id="fpAuto" type="button" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg><span>Reproducción automática</span></button>
+        <button class="fp__icon-btn" id="fpSound" type="button" aria-label="Desactivar sonidos" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4.5 9.5v5h3.2l4.3 3.7V5.8L7.7 9.5H4.5Z"/><path d="M15.5 8.2a5 5 0 0 1 0 7.6"/><path d="M18.2 5.8a8.3 8.3 0 0 1 0 12.4"/></svg></button>
+      </div>
+    </aside>
+    <section class="fp__visual" aria-label="Carrete vertical de proyectos">
+      <div class="fp__stage-wrap">
+        <div class="fp__stack">
+          <div class="fp__empty" id="fpEmpty">
+            <div class="fp__empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Z"/><path d="m6.5 16 3.4-3.6 2.5 2.4 2.2-2.3 2.9 3.5"/><circle cx="15.8" cy="9" r="1.2"/></svg></div>
+            <p class="fp__empty-overline">Carrete vacío</p>
+            <h2>Agrega tu primer <span>proyecto</span></h2>
+            <p>Selecciona una fotografía, escribe la información y el banner construirá automáticamente el carrete vertical.</p>
+            <button class="fp__empty-add" id="fpEmptyAdd" type="button"><span>+</span> Agregar proyecto</button>
+          </div>
+          <div class="fp__peek fp__peek--2" id="fpPeek2" aria-hidden="true"></div>
+          <div class="fp__peek fp__peek--1" id="fpPeek1" aria-hidden="true"></div>
+          <article class="fp__card" id="fpCard" tabindex="0" aria-live="polite">
+            <img class="fp__image" id="fpImage" alt="">
+            <div class="fp__shade"></div>
+            <div class="fp__chips"><span class="fp__chip"><span class="fp__chip-dot"></span><span id="fpCategory"></span></span><span class="fp__chip" id="fpYear"></span></div>
+            <button class="fp__open" id="fpOpen" type="button" aria-label="Abrir proyecto"><svg viewBox="0 0 24 24"><path d="M7.5 16.5 16.5 7.5"/><path d="M10 7.5h6.5V14"/></svg></button>
+            <div class="fp__copy"><p class="fp__kicker" id="fpEyebrow"></p><h2 id="fpTitle"></h2><p id="fpDescription"></p></div>
+            <div class="fp__metrics"><div class="fp__metric"><span>Avance</span><strong id="fpProgress"></strong></div><div class="fp__metric"><span>Vigencia</span><strong id="fpPeriod"></strong></div></div>
+          </article>
+        </div>
+      </div>
+      <aside class="fp__reel">
+        <span class="fp__reel-marker" aria-hidden="true"></span>
+        <div class="fp__reel-viewport" id="fpReelViewport"><div class="fp__reel-track" id="fpReelTrack"></div></div>
+      </aside>
+      <div class="fp__hint"><svg viewBox="0 0 24 24"><path d="M12 4v16m0 0-4-4m4 4 4-4"/></svg><span>Rueda o arrastra hacia abajo</span></div>
+    </section>
+  </div>
+</section>
+<dialog class="fp-dialog" id="fpDialog">
+  <img class="fp-dialog__image" id="fpDialogImage" alt="">
+  <div class="fp-dialog__body"><div><p class="fp-dialog__eyebrow" id="fpDialogEyebrow"></p><h3 id="fpDialogTitle"></h3><p class="fp-dialog__desc" id="fpDialogDesc"></p></div><button class="fp-dialog__close" id="fpDialogClose" type="button">Cerrar</button></div>
+</dialog>
+<dialog class="fp-editor" id="fpEditor">
+  <form class="fp-editor__panel" id="fpEditorForm" method="dialog">
+    <header class="fp-editor__header">
+      <div><p>Editor del carrete</p><h2 id="fpEditorHeading">Agregar proyecto</h2></div>
+      <button class="fp-editor__x" id="fpEditorX" type="button" aria-label="Cerrar">×</button>
+    </header>
+    <div class="fp-editor__body">
+      <label class="fp-upload" id="fpUploadZone">
+        <input id="fpProjectImage" name="image" type="file" accept="image/jpeg,image/png,image/webp" required>
+        <img id="fpUploadPreview" alt="Vista previa de la fotografía seleccionada">
+        <span class="fp-upload__placeholder" id="fpUploadPlaceholder">
+          <span class="fp-upload__icon"><svg viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Z"/><path d="m6.5 16 3.4-3.6 2.5 2.4 2.2-2.3 2.9 3.5"/><circle cx="15.8" cy="9" r="1.2"/></svg></span>
+          <strong>Seleccionar fotografía</strong><small>JPG, PNG o WEBP · se optimiza automáticamente</small>
+        </span>
+        <span class="fp-upload__change">Cambiar imagen</span>
+      </label>
+      <div class="fp-editor__grid">
+        <label><span>Título del proyecto *</span><input id="fpFieldTitle" name="title" required maxlength="80" placeholder="Nombre del proyecto"></label>
+        <label><span>Categoría</span><input id="fpFieldCategory" name="category" maxlength="30" placeholder="Infraestructura"></label>
+        <label><span>Etiqueta superior</span><input id="fpFieldEyebrow" name="eyebrow" maxlength="34" placeholder="PROYECTO DESTACADO"></label>
+        <label><span>Vigencia / año</span><input id="fpFieldYear" name="year" maxlength="28" placeholder="VIGENCIA 2026"></label>
+        <label class="fp-editor__wide"><span>Descripción del proyecto *</span><textarea id="fpFieldDescription" name="description" required maxlength="240" rows="3" placeholder="Escribe un párrafo breve, claro y bien organizado."></textarea></label>
+        <label><span>Avance</span><input id="fpFieldProgress" name="progress" maxlength="12" placeholder="75 %"></label>
+        <label><span>Periodo</span><input id="fpFieldPeriod" name="period" maxlength="18" placeholder="2025–2026"></label>
+        <label><span>Color del proyecto</span><input id="fpFieldAccent" name="accent" type="color" value="#2f6ff2"></label>
+        <label class="fp-editor__wide"><span>Texto alternativo de la imagen</span><input id="fpFieldAlt" name="alt" maxlength="150" placeholder="Descripción accesible de la fotografía"></label>
+      </div>
+    </div>
+    <footer class="fp-editor__footer">
+      <button class="fp-editor__delete" id="fpDeleteProject" type="button" hidden>Eliminar proyecto</button>
+      <span class="fp-editor__spacer"></span>
+      <button class="fp-editor__cancel" id="fpEditorCancel" type="button">Cancelar</button>
+      <button class="fp-editor__save" type="submit">Guardar proyecto</button>
+    </footer>
+  </form>
+</dialog>
+<script>
+const DEFAULT_PROJECTS = [];
+const STORAGE_KEY = 'san-pedro-proyectos-destacados-reel-v2';
+const root = document.documentElement;
+const $ = selector => document.querySelector(selector);
+const stage = $('#fpCard');
+const image = $('#fpImage');
+const category = $('#fpCategory');
+const year = $('#fpYear');
+const eyebrow = $('#fpEyebrow');
+const title = $('#fpTitle');
+const description = $('#fpDescription');
+const progress = $('#fpProgress');
+const period = $('#fpPeriod');
+const current = $('#fpCurrent');
+const total = $('#fpTotal');
+const reelTrack = $('#fpReelTrack');
+const reelViewport = $('#fpReelViewport');
+const peek1 = $('#fpPeek1');
+const peek2 = $('#fpPeek2');
+const autoBtn = $('#fpAuto');
+const soundBtn = $('#fpSound');
+const openBtn = $('#fpOpen');
+const dialog = $('#fpDialog');
+const visual = document.querySelector('.fp__visual');
+const empty = $('#fpEmpty');
+const editor = $('#fpEditor');
+const editorForm = $('#fpEditorForm');
+const imageInput = $('#fpProjectImage');
+const uploadZone = $('#fpUploadZone');
+const uploadPreview = $('#fpUploadPreview');
+const editBtn = $('#fpEditProject');
+const deleteBtn = $('#fpDeleteProject');
+
+let PROJECTS = loadProjects();
+let active = 0;
+let auto = true;
+let sound = true;
+let timer = 0;
+let wheelLocked = false;
+let dragging = false;
+let startY = 0;
+let lastY = 0;
+let audioCtx = null;
+let editorMode = 'add';
+let pendingImage = '';
+
+function normalizeProject(project = {}) {
+  const accent = /^#[0-9a-f]{6}$/i.test(project.accent || '') ? project.accent : '#2f6ff2';
+  const rgb = hexToRgb(accent);
+  return {
+    category: project.category || 'Proyecto',
+    eyebrow: project.eyebrow || 'PROYECTO DESTACADO',
+    year: project.year || 'VIGENCIA',
+    title: project.title || 'Proyecto sin título',
+    description: project.description || '',
+    progress: project.progress || '—',
+    period: project.period || '—',
+    accent,
+    rgb: `${rgb.r},${rgb.g},${rgb.b}`,
+    soft: mixHex(accent, '#ffffff', .68),
+    image: project.image || '',
+    alt: project.alt || project.title || 'Fotografía del proyecto'
+  };
+}
+
+function loadProjects() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const source = stored ? JSON.parse(stored) : DEFAULT_PROJECTS;
+    return Array.isArray(source) ? source.map(normalizeProject).filter(p => p.image) : [];
+  } catch (error) {
+    console.warn('No fue posible recuperar los proyectos guardados.', error);
+    return DEFAULT_PROJECTS.map(normalizeProject).filter(p => p.image);
+  }
+}
+
+function saveProjects() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(PROJECTS));
+  } catch (error) {
+    alert('No fue posible guardar en el navegador. Usa “Guardar HTML” para conservar una copia con las imágenes integradas.');
+  }
+}
+
+function hexToRgb(hex) {
+  const value = hex.replace('#', '');
+  return {r: parseInt(value.slice(0,2),16), g: parseInt(value.slice(2,4),16), b: parseInt(value.slice(4,6),16)};
+}
+
+function mixHex(a, b, amount) {
+  const A = hexToRgb(a), B = hexToRgb(b);
+  const channel = key => Math.round(A[key] + (B[key] - A[key]) * amount).toString(16).padStart(2,'0');
+  return `#${channel('r')}${channel('g')}${channel('b')}`;
+}
+
+function setEmptyState() {
+  const isEmpty = PROJECTS.length === 0;
+  visual.classList.toggle('is-empty', isEmpty);
+  empty.hidden = !isEmpty;
+  editBtn.disabled = isEmpty;
+  openBtn.disabled = isEmpty;
+  autoBtn.disabled = isEmpty;
+  total.textContent = String(PROJECTS.length).padStart(2, '0');
+  current.textContent = isEmpty ? '00' : String(active + 1).padStart(2, '0');
+  if (isEmpty) {
+    clearInterval(timer);
+    reelTrack.innerHTML = '';
+    image.removeAttribute('src');
+    image.alt = '';
+    peek1.style.backgroundImage = 'none';
+    peek2.style.backgroundImage = 'none';
+  }
+}
+
+function makeReel() {
+  if (!PROJECTS.length) {
+    reelTrack.innerHTML = '<div class="fp__reel-empty">Agrega proyectos para construir el carrete.</div>';
+    return;
+  }
+  reelTrack.innerHTML = PROJECTS.map((project, index) => `
+    <button class="fp__reel-item" type="button" data-index="${index}" aria-label="Seleccionar ${escapeHtml(project.title)}">
+      <img src="${project.image}" alt="">
+      <span class="fp__reel-index">${String(index + 1).padStart(2, '0')}</span>
+      <span class="fp__reel-title">${escapeHtml(project.title)}</span>
+    </button>`).join('');
+  reelTrack.querySelectorAll('.fp__reel-item').forEach(button => {
+    button.addEventListener('click', () => goTo(Number(button.dataset.index)));
+  });
+}
+
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+}
+
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function tone(freq, duration = .06, type = 'sine', gain = .018, delay = 0) {
+  if (!sound) return;
+  ensureAudio();
+  const time = audioCtx.currentTime + delay;
+  const oscillator = audioCtx.createOscillator();
+  const volume = audioCtx.createGain();
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(freq, time);
+  volume.gain.setValueAtTime(.0001, time);
+  volume.gain.exponentialRampToValueAtTime(gain, time + .008);
+  volume.gain.exponentialRampToValueAtTime(.0001, time + duration);
+  oscillator.connect(volume).connect(audioCtx.destination);
+  oscillator.start(time);
+  oscillator.stop(time + duration + .03);
+}
+
+function soundNav() { tone(520, .05, 'sine', .015); tone(720, .05, 'sine', .010, .03); }
+function soundOpen() { tone(430, .10, 'triangle', .019); tone(650, .12, 'sine', .014, .05); tone(870, .14, 'sine', .010, .10); }
+
+function updateReel() {
+  const items = [...reelTrack.querySelectorAll('.fp__reel-item')];
+  items.forEach((element, index) => element.classList.toggle('is-active', index === active));
+  if (!items.length) return;
+  if (innerWidth <= 760) {
+    items[active]?.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
+    return;
+  }
+  const item = items[active];
+  const viewportHeight = reelViewport.clientHeight;
+  const center = item.offsetTop + item.offsetHeight / 2;
+  reelTrack.style.transform = `translateY(${Math.round(viewportHeight / 2 - center)}px)`;
+}
+
+function applyProject(animate = true) {
+  setEmptyState();
+  if (!PROJECTS.length) return;
+  active = Math.min(active, PROJECTS.length - 1);
+  const project = PROJECTS[active];
+  const nextOne = PROJECTS[(active + 1) % PROJECTS.length];
+  const nextTwo = PROJECTS[(active + 2) % PROJECTS.length];
+  root.style.setProperty('--accent', project.accent);
+  root.style.setProperty('--accent-rgb', project.rgb);
+  root.style.setProperty('--accent-soft', project.soft);
+  image.src = project.image;
+  image.alt = project.alt;
+  category.textContent = project.category;
+  year.textContent = project.year;
+  eyebrow.textContent = project.eyebrow;
+  title.textContent = project.title;
+  description.textContent = project.description;
+  progress.textContent = project.progress;
+  period.textContent = project.period;
+  current.textContent = String(active + 1).padStart(2, '0');
+  total.textContent = String(PROJECTS.length).padStart(2, '0');
+  peek1.style.backgroundImage = nextOne ? `linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.05)),url("${nextOne.image}")` : 'none';
+  peek2.style.backgroundImage = nextTwo ? `linear-gradient(rgba(255,255,255,.08),rgba(255,255,255,.08)),url("${nextTwo.image}")` : 'none';
+  if (animate) {
+    image.classList.remove('is-entering');
+    void image.offsetWidth;
+    image.classList.add('is-entering');
+  }
+  updateReel();
+  restartAuto();
+}
+
+function refresh(animate = false) {
+  makeReel();
+  setEmptyState();
+  applyProject(animate);
+}
+
+function goTo(index, play = true) {
+  if (!PROJECTS.length) return;
+  const nextIndex = (index + PROJECTS.length) % PROJECTS.length;
+  if (nextIndex === active) return;
+  active = nextIndex;
+  applyProject(true);
+  if (play) soundNav();
+}
+
+function next() { goTo(active + 1); }
+function previous() { goTo(active - 1); }
+function restartAuto() { clearInterval(timer); if (auto && PROJECTS.length > 1) timer = setInterval(next, 6800); }
+
+function openProject() {
+  if (!PROJECTS.length) return;
+  const project = PROJECTS[active];
+  $('#fpDialogImage').src = project.image;
+  $('#fpDialogImage').alt = project.alt;
+  $('#fpDialogEyebrow').textContent = `${project.category} · ${project.year}`;
+  $('#fpDialogTitle').textContent = project.title;
+  $('#fpDialogDesc').textContent = project.description;
+  soundOpen();
+  dialog.showModal();
+}
+
+function onWheel(event) {
+  if (!PROJECTS.length || dialog.open || editor.open || wheelLocked) return;
+  const delta = event.deltaY || event.deltaX;
+  if (Math.abs(delta) < 8) return;
+  event.preventDefault();
+  wheelLocked = true;
+  delta > 0 ? next() : previous();
+  setTimeout(() => wheelLocked = false, 460);
+}
+
+function endDrag(event) {
+  if (!dragging) return;
+  const delta = lastY - startY;
+  dragging = false;
+  stage.classList.remove('is-dragging');
+  try { stage.releasePointerCapture(event.pointerId); } catch {}
+  if (Math.abs(delta) > 52) delta < 0 ? next() : previous();
+  restartAuto();
+}
+
+function openEditor(mode) {
+  editorMode = mode;
+  pendingImage = '';
+  editorForm.reset();
+  $('#fpFieldAccent').value = '#2f6ff2';
+  uploadZone.classList.remove('has-image');
+  uploadPreview.removeAttribute('src');
+  imageInput.required = mode === 'add';
+  deleteBtn.hidden = mode !== 'edit';
+  $('#fpEditorHeading').textContent = mode === 'edit' ? 'Editar proyecto' : 'Agregar proyecto';
+  if (mode === 'edit' && PROJECTS.length) {
+    const project = PROJECTS[active];
+    $('#fpFieldTitle').value = project.title;
+    $('#fpFieldCategory').value = project.category;
+    $('#fpFieldEyebrow').value = project.eyebrow;
+    $('#fpFieldYear').value = project.year;
+    $('#fpFieldDescription').value = project.description;
+    $('#fpFieldProgress').value = project.progress;
+    $('#fpFieldPeriod').value = project.period;
+    $('#fpFieldAccent').value = project.accent;
+    $('#fpFieldAlt').value = project.alt;
+    uploadPreview.src = project.image;
+    uploadZone.classList.add('has-image');
+  }
+  editor.showModal();
+  setTimeout(() => $('#fpFieldTitle').focus(), 80);
+}
+
+async function optimizeImage(file) {
+  if (!file) return '';
+  if (!file.type.startsWith('image/')) throw new Error('Selecciona un archivo de imagen válido.');
+  const source = await fileToDataUrl(file);
+  const bitmap = await loadImage(source);
+  const maxWidth = 1800;
+  const maxHeight = 1100;
+  const ratio = Math.min(1, maxWidth / bitmap.naturalWidth, maxHeight / bitmap.naturalHeight);
+  const width = Math.max(1, Math.round(bitmap.naturalWidth * ratio));
+  const height = Math.max(1, Math.round(bitmap.naturalHeight * ratio));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d', {alpha: false});
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, width, height);
+  context.drawImage(bitmap, 0, 0, width, height);
+  return canvas.toDataURL('image/jpeg', .84);
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(source) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = source;
+  });
+}
+
+async function handleImageFile(file) {
+  try {
+    uploadZone.setAttribute('aria-busy', 'true');
+    pendingImage = await optimizeImage(file);
+    uploadPreview.src = pendingImage;
+    uploadZone.classList.add('has-image');
+  } catch (error) {
+    alert(error.message || 'No fue posible procesar la imagen.');
+  } finally {
+    uploadZone.removeAttribute('aria-busy');
+  }
+}
+
+function formProject() {
+  const form = new FormData(editorForm);
+  const existing = editorMode === 'edit' ? PROJECTS[active] : null;
+  const selectedImage = pendingImage || existing?.image || '';
+  const accent = String(form.get('accent') || '#2f6ff2');
+  return normalizeProject({
+    title: String(form.get('title') || '').trim(),
+    category: String(form.get('category') || '').trim() || 'Proyecto',
+    eyebrow: String(form.get('eyebrow') || '').trim() || 'PROYECTO DESTACADO',
+    year: String(form.get('year') || '').trim() || 'VIGENCIA',
+    description: String(form.get('description') || '').trim(),
+    progress: String(form.get('progress') || '').trim() || '—',
+    period: String(form.get('period') || '').trim() || '—',
+    accent,
+    alt: String(form.get('alt') || '').trim() || `Fotografía de ${String(form.get('title') || 'proyecto').trim()}`,
+    image: selectedImage
+  });
+}
+
+function exportHtml() {
+  if (!PROJECTS.length) {
+    alert('Agrega al menos un proyecto antes de guardar una copia.');
+    return;
+  }
+  const clone = document.documentElement.cloneNode(true);
+  clone.querySelector('#fpEditor')?.removeAttribute('open');
+  clone.querySelector('#fpDialog')?.removeAttribute('open');
+  const script = [...clone.querySelectorAll('script')].find(node => node.textContent.includes('const DEFAULT_PROJECTS ='));
+  if (!script) return;
+  script.textContent = script.textContent.replace(/const DEFAULT_PROJECTS = \[[\s\S]*?\];/, `const DEFAULT_PROJECTS = ${JSON.stringify(PROJECTS)};`);
+  const output = '<!doctype html>\n' + clone.outerHTML;
+  const blob = new Blob([output], {type: 'text/html;charset=utf-8'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'banner_proyectos_destacados_configurado.html';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1500);
+}
+
+refresh(false);
+
+stage.addEventListener('wheel', onWheel, {passive:false});
+reelViewport.addEventListener('wheel', onWheel, {passive:false});
+stage.addEventListener('pointerdown', event => {
+  if (!PROJECTS.length || event.button !== 0) return;
+  dragging = true;
+  startY = lastY = event.clientY;
+  stage.classList.add('is-dragging');
+  stage.setPointerCapture(event.pointerId);
+  clearInterval(timer);
+  ensureAudio();
+});
+stage.addEventListener('pointermove', event => { if (dragging) lastY = event.clientY; });
+stage.addEventListener('pointerup', endDrag);
+stage.addEventListener('pointercancel', endDrag);
+stage.addEventListener('dblclick', openProject);
+openBtn.addEventListener('click', event => { event.stopPropagation(); openProject(); });
+
+window.addEventListener('keydown', event => {
+  if (dialog.open || editor.open || !PROJECTS.length) return;
+  if (!$('#featuredProjects').matches(':hover') && document.activeElement !== stage) return;
+  if (event.key === 'ArrowDown' || event.key === 'ArrowRight') { event.preventDefault(); next(); }
+  else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') { event.preventDefault(); previous(); }
+  else if (event.key === 'Enter') { event.preventDefault(); openProject(); }
+});
+
+autoBtn.addEventListener('click', () => {
+  auto = !auto;
+  autoBtn.setAttribute('aria-pressed', String(auto));
+  autoBtn.querySelector('span').textContent = auto ? 'Reproducción automática' : 'Reproducción pausada';
+  restartAuto();
+  soundOpen();
+});
+soundBtn.addEventListener('click', () => {
+  sound = !sound;
+  soundBtn.setAttribute('aria-pressed', String(sound));
+  soundBtn.setAttribute('aria-label', sound ? 'Desactivar sonidos' : 'Activar sonidos');
+  soundBtn.style.opacity = sound ? '1' : '.48';
+  if (sound) { ensureAudio(); soundOpen(); }
+});
+
+$('#fpDialogClose').addEventListener('click', () => dialog.close());
+dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+$('#fpAddProject').addEventListener('click', () => openEditor('add'));
+$('#fpEmptyAdd').addEventListener('click', () => openEditor('add'));
+editBtn.addEventListener('click', () => openEditor('edit'));
+$('#fpExport').addEventListener('click', exportHtml);
+$('#fpEditorX').addEventListener('click', () => editor.close());
+$('#fpEditorCancel').addEventListener('click', () => editor.close());
+editor.addEventListener('click', event => { if (event.target === editor) editor.close(); });
+
+imageInput.addEventListener('change', event => handleImageFile(event.target.files?.[0]));
+['dragenter','dragover'].forEach(type => uploadZone.addEventListener(type, event => { event.preventDefault(); uploadZone.classList.add('is-dragging'); }));
+['dragleave','drop'].forEach(type => uploadZone.addEventListener(type, event => { event.preventDefault(); uploadZone.classList.remove('is-dragging'); }));
+uploadZone.addEventListener('drop', event => {
+  const file = event.dataTransfer.files?.[0];
+  if (file) handleImageFile(file);
+});
+
+editorForm.addEventListener('submit', event => {
+  event.preventDefault();
+  const project = formProject();
+  if (!project.image) { alert('Selecciona una fotografía para el proyecto.'); return; }
+  if (!project.title || !project.description) { alert('Completa el título y la descripción.'); return; }
+  if (editorMode === 'edit') PROJECTS[active] = project;
+  else { PROJECTS.push(project); active = PROJECTS.length - 1; }
+  saveProjects();
+  editor.close();
+  refresh(true);
+  soundOpen();
+});
+
+deleteBtn.addEventListener('click', () => {
+  if (!PROJECTS.length) return;
+  if (!confirm(`¿Eliminar “${PROJECTS[active].title}” del carrete?`)) return;
+  PROJECTS.splice(active, 1);
+  active = Math.max(0, Math.min(active, PROJECTS.length - 1));
+  saveProjects();
+  editor.close();
+  refresh(false);
+});
+
+new ResizeObserver(updateReel).observe(reelViewport);
+['pointerdown','keydown','wheel','touchstart'].forEach(eventName => window.addEventListener(eventName, ensureAudio, {once:true, passive:true}));
+</script>
+</body>
+</html>

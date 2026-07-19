@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD = "11.46-proyectos-motion-audio";
+  const BUILD = "11.50-proyectos-fluid-dock";
   const MIN_PROJECTS = 5;
   const MAX_PROJECTS = 10;
   const PALETTE = [
@@ -163,6 +163,10 @@
     let lastFocusedBeforeDialog = null;
     let detailOpening = false;
     let dialogScrollY = 0;
+    let summaryTransitionSequence = 0;
+    let summaryAnimations = [];
+    let dockSelectionAnimations = [];
+    let suppressFocusAnimationUntil = 0;
 
     const dom = {
       carousel: q("#projectsCarousel", root),
@@ -284,37 +288,126 @@
       resetDockMagnification();
     }
 
-    function animateSummary() {
-      if (reducedMotion.matches) return;
-      [dom.eyebrow, dom.title, dom.description, dom.tags, dom.metric, dom.metricLabel, dom.secondary]
-        .filter(Boolean)
-        .forEach((element, index) => {
-          element.getAnimations?.().forEach(animation => animation.cancel());
-          element.animate([
-            { opacity: .2, transform: "translateY(9px)" },
-            { opacity: 1, transform: "translateY(0)" }
-          ], {
-            duration: 340 + index * 24,
-            delay: index * 18,
-            easing: "cubic-bezier(.2,.82,.2,1)",
-            fill: "both"
-          });
-        });
+    function setProjectTitle(element, value) {
+      if (!element) return;
+      const words = String(value || "Proyecto").trim().split(/\s+/).filter(Boolean);
+      const accentText = words.pop() || "Proyecto";
+      const leadText = words.join(" ");
+
+      let accent = element.querySelector("em");
+      if (!accent) {
+        accent = document.createElement("em");
+        element.appendChild(accent);
+      }
+
+      let leadNode = [...element.childNodes].find(node =>
+        node.nodeType === Node.TEXT_NODE && node !== accent
+      );
+      if (!leadNode) {
+        leadNode = document.createTextNode("");
+        element.insertBefore(leadNode, accent);
+      }
+
+      [...element.childNodes].forEach(node => {
+        if (node !== leadNode && node !== accent) node.remove();
+      });
+
+      leadNode.nodeValue = leadText ? `${leadText} ` : "";
+      accent.textContent = accentText;
     }
 
-    function updateSummary(initial = false) {
-      const project = projects[activeIndex];
-      if (!project) return;
-      applyTheme(project);
+    function updateTagSlots(tags = []) {
+      let slots = qa("[data-project-tag-slot]", dom.tags);
+      while (slots.length < 8) {
+        const slot = document.createElement("span");
+        slot.dataset.projectTagSlot = String(slots.length);
+        slot.hidden = true;
+        dom.tags.appendChild(slot);
+        slots.push(slot);
+      }
+      slots.forEach((slot, index) => {
+        const value = tags[index] || "";
+        slot.textContent = value;
+        slot.hidden = !value;
+      });
+    }
+
+    function commitSummaryContent(project) {
       dom.index.textContent = String(activeIndex + 1).padStart(2, "0");
       dom.eyebrow.textContent = `${project.category} · ${project.type}`;
-      dom.title.innerHTML = titleMarkup(project.title);
+      setProjectTitle(dom.title, project.title);
       dom.description.textContent = project.description;
-      dom.tags.innerHTML = project.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join("");
+      updateTagSlots(project.tags);
       dom.metric.textContent = project.metric;
       dom.metricLabel.textContent = project.metricLabel;
       dom.metricBar.style.setProperty("--metric-value", `${project.progress}%`);
       dom.secondary.textContent = project.secondaryMetric;
+    }
+
+    function cancelSummaryAnimations() {
+      summaryAnimations.forEach(animation => {
+        try { animation.cancel(); } catch (_) {}
+      });
+      summaryAnimations = [];
+    }
+
+    function transitionSummaryContent(project, direction = 1, initial = false) {
+      const copy = dom.title?.closest(".projects-psp__summary-copy");
+      const metric = dom.metric?.closest(".projects-psp__metric");
+      const targets = [copy, metric].filter(Boolean);
+
+      if (initial || reducedMotion.matches || !targets.length || typeof targets[0].animate !== "function") {
+        cancelSummaryAnimations();
+        commitSummaryContent(project);
+        root.classList.remove("is-project-switching");
+        return;
+      }
+
+      const sequence = ++summaryTransitionSequence;
+      cancelSummaryAnimations();
+      root.classList.add("is-project-switching");
+
+      const outX = direction >= 0 ? -18 : 18;
+      const outAnimations = targets.map((target, index) => target.animate([
+        { opacity: 1, transform: "translate3d(0,0,0) scale(1)", filter: "blur(0)" },
+        { opacity: .12, transform: `translate3d(${outX * (index ? .55 : 1)}px,-3px,0) scale(.985)`, filter: "blur(4px)" }
+      ], {
+        duration: index ? 150 : 175,
+        easing: "cubic-bezier(.4,0,.7,.2)",
+        fill: "both"
+      }));
+
+      summaryAnimations = outAnimations;
+
+      Promise.allSettled(outAnimations.map(animation => animation.finished)).then(() => {
+        if (sequence !== summaryTransitionSequence) return;
+
+        commitSummaryContent(project);
+        const inX = direction >= 0 ? 24 : -24;
+        const inAnimations = targets.map((target, index) => target.animate([
+          { opacity: 0, transform: `translate3d(${inX * (index ? .55 : 1)}px,8px,0) scale(.975)`, filter: "blur(5px)" },
+          { offset: .68, opacity: 1, transform: "translate3d(-2px,-2px,0) scale(1.006)", filter: "blur(0)" },
+          { opacity: 1, transform: "translate3d(0,0,0) scale(1)", filter: "blur(0)" }
+        ], {
+          duration: index ? 390 : 440,
+          delay: index * 28,
+          easing: "cubic-bezier(.16,.86,.18,1)",
+          fill: "both"
+        }));
+
+        summaryAnimations = inAnimations;
+        return Promise.allSettled(inAnimations.map(animation => animation.finished));
+      }).finally(() => {
+        if (sequence !== summaryTransitionSequence) return;
+        summaryAnimations = [];
+        root.classList.remove("is-project-switching");
+      });
+    }
+
+    function updateSummary(initial = false, direction = 1) {
+      const project = projects[activeIndex];
+      if (!project) return;
+      applyTheme(project);
 
       qa(".projects-folder", dom.carousel).forEach(folder => {
         const folderIndex = Number(folder.dataset.projectIndex);
@@ -330,7 +423,8 @@
       dom.progressBar.style.width = `${total > 1 ? (position / (total - 1)) * 100 : 100}%`;
       dom.prev.disabled = position <= 0;
       dom.next.disabled = position >= total - 1;
-      if (!initial) animateSummary();
+
+      transitionSummaryContent(project, direction, initial);
     }
 
     function unlockSelectionAudio() {
@@ -375,59 +469,133 @@
       });
     }
 
+    function cancelDockSelectionAnimations() {
+      dockSelectionAnimations.forEach(animation => {
+        try { animation.cancel(); } catch (_) {}
+      });
+      dockSelectionAnimations = [];
+    }
+
     function animateDockSelection(previousIndex, nextIndex, direction = 1, source = "program") {
-      window.clearTimeout(selectionAnimationTimer);
-      const folders = qa(".projects-folder",dom.carousel);
-      root.classList.remove("is-selection-transition");
-      void root.offsetWidth;
-      root.classList.add("has-selection","is-selection-transition");
+      cancelDockSelectionAnimations();
+      root.classList.add("has-selection");
+
+      const folders = qa(".projects-folder", dom.carousel);
+      const nextPosition = visibleIndices.indexOf(nextIndex);
+      const animations = [];
+
       folders.forEach(folder => {
         const index = Number(folder.dataset.projectIndex);
         const visiblePosition = visibleIndices.indexOf(index);
-        const nextPosition = visibleIndices.indexOf(nextIndex);
         const distance = Math.abs(visiblePosition - nextPosition);
-        folder.classList.remove("is-selection-entering","is-selection-leaving","is-selection-neighbor");
-        folder.style.setProperty("--selection-direction",String(direction || 1));
-        folder.style.setProperty("--selection-distance",String(Math.min(distance,3)));
-        if (index === nextIndex) folder.classList.add("is-selection-entering");
-        else if (index === previousIndex) folder.classList.add("is-selection-leaving");
-        else if (distance <= 2) folder.classList.add("is-selection-neighbor");
+        const front = q(".projects-folder__front", folder);
+        const paper = q(".projects-folder__paper", folder);
+
+        if (index === nextIndex) {
+          if (front?.animate) animations.push(front.animate([
+            { transform: `perspective(760px) translate3d(${direction * 18}px,12px,0) scale(.92) rotateY(${direction * 8}deg)`, filter: "brightness(.9)" },
+            { offset: .48, transform: `perspective(760px) translate3d(${-direction * 3}px,-18px,0) scale(1.06) rotateY(${-direction * 2}deg)`, filter: "brightness(1.12)" },
+            { offset: .76, transform: "perspective(760px) translate3d(0,3px,0) scale(.992) rotateY(.4deg)", filter: "brightness(1.02)" },
+            { transform: "perspective(760px) translate3d(0,0,0) scale(1) rotateY(0)", filter: "none" }
+          ], { duration: 720, easing: "cubic-bezier(.16,.9,.18,1)", fill: "none" }));
+
+          if (paper?.animate) animations.push(paper.animate([
+            { transform: "translate3d(0,-3px,0) scale(.96)", opacity: .76 },
+            { offset: .48, transform: `translate3d(${-direction * 3}px,-31px,0) scale(1.045) rotate(${-direction * .5}deg)`, opacity: 1 },
+            { offset: .75, transform: "translate3d(0,-9px,0) scale(.995)", opacity: 1 },
+            { transform: "translate3d(0,-12px,0) scale(1)", opacity: 1 }
+          ], { duration: 720, easing: "cubic-bezier(.16,.9,.18,1)", fill: "none" }));
+        } else if (index === previousIndex && front?.animate) {
+          animations.push(front.animate([
+            { transform: "translate3d(0,-5px,0) scale(1.025)", filter: "brightness(1.05)" },
+            { transform: `translate3d(${-direction * 12}px,7px,0) scale(.94) rotateY(${-direction * 4}deg)`, filter: "brightness(.92)" },
+            { transform: "translate3d(0,0,0) scale(1) rotateY(0)", filter: "none" }
+          ], { duration: 520, easing: "cubic-bezier(.2,.76,.2,1)", fill: "none" }));
+        } else if (distance <= 2 && front?.animate) {
+          const lift = Math.max(3, 10 - distance * 3);
+          animations.push(front.animate([
+            { transform: "translate3d(0,0,0)" },
+            { offset: .48, transform: `translate3d(${direction * (3 - distance) * 4}px,-${lift}px,0)` },
+            { transform: "translate3d(0,0,0)" }
+          ], {
+            duration: 500 + distance * 55,
+            delay: distance * 28,
+            easing: "cubic-bezier(.2,.82,.2,1)",
+            fill: "none"
+          }));
+        }
       });
-      selectionAnimationTimer = window.setTimeout(() => {
-        root.classList.remove("is-selection-transition");
-        folders.forEach(folder => folder.classList.remove("is-selection-entering","is-selection-leaving","is-selection-neighbor"));
-      },820);
-      if (previousIndex !== nextIndex) playSelectionSound(direction,source);
+
+      const ambient = q(".projects-psp__ambient--one", root);
+      if (ambient?.animate) animations.push(ambient.animate([
+        { transform: "scale(1) translate3d(0,0,0)", opacity: .76 },
+        { transform: "scale(1.11) translate3d(-2%,2%,0)", opacity: 1 },
+        { transform: "scale(1) translate3d(0,0,0)", opacity: .76 }
+      ], { duration: 760, easing: "cubic-bezier(.2,.82,.2,1)", fill: "none" }));
+
+      dockSelectionAnimations = animations;
+      if (previousIndex !== nextIndex) playSelectionSound(direction, source);
+      Promise.allSettled(animations.map(animation => animation.finished)).finally(() => {
+        if (dockSelectionAnimations === animations) dockSelectionAnimations = [];
+      });
     }
 
     function triggerSelectionBounce(folder, source = "program") {
       if (!folder || reducedMotion.matches) return;
-      folder.classList.remove("is-selection-bounce");
-      void folder.offsetWidth;
-      folder.classList.add("is-selection-bounce");
+      const front = q(".projects-folder__front", folder);
+      const paper = q(".projects-folder__paper", folder);
+      const animations = [];
+
+      if (front?.animate) animations.push(front.animate([
+        { transform: "translate3d(0,0,0) scale(1)" },
+        { offset: .32, transform: "translate3d(0,-17px,0) scale(1.035)" },
+        { offset: .58, transform: "translate3d(0,3px,0) scale(.995)" },
+        { offset: .8, transform: "translate3d(0,-6px,0) scale(1.01)" },
+        { transform: "translate3d(0,0,0) scale(1)" }
+      ], { duration: 620, easing: "cubic-bezier(.18,.9,.24,1.12)", fill: "none" }));
+
+      if (paper?.animate) animations.push(paper.animate([
+        { transform: "translate3d(0,-12px,0)" },
+        { offset: .32, transform: "translate3d(0,-29px,0) rotate(-.5deg)" },
+        { offset: .6, transform: "translate3d(0,-9px,0) rotate(.2deg)" },
+        { transform: "translate3d(0,-12px,0) rotate(0)" }
+      ], { duration: 620, easing: "cubic-bezier(.18,.9,.24,1.12)", fill: "none" }));
+
       folder.dataset.selectionSource = source;
-      window.setTimeout(() => folder.classList.remove("is-selection-bounce"), 760);
+      dockSelectionAnimations.push(...animations);
     }
 
     function centerFolderInViewport(folder, behavior = "smooth") {
       if (!folder) return;
       if (dockScrollAnimationFrame) cancelAnimationFrame(dockScrollAnimationFrame);
+      dom.viewport.classList.remove("is-programmatic-scroll");
+
       const maxScroll = Math.max(0, dom.viewport.scrollWidth - dom.viewport.clientWidth);
-      const target = clamp(folder.offsetLeft + folder.offsetWidth / 2 - dom.viewport.clientWidth / 2,0,maxScroll);
+      const target = clamp(folder.offsetLeft + folder.offsetWidth / 2 - dom.viewport.clientWidth / 2, 0, maxScroll);
       const startLeft = dom.viewport.scrollLeft;
       const distance = target - startLeft;
+
       if (behavior === "auto" || Math.abs(distance) < 1) {
         dom.viewport.scrollLeft = target;
         return;
       }
+
+      dom.viewport.classList.add("is-programmatic-scroll");
       const startedAt = performance.now();
-      const duration = clamp(420 + Math.abs(distance) * .38,460,720);
-      const ease = value => 1 - Math.pow(1 - value,4);
+      const duration = clamp(330 + Math.abs(distance) * .28, 360, 560);
+      const ease = value => value < .5
+        ? 4 * value * value * value
+        : 1 - Math.pow(-2 * value + 2, 3) / 2;
+
       const frame = now => {
-        const progress = clamp((now - startedAt) / duration,0,1);
+        const progress = clamp((now - startedAt) / duration, 0, 1);
         dom.viewport.scrollLeft = startLeft + distance * ease(progress);
-        if (progress < 1) dockScrollAnimationFrame = requestAnimationFrame(frame);
-        else dockScrollAnimationFrame = 0;
+        if (progress < 1) {
+          dockScrollAnimationFrame = requestAnimationFrame(frame);
+        } else {
+          dockScrollAnimationFrame = 0;
+          dom.viewport.classList.remove("is-programmatic-scroll");
+        }
       };
       dockScrollAnimationFrame = requestAnimationFrame(frame);
     }
@@ -440,10 +608,13 @@
       const nextPosition = visibleIndices.indexOf(index);
       const direction = nextPosition === previousPosition ? 0 : nextPosition > previousPosition ? 1 : -1;
       activeIndex = index;
-      updateSummary(false);
+      updateSummary(false, direction || 1);
       const folder = q(`.projects-folder[data-project-index="${index}"]`, dom.carousel);
       if (scroll) centerFolderInViewport(folder, reducedMotion.matches ? "auto" : "smooth");
-      if (focus) folder?.focus({ preventScroll: true });
+      if (focus) {
+        suppressFocusAnimationUntil = performance.now() + 520;
+        folder?.focus({ preventScroll: true });
+      }
       if (animate && (changed || source === "keyboard" || source === "wheel" || source === "button")) {
         animateDockSelection(previousIndex,index,direction || 1,source);
         triggerSelectionBounce(folder, source);
@@ -975,10 +1146,13 @@
       const folder = event.target.closest(".projects-folder");
       if (!folder) return;
       const index = Number(folder.dataset.projectIndex);
-      if (index !== activeIndex) selectProject(index, { scroll: true, focus: false, source: "keyboard" });
-      else {
+      if (index !== activeIndex) {
+        selectProject(index, { scroll: true, focus: false, source: "keyboard" });
+      } else {
         resetDockMagnification();
-        triggerSelectionBounce(folder, "keyboard");
+        if (performance.now() > suppressFocusAnimationUntil) {
+          triggerSelectionBounce(folder, "keyboard");
+        }
       }
     });
 

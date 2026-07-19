@@ -30,7 +30,8 @@
   <link rel="icon" href="assets/favicon.png">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css?v=11.49.0-script-no-lines">
-  <link rel="stylesheet" href="projects-psp.css?v=11.46.0-motion-audio">
+  <link rel="stylesheet" href="projects-psp.css?v=11.50.0-fluid-dock">
+  <link rel="stylesheet" href="platform-fixes-v1150.css?v=11.50.0-isolated-fixes">
   <title>Proyectos | Rendición de Cuentas de San Pedro</title>
   <link rel="preconnect" href="https://accounts.google.com">
 </head>
@@ -38,11 +39,18 @@
   <div id="siteHeader"></div>
 
   <main id="main-content" class="projects-page-flow" aria-label="Módulo de proyectos">
-    <section id="projectsBannerSlot" class="projects-banner-slot" aria-label="Espacio reservado para el nuevo banner de proyectos">
-      <span class="projects-banner-slot__glow" aria-hidden="true"></span>
+
+    <section class="modulo-banner-proyectos" aria-label="Proyectos destacados">
+      <iframe
+        class="modulo-banner-proyectos__iframe"
+        src="./banner-proyectos-destacados.html"
+        title="Banner interactivo de proyectos destacados"
+        loading="eager"
+        allow="autoplay; fullscreen"
+      ></iframe>
     </section>
 
-    <section id="proyectos" class="projects-psp-shell" aria-labelledby="projectsModuleTitle">
+<section id="proyectos" class="projects-psp-shell" aria-labelledby="projectsModuleTitle">
       <div id="projectsPsp" class="projects-psp" tabindex="-1" aria-label="Explorador interactivo de proyectos">
         <span class="projects-psp__ambient projects-psp__ambient--one" aria-hidden="true"></span>
         <span class="projects-psp__ambient projects-psp__ambient--two" aria-hidden="true"></span>
@@ -76,7 +84,7 @@
               </div>
               <h2 id="projectsTitle">Proyecto <em>01</em></h2>
               <p id="projectsDescription">Seleccione una carpeta para conocer el objetivo, los avances, los resultados y las evidencias del proyecto.</p>
-              <div id="projectsTags" class="projects-psp__tags"></div>
+              <div id="projectsTags" class="projects-psp__tags" aria-label="Etiquetas del proyecto"><span data-project-tag-slot="0" hidden></span><span data-project-tag-slot="1" hidden></span><span data-project-tag-slot="2" hidden></span><span data-project-tag-slot="3" hidden></span><span data-project-tag-slot="4" hidden></span><span data-project-tag-slot="5" hidden></span><span data-project-tag-slot="6" hidden></span><span data-project-tag-slot="7" hidden></span></div>
             </div>
 
             <aside class="projects-psp__metric" aria-label="Indicador del proyecto seleccionado">
@@ -213,6 +221,6 @@
   <div id="globalDialogs"></div>
 
   <script src="portal-core-v11409.js?v=11.49.0-script-no-lines"></script>
-  <script src="projects-psp.js?v=11.46.0-motion-audio" defer></script>
+  <script src="projects-psp.js?v=11.50.0-fluid-dock" defer></script>
 </body>
 </html>

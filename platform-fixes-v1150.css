@@ -1,0 +1,376 @@
+
+/* =========================================================
+   V11.50 · Correcciones aisladas
+   - Laboratorio ciudadano: elimina el bloque de gradiente accidental.
+   - Tarjetas resumen: Recursos y Noticias.
+   - Integración visual del banner de Proyectos.
+   Este archivo no modifica módulos ajenos a estas páginas.
+   ========================================================= */
+
+/* Laboratorio ciudadano */
+html body.page-ideas.claude-page-ideas main#main-content
+section.ideas-page div.site-shell div.ideas-page__head
+h1.has-script-accent span.title-accent-word,
+html body.page-ideas.claude-page-ideas main#main-content
+section.ideas-page div.site-shell div.ideas-page__head
+h1 span.title-accent-word {
+  position: relative !important;
+  top: -.045em !important;
+  z-index: 12 !important;
+  display: inline-block !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: -.12em 0 -.28em .08em !important;
+  padding: .18em .08em .36em .03em !important;
+  overflow: visible !important;
+  color: #991b4d !important;
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  background-size: auto !important;
+  background-position: initial !important;
+  background-repeat: no-repeat !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: currentColor !important;
+  font-family: "Hullgaria","Segoe Script","Brush Script MT",cursive !important;
+  font-size: clamp(1.28em, 1.22em + .34vw, 1.46em) !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: .94 !important;
+  letter-spacing: .004em !important;
+  vertical-align: .035em !important;
+  white-space: nowrap !important;
+  text-shadow: 0 2px 0 rgba(255,255,255,.92), 0 10px 24px rgba(153,27,77,.16) !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  isolation: auto !important;
+}
+html body.page-ideas.claude-page-ideas main#main-content
+section.ideas-page div.site-shell div.ideas-page__head
+h1 span.title-accent-word::before,
+html body.page-ideas.claude-page-ideas main#main-content
+section.ideas-page div.site-shell div.ideas-page__head
+h1 span.title-accent-word::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+html body.page-ideas.claude-page-ideas main#main-content
+section.ideas-page div.site-shell div.ideas-page__head {
+  min-height: 215px !important;
+  padding: clamp(28px,3vw,42px) clamp(28px,3.4vw,48px) !important;
+  padding-right: clamp(190px,19vw,260px) !important;
+  align-items: center !important;
+}
+html body.page-ideas.claude-page-ideas main#main-content
+section.ideas-page div.site-shell div.ideas-page__head h1 {
+  max-width: 760px !important;
+  margin: 14px 0 16px !important;
+  font-size: clamp(3rem,5vw,5.25rem) !important;
+  line-height: .98 !important;
+  overflow: visible !important;
+}
+
+/* Tarjeta Recursos */
+html body.page-resources.claude-page-resources main#main-content
+section.page-hero .page-hero__grid > aside.year-selector-card {
+  position: relative !important;
+  isolation: isolate !important;
+  display: grid !important;
+  align-content: start !important;
+  gap: 0 !important;
+  min-height: 360px !important;
+  padding: clamp(30px,3vw,42px) !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(76,54,178,.16) !important;
+  border-radius: 34px !important;
+  color: #0b2850 !important;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(124,58,237,.14), transparent 31%),
+    radial-gradient(circle at 8% 100%, rgba(31,153,219,.13), transparent 34%),
+    linear-gradient(155deg,rgba(255,255,255,.98),rgba(244,247,255,.94)) !important;
+  box-shadow:
+    0 28px 70px rgba(25,58,110,.16),
+    inset 0 1px 0 rgba(255,255,255,.96) !important;
+  backdrop-filter: blur(18px) saturate(1.08) !important;
+}
+html body.page-resources.claude-page-resources main#main-content
+section.page-hero .page-hero__grid > aside.year-selector-card::before {
+  content: "" !important;
+  position: absolute !important;
+  z-index: -1 !important;
+  top: -74px !important;
+  right: -56px !important;
+  width: 190px !important;
+  height: 190px !important;
+  border: 28px solid rgba(109,40,217,.085) !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  transform: rotate(-12deg) !important;
+}
+html body.page-resources.claude-page-resources main#main-content
+section.page-hero .page-hero__grid > aside.year-selector-card::after {
+  content: "↗" !important;
+  position: absolute !important;
+  right: 28px !important;
+  bottom: 28px !important;
+  width: 54px !important;
+  height: 54px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 18px !important;
+  color: #fff !important;
+  background: linear-gradient(145deg,#6d28d9,#3f7ee8) !important;
+  box-shadow: 0 15px 30px rgba(90,53,196,.24) !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
+}
+html body.page-resources.claude-page-resources main#main-content
+section.page-hero .page-hero__grid > aside.year-selector-card > span {
+  width: max-content !important;
+  margin: 0 0 24px !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(109,40,217,.12) !important;
+  border-radius: 999px !important;
+  color: #5b2cb8 !important;
+  background: rgba(109,40,217,.075) !important;
+  font-size: .69rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+}
+html body.page-resources.claude-page-resources main#main-content
+section.page-hero .page-hero__grid > aside.year-selector-card h2 {
+  display: flex !important;
+  align-items: baseline !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  margin: 0 0 24px !important;
+  color: #0b2850 !important;
+  font-size: clamp(1.22rem,1.7vw,1.55rem) !important;
+  line-height: 1 !important;
+  letter-spacing: -.035em !important;
+}
+html body.page-resources.claude-page-resources main#main-content
+section.page-hero .page-hero__grid > aside.year-selector-card h2 strong {
+  color: #6d28d9 !important;
+  font-size: clamp(3.8rem,6vw,5.8rem) !important;
+  line-height: .78 !important;
+  letter-spacing: -.075em !important;
+  text-shadow: 0 16px 30px rgba(109,40,217,.15) !important;
+}
+html body.page-resources.claude-page-resources main#main-content
+section.page-hero .page-hero__grid > aside.year-selector-card p {
+  max-width: 30ch !important;
+  margin: 0 !important;
+  padding: 23px 74px 0 0 !important;
+  border-top: 1px solid rgba(20,70,125,.11) !important;
+  color: #315375 !important;
+  font-size: clamp(.96rem,1.1vw,1.08rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.72 !important;
+}
+
+/* Tarjeta Noticias */
+html body.page-news.claude-page-news main#main-content
+section.news-page-hero .news-page-hero__grid > aside.news-hero-summary {
+  position: relative !important;
+  isolation: isolate !important;
+  display: grid !important;
+  align-content: start !important;
+  min-height: 390px !important;
+  padding: clamp(30px,3vw,42px) !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255,255,255,.2) !important;
+  border-radius: 34px !important;
+  color: #fff !important;
+  background:
+    radial-gradient(circle at 82% 15%,rgba(95,202,255,.32),transparent 30%),
+    radial-gradient(circle at 3% 100%,rgba(126,87,255,.25),transparent 34%),
+    linear-gradient(145deg,#0a3268 0%,#125ca4 58%,#1596cb 100%) !important;
+  box-shadow:
+    0 30px 72px rgba(5,48,94,.27),
+    inset 0 1px 0 rgba(255,255,255,.24) !important;
+  backdrop-filter: blur(16px) saturate(1.08) !important;
+}
+html body.page-news.claude-page-news main#main-content
+section.news-page-hero .news-page-hero__grid > aside.news-hero-summary::before {
+  content: "" !important;
+  position: absolute !important;
+  z-index: -1 !important;
+  right: -90px !important;
+  bottom: -105px !important;
+  width: 250px !important;
+  height: 250px !important;
+  border: 34px solid rgba(255,255,255,.09) !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+}
+html body.page-news.claude-page-news main#main-content
+section.news-page-hero .news-page-hero__grid > aside.news-hero-summary::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 35px !important;
+  right: 34px !important;
+  width: 11px !important;
+  height: 11px !important;
+  border: 3px solid rgba(255,255,255,.72) !important;
+  border-radius: 50% !important;
+  background: #50d1f1 !important;
+  box-shadow: 0 0 0 8px rgba(80,209,241,.16), 0 0 24px rgba(80,209,241,.58) !important;
+  opacity: 1 !important;
+}
+html body.page-news.claude-page-news main#main-content
+section.news-page-hero .news-page-hero__grid > aside.news-hero-summary > span {
+  width: max-content !important;
+  margin: 0 0 26px !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(255,255,255,.2) !important;
+  border-radius: 999px !important;
+  color: #dff6ff !important;
+  background: rgba(255,255,255,.105) !important;
+  font-size: .69rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+}
+html body.page-news.claude-page-news main#main-content
+section.news-page-hero .news-page-hero__grid > aside.news-hero-summary > strong {
+  display: block !important;
+  margin: 0 0 17px !important;
+  color: #fff !important;
+  font-size: clamp(4.6rem,7vw,6.5rem) !important;
+  font-weight: 700 !important;
+  line-height: .8 !important;
+  letter-spacing: -.075em !important;
+  text-shadow: 0 18px 36px rgba(0,18,54,.32) !important;
+}
+html body.page-news.claude-page-news main#main-content
+section.news-page-hero .news-page-hero__grid > aside.news-hero-summary > p {
+  max-width: 27ch !important;
+  margin: 0 0 18px !important;
+  color: #fff !important;
+  font-size: clamp(1.12rem,1.45vw,1.38rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.45 !important;
+}
+html body.page-news.claude-page-news main#main-content
+section.news-page-hero .news-page-hero__grid > aside.news-hero-summary > small {
+  display: block !important;
+  max-width: 34ch !important;
+  margin-top: auto !important;
+  padding-top: 20px !important;
+  border-top: 1px solid rgba(255,255,255,.18) !important;
+  color: rgba(234,248,255,.84) !important;
+  font-size: .84rem !important;
+  line-height: 1.65 !important;
+}
+
+/* Banner final de Proyectos */
+html body.page-projects main.projects-page-flow {
+  overflow: clip !important;
+  background:
+    radial-gradient(circle at 88% 6%,rgba(54,164,222,.09),transparent 24%),
+    linear-gradient(180deg,#f3f7fc 0%,#f5f9fd 62%,#edf6fc 100%) !important;
+}
+html body.page-projects main.projects-page-flow section.modulo-banner-proyectos {
+  position: relative !important;
+  z-index: 3 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: clamp(12px,1.4vw,22px) 0 0 !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(180deg,rgba(243,247,252,1),rgba(243,247,252,.98) 76%,rgba(243,247,252,0)) !important;
+}
+html body.page-projects main.projects-page-flow iframe.modulo-banner-proyectos__iframe {
+  display: block !important;
+  width: 100% !important;
+  height: clamp(650px,51vw,780px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+html body.page-projects main.projects-page-flow
+section.modulo-banner-proyectos + section.projects-psp-shell {
+  position: relative !important;
+  z-index: 2 !important;
+  margin-top: clamp(-34px,-2.2vw,-18px) !important;
+  padding-top: clamp(56px,5vw,88px) !important;
+  background:
+    linear-gradient(180deg,rgba(243,247,252,0),#f2f8fc 90px,#edf6fb 100%) !important;
+}
+html body.page-projects .projects-psp__dock-viewport {
+  scroll-behavior: auto !important;
+}
+html body.page-projects .projects-psp__dock-viewport.is-programmatic-scroll {
+  scroll-snap-type: none !important;
+}
+html body.page-projects .projects-psp.is-project-switching .projects-psp__summary {
+  pointer-events: none !important;
+}
+html body.page-projects .projects-psp__summary-copy,
+html body.page-projects .projects-psp__metric {
+  will-change: transform,opacity,filter !important;
+}
+html body.page-projects .projects-folder {
+  backface-visibility: hidden !important;
+  contain: layout style !important;
+}
+html body.page-projects .projects-folder__front,
+html body.page-projects .projects-folder__paper,
+html body.page-projects .projects-folder__back {
+  backface-visibility: hidden !important;
+  transform-style: preserve-3d !important;
+}
+
+@media (max-width:1120px) {
+  html body.page-projects main.projects-page-flow iframe.modulo-banner-proyectos__iframe {
+    height: clamp(620px,63vw,740px) !important;
+  }
+}
+@media (max-width:760px) {
+  html body.page-ideas.claude-page-ideas main#main-content
+  section.ideas-page div.site-shell div.ideas-page__head {
+    min-height: 0 !important;
+    padding: 26px 24px 30px !important;
+  }
+  html body.page-ideas.claude-page-ideas main#main-content
+  section.ideas-page div.site-shell div.ideas-page__head h1 {
+    font-size: clamp(2.55rem,12vw,4rem) !important;
+  }
+  html body.page-ideas.claude-page-ideas main#main-content
+  section.ideas-page div.site-shell div.ideas-page__head h1 span.title-accent-word {
+    display: inline-block !important;
+    font-size: clamp(1.22em,1.08em + 2.2vw,1.38em) !important;
+    white-space: normal !important;
+  }
+  html body.page-resources.claude-page-resources main#main-content
+  section.page-hero .page-hero__grid > aside.year-selector-card,
+  html body.page-news.claude-page-news main#main-content
+  section.news-page-hero .news-page-hero__grid > aside.news-hero-summary {
+    min-height: 310px !important;
+    padding: 28px 24px !important;
+    border-radius: 28px !important;
+  }
+  html body.page-projects main.projects-page-flow iframe.modulo-banner-proyectos__iframe {
+    height: 1040px !important;
+  }
+  html body.page-projects main.projects-page-flow
+  section.modulo-banner-proyectos + section.projects-psp-shell {
+    margin-top: -24px !important;
+    padding-top: 52px !important;
+  }
+}
+@media (max-width:480px) {
+  html body.page-projects main.projects-page-flow iframe.modulo-banner-proyectos__iframe {
+    height: 980px !important;
+  }
+}
