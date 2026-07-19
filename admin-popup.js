@@ -47,7 +47,6 @@
   const portal = () => window.Portal;
   const isAdmin = () => Boolean(
     portal()?.state?.admin ||
-    sessionStorage.getItem(portal()?.KEYS?.admin || "sp_v6_admin") === "1" ||
     window.FirebasePortal?.getStatus?.()?.canWrite
   );
 

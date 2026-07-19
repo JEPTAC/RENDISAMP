@@ -182,21 +182,12 @@ Para logos y recursos permanentes de la identidad institucional sigue siendo rec
 - El alcance `drive.file` evita acceso general a todo el Drive.
 - El administrador debe seguir autenticado en Firebase y tener un rol autorizado para cargar archivos desde el editor.
 
-## 11. Archivos que reemplaza esta versión
-
-```text
-shared.js
-inline-admin.js
-firebase-service.js
-styles.css
-firebase.json
-FIREBASE_SETUP.md
-```
-
-Archivos nuevos:
+## 11. Archivos activos de la integración
 
 ```text
 drive-config.js
 drive-service.js
+firebase-service.js
+portal-core-v11409.js
 GOOGLE_DRIVE_SETUP.md
 ```

@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD = "11.39-proyectos-psp";
+  const BUILD = "11.41.0-firebase-rebuild-projects";
   const MIN_PROJECTS = 5;
   const MAX_PROJECTS = 10;
   const PALETTE = [
@@ -94,7 +94,7 @@
   }
 
   function init() {
-    if (document.body?.dataset.page !== "home") return;
+    if (document.body?.dataset.page !== "projects") return;
     const root = q("#projectsPsp");
     const shell = q("#proyectos");
     if (!root || !shell || !window.Portal) return;
@@ -361,11 +361,9 @@
     }
 
     function updateAdminVisibility() {
-      let localMode = false;
-      try { localMode = sessionStorage.getItem("sp_admin_mode") === "local"; } catch (_) {}
       const adminSession = q("#adminSession");
       const canManage = Boolean(state.admin)
-        || localMode
+        || Boolean(window.FirebasePortal?.getStatus?.()?.canWrite)
         || Boolean(adminSession && !adminSession.hidden);
       dom.manage.hidden = !canManage;
     }

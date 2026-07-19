@@ -1,5 +1,5 @@
 (() => {
-  const FIREBASE_VERSION = "12.15.0";
+  const FIREBASE_VERSION = "12.16.0";
   const firebaseConfig = {
     apiKey: "AIzaSyD02YaIMxLO2IPAJYZdPY2cWUvpkZDRo2U",
     authDomain: "rendicion-de-cuentas-6aceb.firebaseapp.com",
@@ -102,9 +102,9 @@
      */
     try {
       const [app, auth, firestore] = await Promise.all([
-        import("https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js"),
-        import("https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js"),
-        import("https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js")
+        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
       ]);
       return {app,auth,firestore};
     } catch (error) {
@@ -129,6 +129,9 @@
       canWrite:runtime.canWrite,
       isSuperAdmin:runtime.isSuperAdmin,
       emailVerified:Boolean(runtime.user?.emailVerified),
+      uid:runtime.user?.uid || "",
+      projectId:firebaseConfig.projectId,
+      transport:runtime.transport || "default",
       ...extra
     };
   }
@@ -141,26 +144,30 @@
     runtime.initPromise = (async () => {
       try {
         runtime.modules = await loadModules();
-        runtime.app = runtime.modules.app.initializeApp(firebaseConfig);
+        runtime.app = runtime.modules.app.getApps().length
+          ? runtime.modules.app.getApp()
+          : runtime.modules.app.initializeApp(firebaseConfig);
         runtime.auth = runtime.modules.auth.getAuth(runtime.app);
 
         /*
          * Algunas redes, antivirus y proxies reinician los canales
-         * WebChannel de Firestore. Se fuerza únicamente long polling.
-         * No se combina con experimentalAutoDetectLongPolling.
+         * WebChannel de Firestore. La detección automática permite que el SDK
+         * cambie a long polling cuando el entorno lo necesita.
          */
-        runtime.db = runtime.modules.firestore.initializeFirestore(
-          runtime.app,
-          {
-            experimentalForceLongPolling:true,
-            experimentalLongPollingOptions:{
-              timeoutSeconds:20
-            },
-            ignoreUndefinedProperties:true
-          }
-        );
-
-        runtime.transport = "forced-long-polling";
+        try {
+          runtime.db = runtime.modules.firestore.initializeFirestore(
+            runtime.app,
+            {
+              experimentalAutoDetectLongPolling:true,
+              ignoreUndefinedProperties:true
+            }
+          );
+          runtime.transport = "auto-long-polling";
+        } catch (firestoreInitError) {
+          runtime.db = runtime.modules.firestore.getFirestore(runtime.app);
+          runtime.transport = "existing-instance";
+          console.info("[Firebase] Se reutilizó la instancia existente de Firestore.",firestoreInitError);
+        }
         runtime.auth.languageCode = "es";
 
         await runtime.modules.auth.setPersistence(
@@ -204,9 +211,11 @@
         runtime.ready = false;
         emit("firebase:ready", {
           connected:false,
-          error:friendlyError(error)
+          error:friendlyError(error),
+          projectId:firebaseConfig.projectId
         });
         console.warn("[Firebase] No fue posible inicializar.", error);
+        runtime.initPromise = null;
       }
       return runtime;
     })();
@@ -368,8 +377,17 @@
     emit("firebase:auth", authDetail(options));
   }
 
+  function assertReady() {
+    if (!runtime.modules || !runtime.auth || !runtime.db) {
+      const error = new Error("Firebase no terminó de inicializar. Revise la conexión y la configuración del proyecto.");
+      error.code = runtime.lastError?.code || "failed-precondition";
+      throw error;
+    }
+  }
+
   async function signInEmail(email,password) {
     if (!runtime.ready) await init();
+    assertReady();
     const credential = await runtime.modules.auth.signInWithEmailAndPassword(
       runtime.auth,
       String(email || "").trim(),
@@ -381,6 +399,7 @@
 
   async function signInGoogle() {
     if (!runtime.ready) await init();
+    assertReady();
     const provider = new runtime.modules.auth.GoogleAuthProvider();
     provider.setCustomParameters({prompt:"select_account"});
     const credential = await runtime.modules.auth.signInWithPopup(runtime.auth,provider);
@@ -390,6 +409,7 @@
 
   async function registerEmail(values = {}) {
     if (!runtime.ready) await init();
+    assertReady();
 
     const displayName = String(values.displayName || "").trim();
     const email = String(values.email || "").trim().toLowerCase();
@@ -435,6 +455,7 @@
 
   async function sendPasswordReset(email) {
     if (!runtime.ready) await init();
+    assertReady();
     const value = String(email || "").trim();
     if (!value) throw new Error("Escriba el correo de la cuenta.");
     await runtime.modules.auth.sendPasswordResetEmail(runtime.auth,value);
@@ -728,6 +749,12 @@
 
   async function pushAll(options = {}) {
     if (!runtime.ready) await init();
+    assertReady();
+    if (!runtime.user) {
+      const error = new Error("Debe iniciar sesión antes de sincronizar.");
+      error.code = "auth/user-not-found";
+      throw error;
+    }
     if (!runtime.canWrite) {
       throw Object.assign(
         new Error("La cuenta no tiene permisos de edición."),
@@ -794,6 +821,7 @@
 
   async function createPublicIdea(idea) {
     if (!runtime.ready) await init();
+    assertReady();
 
     const {doc,setDoc,serverTimestamp} = runtime.modules.firestore;
     const payload = {
@@ -866,6 +894,36 @@
     });
   });
 
+  async function diagnose() {
+    if (!runtime.ready) await init();
+    assertReady();
+    const result = {
+      projectId:firebaseConfig.projectId,
+      appId:firebaseConfig.appId,
+      authReady:Boolean(runtime.auth),
+      firestoreReady:Boolean(runtime.db),
+      signedIn:Boolean(runtime.user),
+      uid:runtime.user?.uid || "",
+      role:runtime.role || "guest",
+      canWrite:Boolean(runtime.canWrite),
+      profileSource:runtime.profileSource || "",
+      profileError:runtime.profileError ? friendlyError(runtime.profileError) : "",
+      transport:runtime.transport || "default"
+    };
+    if (runtime.user) {
+      try {
+        await runtime.modules.firestore.getDoc(
+          runtime.modules.firestore.doc(runtime.db,"users",runtime.user.uid)
+        );
+        result.profileRead = true;
+      } catch (error) {
+        result.profileRead = false;
+        result.profileReadError = friendlyError(error);
+      }
+    }
+    return result;
+  }
+
   window.FirebasePortal = {
     init,
     signInEmail,
@@ -886,6 +944,7 @@
     normalizeRole,
     roleLabel,
     friendlyError,
+    diagnose,
     canWrite:() => runtime.canWrite,
     isSuperAdmin:() => runtime.isSuperAdmin,
     getStatus:() => ({

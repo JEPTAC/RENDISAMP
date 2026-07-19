@@ -1,0 +1,133 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function currentUserPath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function hasCurrentProfile() {
+      return signedIn() && exists(currentUserPath());
+    }
+
+    function currentProfile() {
+      return get(currentUserPath()).data;
+    }
+
+    function hasActiveRole(roles) {
+      return hasCurrentProfile()
+        && currentProfile().active == true
+        && currentProfile().role in roles;
+    }
+
+    function isEditor() {
+      return hasActiveRole(['super_admin', 'admin', 'editor']);
+    }
+
+    function isSuperAdmin() {
+      return hasActiveRole(['super_admin']);
+    }
+
+    function isOwnUserDocument(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function isOwnLegacyProfile() {
+      return signedIn()
+        && resource.data.email is string
+        && request.auth.token.email is string
+        && resource.data.email == request.auth.token.email;
+    }
+
+    function isValidGuestCreation(userId) {
+      return isOwnUserDocument(userId)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role == 'guest'
+        && request.resource.data.active == true;
+    }
+
+    function legacyProfileExists() {
+      return signedIn()
+        && request.auth.token.email is string
+        && exists(/databases/$(database)/documents/users/$(request.auth.token.email));
+    }
+
+    function isValidLegacyMigration(userId) {
+      return isOwnUserDocument(userId)
+        && legacyProfileExists()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role == get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role
+        && request.resource.data.active == get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.active;
+    }
+
+    function ownProfileFieldsOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+        'displayName', 'phone', 'neighborhood', 'emailVerified',
+        'lastLoginAt', 'updatedAt'
+      ]);
+    }
+
+    match /portal/{documentId} {
+      allow read: if true;
+      allow create, update, delete: if isEditor();
+    }
+
+    match /ideas/{ideaId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly([
+          'title', 'author', 'location', 'category', 'description',
+          'status', 'response', 'votes', 'created', 'createdBy',
+          'createdByEmail', 'createdAt'
+        ])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 3
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.description is string
+        && request.resource.data.description.size() >= 10
+        && request.resource.data.description.size() <= 1200
+        && request.resource.data.status == 'recibida'
+        && request.resource.data.response == ''
+        && request.resource.data.votes == 0
+        && (
+          !signedIn()
+          || request.resource.data.createdBy == request.auth.uid
+        );
+      allow update, delete: if isEditor();
+    }
+
+    match /users/{userId} {
+      allow get: if isOwnUserDocument(userId)
+        || isOwnLegacyProfile()
+        || isSuperAdmin();
+      allow list: if isSuperAdmin();
+      allow create: if isValidGuestCreation(userId)
+        || isValidLegacyMigration(userId)
+        || isSuperAdmin();
+      allow update: if (
+          isOwnUserDocument(userId)
+          && ownProfileFieldsOnly()
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.email == resource.data.email
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.active == resource.data.active
+        ) || isSuperAdmin();
+      allow delete: if isSuperAdmin() && request.auth.uid != userId;
+    }
+
+    match /auditLogs/{logId} {
+      allow create: if isEditor()
+        && request.resource.data.userId == request.auth.uid;
+      allow read: if isSuperAdmin();
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

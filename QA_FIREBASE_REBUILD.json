@@ -1,0 +1,358 @@
+{
+  "javascript": {
+    "ok": true,
+    "files": [
+      {
+        "file": "admin-popup.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "claude-design.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "dashboard.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "drive-config.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "drive-service.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "firebase-service.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "home.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "ideas.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "motion-studio.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "noticia.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "noticias.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "portal-core-v11409.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "projects-psp.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "resources.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "stack-motion.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "territory-experience.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "vigencias.js",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "year-page.js",
+        "ok": true,
+        "error": ""
+      }
+    ]
+  },
+  "json": {
+    "ok": true,
+    "files": [
+      {
+        "file": ".firebaserc",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "QA_FIREBASE_REBUILD.json",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "firebase.json",
+        "ok": true,
+        "error": ""
+      },
+      {
+        "file": "manifest.json",
+        "ok": true,
+        "error": ""
+      }
+    ]
+  },
+  "html": {
+    "ok": true,
+    "files": [
+      {
+        "file": "ideas.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "index.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "noticia.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "noticias.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "proyectos.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "recursos.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "rendicion-2025.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "rendicion-2026.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "rendicion-2027.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "rendicion.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      },
+      {
+        "file": "vigencias.html",
+        "duplicateIds": [],
+        "imagesMissingAlt": []
+      }
+    ],
+    "missingLocalReferences": []
+  },
+  "css": {
+    "ok": true,
+    "files": [
+      {
+        "file": "claude-design.css",
+        "balancedBraces": true,
+        "missingLocalReferences": []
+      },
+      {
+        "file": "projects-psp.css",
+        "balancedBraces": true,
+        "missingLocalReferences": []
+      },
+      {
+        "file": "styles.css",
+        "balancedBraces": true,
+        "missingLocalReferences": []
+      }
+    ]
+  },
+  "emptyFiles": {
+    "ok": true,
+    "files": []
+  },
+  "exactDuplicates": {
+    "ok": true,
+    "groups": []
+  },
+  "visualIntegrity": {
+    "ok": true,
+    "files": [
+      {
+        "file": "styles.css",
+        "unchanged": true,
+        "sha256": "5ab41539ccf6ae08a29741adba2a49c8207fd84ae488a65ce13f0f3aa5fe37b2"
+      },
+      {
+        "file": "claude-design.css",
+        "unchanged": true,
+        "sha256": "3d6d39b29f9615e53ce7940e9a7fd72dc790bd7e555cb3239da623cf217e8d3a"
+      },
+      {
+        "file": "claude-design.js",
+        "unchanged": true,
+        "sha256": "3d9e61ad0d5d3fe7cdbd46b9756b46b029862151efc4b519b27515e511a1e861"
+      },
+      {
+        "file": "territory-experience.js",
+        "unchanged": true,
+        "sha256": "41bb7121853a33e7f7d61589cf67df13dcad0aa0e427cca4ff8898d0700a84ee"
+      },
+      {
+        "file": "motion-studio.js",
+        "unchanged": true,
+        "sha256": "082ccea305fccd36fc252bc793b4ab109370091018f545f8efacdcf001135b85"
+      },
+      {
+        "file": "stack-motion.js",
+        "unchanged": true,
+        "sha256": "3dc4e9f0d6f1d59cbaaad9e1a4fe89e392d465cb4d1558fe485421520e2cc20a"
+      }
+    ]
+  },
+  "firebaseConfiguration": {
+    "ok": true,
+    "projectId": "rendicion-de-cuentas-6aceb",
+    "projectNumber": "509564686428",
+    "sdk": "12.16.0",
+    "requiredFiles": {
+      "firebase-service.js": true,
+      "firestore.rules": true,
+      "firebase.json": true,
+      ".firebaserc": true,
+      ".firebaseignore": true,
+      ".github/workflows/firebase-deploy.yml": true
+    }
+  },
+  "browser": {
+    "indexDesktop": {
+      "data": {
+        "title": "Rendición de Cuentas | San Pedro",
+        "page": "home",
+        "portalBuild": "11.41.0-firebase-rebuild",
+        "headerRendered": true,
+        "footerRendered": true,
+        "mainSections": 7,
+        "admin": false,
+        "editButtons": 0,
+        "bodyScrollWidth": 1440,
+        "viewportWidth": 1440,
+        "localStyles": [
+          "http://127.0.0.1:8765/styles.css?v=11.41.0-firebase-rebuild",
+          "http://127.0.0.1:8765/claude-design.css?v=11.41.0-firebase-rebuild",
+          "inline"
+        ],
+        "projectsShell": false,
+        "projectCards": 0,
+        "territoryPresent": true
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": []
+    },
+    "projectsMobile": {
+      "data": {
+        "title": "Proyectos | Rendición de Cuentas de San Pedro",
+        "page": "projects",
+        "portalBuild": "11.41.0-firebase-rebuild",
+        "headerRendered": true,
+        "footerRendered": true,
+        "mainSections": 1,
+        "admin": false,
+        "editButtons": 0,
+        "bodyScrollWidth": 390,
+        "viewportWidth": 390,
+        "localStyles": [
+          "http://127.0.0.1:8765/styles.css?v=11.41.0-firebase-rebuild",
+          "http://127.0.0.1:8765/projects-psp.css?v=11.41.0-firebase-rebuild",
+          "http://127.0.0.1:8765/claude-design.css?v=11.41.0-firebase-rebuild",
+          "inline"
+        ],
+        "projectsShell": true,
+        "projectCards": 5,
+        "territoryPresent": false
+      },
+      "consoleErrors": [
+        "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+        "Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+        "Failed to load resource: net::ERR_NAME_NOT_RESOLVED"
+      ],
+      "pageErrors": [],
+      "failedRequests": [
+        {
+          "url": "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js",
+          "error": "net::ERR_NAME_NOT_RESOLVED"
+        },
+        {
+          "url": "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js",
+          "error": "net::ERR_NAME_NOT_RESOLVED"
+        },
+        {
+          "url": "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js",
+          "error": "net::ERR_NAME_NOT_RESOLVED"
+        }
+      ]
+    },
+    "authSimulation": {
+      "staleCheck": {
+        "stateAdmin": false,
+        "staleFlag": null
+      },
+      "enabled": {
+        "stateAdmin": true,
+        "editButtons": 26,
+        "adminSessionHidden": false,
+        "adminEntryHidden": true,
+        "territoryAdminVisible": true
+      },
+      "disabled": {
+        "stateAdmin": false,
+        "editButtons": 0,
+        "adminSessionHidden": true,
+        "adminEntryHidden": false
+      }
+    }
+  },
+  "obsoleteSecurityLeftovers": {
+    "ok": true,
+    "found": []
+  },
+  "summary": {
+    "ok": true,
+    "currentFileCount": 60,
+    "originalFileCount": 116
+  }
+}

@@ -1,54 +1,41 @@
-# Portal de Rendición de Cuentas de San Pedro — V11.23
+# Portal de Rendición de Cuentas de San Pedro
 
-Portal multipágina para publicar vigencias, resultados, documentos, noticias, indicadores e iniciativas ciudadanas del municipio de San Pedro, Valle del Cauca.
+Versión técnica: `11.41.0-firebase-rebuild`
 
-## Actualización V11.23
+Portal multipágina para vigencias, noticias, recursos, participación ciudadana, proyectos y administración de contenido.
 
-La portada fue recuperada desde su estructura estable y rediseñada sin la capa experimental de V11.22. La composición actual mantiene el contenido institucional a la izquierda y el recurso visual administrable a la derecha, con el explorador ubicado después del hero y sin superposiciones.
+## Diseño preservado
 
-Cambios principales:
+La reconstrucción no modifica la capa gráfica principal. `styles.css`, `claude-design.css/js`, el mapa territorial, las animaciones y los adaptadores visuales conservan el mismo contenido recibido. Los cambios se concentran en Firebase, permisos, edición, sincronización, limpieza segura y recuperación funcional de Proyectos.
 
-- Estructura del hero normalizada; el panel visual vuelve a ser hermano de la cuadrícula de contenido.
-- Jerarquía tipográfica limpia en Century Gothic y palabra «confianza» completamente visible.
-- Diseño editorial institucional, con profundidad moderada y movimiento no invasivo.
-- Fotografía del administrador conservada dentro del panel visual.
-- Explorador independiente del hero en escritorio, tableta y celular.
-- Respeto por `prefers-reduced-motion`.
-- Eliminación de scripts, recursos duplicados e informes históricos que no intervenían en la ejecución.
+## Estructura activa
 
-## Páginas
-
-- `index.html`: portada.
-- `vigencias.html`: archivo histórico.
-- `rendicion-2025.html`, `rendicion-2026.html`, `rendicion-2027.html`: vigencias publicadas.
-- `rendicion.html?year=AAAA`: plantilla de vigencias futuras.
-- `recursos.html`: centro de recursos.
-- `noticias.html` y `noticia.html`: publicaciones.
-- `ideas.html`: laboratorio ciudadano.
-
-## Componentes de ejecución
-
-- `shared.js`: estado, encabezado, pie, accesibilidad, administración e integraciones.
-- `claude-design.css` y `claude-design.js`: composición visual y comportamiento de presentación.
-- `firebase-service.js`: autenticación y persistencia Firebase.
-- `drive-service.js` y `drive-config.js`: integración con Google Drive/Picker.
+- `portal-core-v11409.js`: núcleo único del portal.
+- `firebase-service.js`: única implementación Firebase.
+- `firestore.rules`: reglas de acceso.
+- `.firebaserc`, `.firebaseignore` y `firebase.json`: configuración de proyecto y despliegue.
+- `admin-popup.js`: editor contextual.
 - `territory-experience.js`: experiencia territorial y mapa.
-- `admin-popup.js`: consola administrativa.
+- `proyectos.html`, `projects-psp.css`, `projects-psp.js`: módulo de proyectos.
+- `FIREBASE_SETUP.md`: activación del primer administrador y despliegue.
+- `AUDITORIA_TECNICA_FIREBASE.md`: diagnóstico y cambios.
+- `QA_FIREBASE_REBUILD.json`: resultados de validación.
 
-## Publicación en GitHub Pages
+## Ejecución local
 
-Suba el contenido completo de esta carpeta a la raíz del repositorio y configure:
+```bash
+python -m http.server 8080
+```
 
-`Settings → Pages → Deploy from a branch → main → / (root)`
+Abra `http://localhost:8080/index.html`. No abra los HTML con doble clic, porque los módulos y servicios web requieren un servidor HTTP.
 
-Después de reemplazar una versión anterior, haga una recarga completa con `Ctrl + Shift + R`.
+## Despliegue manual
 
-## Configuración
+```bash
+npm install -g firebase-tools
+firebase login
+firebase use rendicion-de-cuentas-6aceb
+firebase deploy --only firestore:rules,hosting
+```
 
-Consulte:
-
-- `FIREBASE_SETUP.md`
-- `FIREBASE_USUARIOS_SETUP.md`
-- `GOOGLE_DRIVE_SETUP.md`
-
-Las credenciales y reglas de producción deben configurarse en los servicios correspondientes; no se incluyen secretos en el paquete.
+El despliegue automático desde GitHub está configurado en `.github/workflows/firebase-deploy.yml`.

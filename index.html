@@ -5,29 +5,12 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
-    window.__PORTAL_EXPECTED_BUILD__ = "11.40.9-firestore-nested-arrays";
-    (async () => {
-      try {
-        if ("serviceWorker" in navigator) {
-          const regs = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(regs.map(reg => {
-            const urls = [reg.active?.scriptURL, reg.waiting?.scriptURL, reg.installing?.scriptURL].filter(Boolean);
-            return urls.some(url => url.includes("coop-sw.js")) ? reg.unregister() : Promise.resolve(false);
-          }));
-        }
-        if ("caches" in window) {
-          const names = await caches.keys();
-          await Promise.all(names.map(name => caches.delete(name)));
-        }
-      } catch (error) {
-        console.info("[Portal] Limpieza preventiva completada con observaciones.", error);
-      }
-    })();
+    window.__PORTAL_EXPECTED_BUILD__ = "11.41.0-firebase-rebuild";
   </script>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="preload" href="assets/fonts/brother-signature.otf" as="font" type="font/otf" crossorigin>
   <meta name="description" content="Portal especial de Rendición de Cuentas de San Pedro, Valle del Cauca.">
-  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.40.9-firestore-nested-arrays">
+  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.41.0-firebase-rebuild">
   <title>Rendición de Cuentas | San Pedro</title>
 
   <link rel="preconnect" href="https://accounts.google.com">
@@ -131,6 +114,6 @@
     </section>
   </main>
   <div id="siteFooter"></div><div id="globalDialogs"></div>
-  <script src="portal-core-v11409.js?v=11.40.9-firestore-nested-arrays"></script><script src="home.js?v=11.40.9-firestore-nested-arrays"></script>
+  <script src="portal-core-v11409.js?v=11.41.0-firebase-rebuild"></script><script src="home.js?v=11.41.0-firebase-rebuild"></script>
 </body>
 </html>

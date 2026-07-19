@@ -1,48 +1,6 @@
 (() => {
-  const PORTAL_BUILD = "11.40.9-firestore-nested-arrays";
+  const PORTAL_BUILD = "11.41.0-firebase-rebuild";
 
-  /*
-   * Retira definitivamente el service worker experimental de V11.40.2. GitHub Pages no
-   * permite controlar COOP mediante ese mecanismo y mantenerlo activo
-   * puede dejar una navegación controlada innecesariamente.
-   */
-  const legacyCoopCleanup = (() => {
-    if (!("serviceWorker" in navigator)) return null;
-
-    const cleanupKey = "sp_legacy_coop_sw_removed_v11404";
-    const controlledByLegacyWorker = Boolean(
-      navigator.serviceWorker.controller?.scriptURL?.includes("coop-sw.js")
-    );
-
-    navigator.serviceWorker.getRegistrations().then(async registrations => {
-      const legacyRegistrations = registrations.filter(registration => {
-        const urls = [
-          registration.active?.scriptURL,
-          registration.waiting?.scriptURL,
-          registration.installing?.scriptURL
-        ].filter(Boolean);
-        return urls.some(url => url.includes("coop-sw.js"));
-      });
-
-      await Promise.all(legacyRegistrations.map(registration => registration.unregister()));
-
-      if ("caches" in window) {
-        const cacheNames = await caches.keys();
-        await Promise.all(cacheNames.map(name => caches.delete(name)));
-      }
-
-      if (controlledByLegacyWorker && !sessionStorage.getItem(cleanupKey)) {
-        sessionStorage.setItem(cleanupKey,"1");
-        const next = new URL(location.href);
-        next.searchParams.set("portal-build", PORTAL_BUILD);
-        location.replace(next.href);
-      }
-    }).catch(error => {
-      console.info("[Portal] No fue posible retirar el service worker anterior.",error);
-    });
-
-    return true;
-  })();
 
   /*
    * Arranque visual temprano.
@@ -935,6 +893,9 @@ window.addEventListener("unhandledrejection",event => {
   event.preventDefault();
 });
 
+  // Un indicador local antiguo no puede conceder permisos. Firebase decide el rol.
+  sessionStorage.removeItem(KEYS.admin);
+
   const state = {
     years: loadArray(KEYS.years, DEFAULT_YEARS),
     resources: loadArray(KEYS.resources, DEFAULT_RESOURCES),
@@ -946,7 +907,7 @@ window.addEventListener("unhandledrejection",event => {
     dashboards: loadObject(KEYS.dashboards, DEFAULT_DASHBOARDS),
     commitments: loadArray(KEYS.commitments, DEFAULT_COMMITMENTS),
     citizenRequests: loadArray(KEYS.citizenRequests, DEFAULT_CITIZEN_REQUESTS),
-    admin: sessionStorage.getItem(KEYS.admin) === "1"
+    admin: false
   };
 
   const helpers = {
@@ -1390,10 +1351,6 @@ helpers.showClickEffect = showClickEffect;
             <button class="button button-secondary" type="button" id="googleAdminLogin">Continuar con Google</button>
             <button class="auth-text-button" type="button" id="forgotPasswordButton">Olvidé mi contraseña</button>
             <small id="firebaseLoginStatus" class="auth-status" aria-live="polite">Conectando con Firebase…</small>
-            <details class="local-login-help">
-              <summary>Acceso local de emergencia</summary>
-              <p>Solo para mantenimiento temporal. No sincroniza información entre dispositivos.</p>
-            </details>
           </form>
         </section>
 
@@ -1793,8 +1750,7 @@ helpers.showClickEffect = showClickEffect;
     const name = document.querySelector("#adminSessionName");
     const role = document.querySelector("#adminSessionRole");
 
-    const canWrite = Boolean(detail.canWrite)
-      || sessionStorage.getItem("sp_admin_mode") === "local";
+    const canWrite = Boolean(detail.canWrite);
 
     if (!canWrite) {
       if (session) session.hidden = true;
@@ -1806,16 +1762,12 @@ helpers.showClickEffect = showClickEffect;
       detail.profile?.displayName
       || detail.user?.displayName
       || detail.user?.email
-      || (sessionStorage.getItem("sp_admin_mode") === "local"
-        ? "Administrador local"
-        : "Administrador");
+      || "Administrador";
 
     const roleName =
       detail.roleLabel
       || roleLabel(detail.role)
-      || (sessionStorage.getItem("sp_admin_mode") === "local"
-        ? "Acceso local"
-        : "Administrador");
+      || "Administrador";
 
     if (session) session.hidden = false;
     if (entry) entry.hidden = true;
@@ -1909,8 +1861,6 @@ helpers.showClickEffect = showClickEffect;
   async function performFirebaseSignout() {
     await window.FirebasePortal?.signOut?.().catch(() => {});
     state.admin = false;
-    sessionStorage.removeItem(KEYS.admin);
-    sessionStorage.removeItem("sp_admin_mode");
     closeDialog("adminPanel");
     closeDialog("accountDialog");
 
@@ -2077,25 +2027,6 @@ helpers.showClickEffect = showClickEffect;
       const password = String(form.get("password") || "");
       const status = document.querySelector("#firebaseLoginStatus");
 
-      if (identity === "admin" && password === "SanPedro2026*") {
-        state.admin = true;
-        sessionStorage.setItem(KEYS.admin,"1");
-        sessionStorage.setItem("sp_admin_mode","local");
-        loginForm.reset();
-        closeDialog("loginDialog");
-
-        updateAdminHeader({
-          canWrite:true,
-          roleLabel:"Acceso local",
-          profile:{displayName:"Administrador local"}
-        });
-        syncAdmin();
-        window.AdminPopup?.sync?.();
-        window.AdminPopup?.openAdmin?.();
-        if (!window.AdminPopup) openDialog("adminPanel");
-        helpers.toast("Sesión administrativa iniciada.");
-        return;
-      }
 
       emailLoginPending = true;
       loginForm.setAttribute("aria-busy","true");
@@ -2253,14 +2184,6 @@ helpers.showClickEffect = showClickEffect;
     });
 
     document.querySelector("#adminSignout")?.addEventListener("click",performFirebaseSignout);
-
-    if (state.admin && sessionStorage.getItem("sp_admin_mode") === "local") {
-      updateAdminHeader({
-        canWrite:true,
-        roleLabel:"Acceso local",
-        profile:{displayName:"Administrador local"}
-      });
-    }
 
     document.querySelector("#applyAdminColors")?.addEventListener("click", () => {
       state.settings.primary = document.querySelector("#adminPrimary").value;
@@ -2464,7 +2387,7 @@ helpers.showClickEffect = showClickEffect;
   function loadFirebaseService() {
     if (document.querySelector('script[data-firebase-portal]')) return;
     const script = document.createElement("script");
-    script.src = `firebase-auth-v11409.js?v=${PORTAL_BUILD}`;
+    script.src = `firebase-service.js?v=${PORTAL_BUILD}`;
     script.dataset.firebasePortal = "true";
     script.onload = () => window.FirebasePortal?.init?.();
     script.onerror = () => helpers.toast("No fue posible cargar la conexión con Firebase.");
@@ -2887,19 +2810,12 @@ helpers.showClickEffect = showClickEffect;
 
     window.addEventListener("firebase:auth", event => {
       const detail = event.detail || {};
-      const localMode =
-        sessionStorage.getItem("sp_admin_mode") === "local";
-
-      if (!detail.user && localMode) return;
-
       updateAccountDialog(detail);
 
       const button = document.querySelector("#adminEntry");
 
       if (detail.user && detail.canWrite) {
         state.admin = true;
-        sessionStorage.setItem(KEYS.admin,"1");
-        sessionStorage.setItem("sp_admin_mode","firebase");
 
         updateAdminHeader(detail);
     
@@ -2910,11 +2826,8 @@ helpers.showClickEffect = showClickEffect;
         }
       } else if (detail.user) {
         state.admin = false;
-        sessionStorage.removeItem(KEYS.admin);
-        sessionStorage.removeItem("sp_admin_mode");
-    
+
         updateAdminHeader({canWrite:false});
-        window.AdminPopup?.sync?.();
         if (button) {
           button.hidden = false;
           button.textContent = "Mi cuenta";
@@ -2923,24 +2836,26 @@ helpers.showClickEffect = showClickEffect;
 
         if (detail.profileError) {
           helpers.toast(
-            "La cuenta inició sesión, pero Firestore no permitió leer el rol. Publique las reglas V9."
+            "La cuenta inició sesión, pero Firestore no permitió leer el rol. Publique firestore.rules incluido en el proyecto."
           );
         } else if (detail.reason === "registration") {
           helpers.toast("Cuenta creada con rol de invitado.");
         }
       } else {
         state.admin = false;
-        sessionStorage.removeItem(KEYS.admin);
-        sessionStorage.removeItem("sp_admin_mode");
 
         updateAdminHeader({canWrite:false});
-        window.AdminPopup?.sync?.();
         if (button) {
           button.hidden = false;
           button.textContent = "Ingresar";
           button.classList.remove("is-active");
         }
       }
+
+      window.AdminPopup?.sync?.();
+      document.dispatchEvent(new CustomEvent("portal:adminchange", {
+        detail:{...detail, canWrite:state.admin}
+      }));
     });
 
     window.addEventListener("firebase:data", () => {
@@ -3252,6 +3167,9 @@ const initializeLoadingFeedback = () => {
   initInteractiveFeedback();
   bindLoadingNavigationFeedback();
   startInitialPageLoading();
+
+  // La carga visual no debe quedar bloqueada por Firebase, Drive o una imagen externa.
+  window.setTimeout(finishInitialPageLoading,1800);
 };
 
 if (document.readyState === "loading") {
