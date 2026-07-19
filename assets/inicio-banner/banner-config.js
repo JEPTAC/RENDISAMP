@@ -36,8 +36,8 @@ window.SP_HOME_BANNER_CONFIG = {
       alt: "Parque principal — San Pedro",
       accent: "#40c9ff",
       soft: "#d9f5ff",
-      cursiveColor: "#67d8ff",
-      compactColor: "#315c79",
+      cursiveColor: "#0077b6",
+      compactColor: "#173f5f",
       captionTitleColor: "#ffffff",
       captionDescriptionColor: "#ffffff"
     },
@@ -53,8 +53,8 @@ window.SP_HOME_BANNER_CONFIG = {
       alt: "Palmas de la plaza — San Pedro",
       accent: "#6fcf97",
       soft: "#e2f7e9",
-      cursiveColor: "#9df0bd",
-      compactColor: "#356c4d",
+      cursiveColor: "#087f5b",
+      compactColor: "#24533e",
       captionTitleColor: "#ffffff",
       captionDescriptionColor: "#ffffff"
     },
@@ -70,8 +70,8 @@ window.SP_HOME_BANNER_CONFIG = {
       alt: "Templo y territorio — San Pedro",
       accent: "#f2c94c",
       soft: "#fff5c9",
-      cursiveColor: "#ffe081",
-      compactColor: "#7a6530",
+      cursiveColor: "#c45a08",
+      compactColor: "#6f4a00",
       captionTitleColor: "#fff8df",
       captionDescriptionColor: "#ffffff"
     },
@@ -87,8 +87,8 @@ window.SP_HOME_BANNER_CONFIG = {
       alt: "Encuentro ciudadano — San Pedro",
       accent: "#ff7b9c",
       soft: "#ffe2ea",
-      cursiveColor: "#ffadc1",
-      compactColor: "#835064",
+      cursiveColor: "#c4144f",
+      compactColor: "#6f2944",
       captionTitleColor: "#ffffff",
       captionDescriptionColor: "#ffffff"
     },
@@ -104,8 +104,8 @@ window.SP_HOME_BANNER_CONFIG = {
       alt: "Vías del centro — San Pedro",
       accent: "#8f7cff",
       soft: "#e9e5ff",
-      cursiveColor: "#b7aaff",
-      compactColor: "#5a5187",
+      cursiveColor: "#6d28d9",
+      compactColor: "#49358d",
       captionTitleColor: "#ffffff",
       captionDescriptionColor: "#ffffff"
     }

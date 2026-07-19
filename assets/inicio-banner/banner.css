@@ -268,7 +268,7 @@
   text-shadow:0 2px 2px rgba(255,255,255,.32),0 7px 22px rgba(5,24,45,.32)!important;
 }
 .spb-banner__script{font-size:clamp(4.5rem,6.7vw,8.25rem)!important;margin-block:-.04em .08em!important}
-.spb-banner__caption-script{font-size:1.28em!important;line-height:1.05!important;transform:translateY(.03em) rotate(-1deg)!important}
+.spb-banner__caption-script{font-size:1.28em!important;line-height:1.05!important;transform:translateY(.03em) rotate(-1deg)}
 .spb-banner__discover{font-size:clamp(1.5rem,2vw,2.25rem)!important}
 .spb-banner__modal-copy small{font-size:clamp(1.9rem,2.5vw,2.8rem)!important;color:var(--spb-cursive-color,var(--spb-accent))!important}
 .spb-banner__caption h2,.spb-banner__modal-copy{overflow:visible!important}
@@ -278,4 +278,59 @@
   .spb-banner__caption-script{font-size:1.16em!important}
   .spb-banner__modal-card{max-height:calc(100dvh - 24px)}
   .spb-banner__modal-copy small{font-size:clamp(1.75rem,8vw,2.35rem)!important}
+}
+
+/* =========================================================
+   V2.3 · Hullgaria protagonista y cambios de escena más notorios
+   ========================================================= */
+.spb-banner__left,.spb-banner__title,.spb-banner__caption,.spb-banner__caption h2{overflow:visible}
+.spb-banner__script{
+  width:max-content;
+  max-width:100%;
+  padding:.16em .08em .36em .02em;
+  margin:-.12em 0 -.18em;
+  color:var(--spb-cursive-color,var(--spb-accent));
+  font-size:clamp(5.4rem,7.65vw,10.4rem)!important;
+  line-height:.82!important;
+  letter-spacing:.002em;
+  white-space:nowrap;
+  text-shadow:0 2px 0 rgba(255,255,255,.78),0 12px 34px rgba(var(--spb-accent-rgb),.22);
+}
+.spb-banner__caption-script{
+  display:inline-block;
+  max-width:100%;
+  padding:.12em .12em .31em .05em;
+  margin:-.1em 0 -.25em .06em;
+  color:var(--spb-cursive-color,var(--spb-accent));
+  font-size:clamp(1.5em,1.38em + .55vw,1.78em)!important;
+  line-height:.9!important;
+  vertical-align:-.16em;
+  white-space:nowrap;
+  text-shadow:0 2px 3px rgba(0,0,0,.92),0 10px 28px rgba(0,0,0,.6);
+}
+.spb-banner__pill,.spb-banner__discover,.spb-banner__modal-copy small{
+  font-size:clamp(1.42rem,1.06rem + .82vw,2.25rem)!important;
+  line-height:1.05;
+  overflow:visible;
+}
+@keyframes spbTextRiseV23{
+  0%{opacity:0;transform:translate3d(0,24px,0) scale(.965);filter:blur(6px)}
+  64%{opacity:1;transform:translate3d(0,-3px,0) scale(1.012);filter:none}
+  100%{opacity:1;transform:none;filter:none}
+}
+@keyframes spbScriptRiseV23{
+  0%{opacity:0;transform:translate3d(-.12em,.22em,0) scale(.72) rotate(-5deg);filter:blur(6px)}
+  58%{opacity:1;transform:translate3d(.03em,-.04em,0) scale(1.07) rotate(1deg);filter:none}
+  80%{transform:scale(.99) rotate(-.25deg)}
+  100%{opacity:1;transform:none;filter:none}
+}
+.spb-banner__caption.is-refreshing .spb-banner__caption-main{animation:spbTextRiseV23 .66s var(--spb-ease) both}
+.spb-banner__caption.is-refreshing .spb-banner__caption-script{animation:spbScriptRiseV23 .88s var(--spb-ease) .08s both}
+.spb-banner__caption.is-refreshing p{animation:spbTextRiseV23 .7s var(--spb-ease) .13s both}
+@media(max-width:680px){
+  .spb-banner__script{width:auto;max-width:100%;font-size:clamp(4.9rem,22vw,7.3rem)!important;line-height:.84;white-space:normal;overflow-wrap:normal}
+  .spb-banner__caption-script{font-size:clamp(1.44em,1.3em + 2vw,1.64em)!important;white-space:normal}
+}
+@media(prefers-reduced-motion:reduce){
+  .spb-banner__caption.is-refreshing *{animation:none!important;filter:none!important;transform:none!important;opacity:1!important}
 }

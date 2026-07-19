@@ -285,6 +285,38 @@
     });
   }
 
+  function normalizeScriptAccents(root = document) {
+    const excluded = [
+      "dialog",
+      ".context-editor",
+      ".admin-console",
+      ".projects-manager",
+      ".firebase-google-card",
+      "button",
+      "label",
+      "nav",
+      "form"
+    ].join(",");
+
+    root.querySelectorAll([
+      "main h1 em",
+      "main h2 em",
+      "main h3 em",
+      "main .title-accent-word",
+      ".site-footer h2 em",
+      ".site-footer .title-accent-word",
+      ".spb-banner__script",
+      ".spb-banner__caption-script",
+      ".projects-folder__title em"
+    ].join(",")).forEach((accent,index) => {
+      if (!accent.isConnected || accent.closest(excluded)) return;
+      accent.classList.add("title-accent-word");
+      accent.style.setProperty("--portal-script-order",String(index % 8));
+      const heading = accent.closest("h1,h2,h3,.page-title,.spb-banner__caption");
+      heading?.classList.add("has-script-accent");
+    });
+  }
+
   function suitableSections() {
     return [...document.querySelectorAll(
       "main > section, main > article, .site-main > section, .site-main > article"
@@ -933,6 +965,7 @@
     bindHomeHeroMotion();
     const sections = decorateSections();
     accentTitleLastWords(document);
+    normalizeScriptAccents(document);
     decorateCards();
     normalizeAdminControls();
     setupReveal();
