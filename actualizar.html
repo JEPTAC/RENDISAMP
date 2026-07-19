@@ -27,7 +27,7 @@
         sessionStorage.clear();
       }catch(_error){}
       const target=new URL('index.html',location.href);
-      target.searchParams.set('portal-build','11.48.0-script-motion');
+      target.searchParams.set('portal-build','11.49.0-script-no-lines');
       target.searchParams.set('_',Date.now().toString());
       location.replace(target.href);
     })();

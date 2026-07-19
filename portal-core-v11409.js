@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.48.0-script-motion";
+  const PORTAL_BUILD = "11.49.0-script-no-lines";
 
   /*
    * Retira definitivamente el service worker experimental de V11.40.2. GitHub Pages no

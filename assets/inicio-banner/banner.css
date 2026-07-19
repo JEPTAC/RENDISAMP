@@ -334,3 +334,57 @@
 @media(prefers-reduced-motion:reduce){
   .spb-banner__caption.is-refreshing *{animation:none!important;filter:none!important;transform:none!important;opacity:1!important}
 }
+
+/* =========================================================
+   V2.4 · Cursivas sin rayas, más grandes y ligeramente elevadas
+   ========================================================= */
+.spb-banner__script::after,
+.spb-banner__caption-script::after,
+.spb-banner__discover::after{
+  content:none!important;
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  background:none!important;
+  animation:none!important;
+}
+.spb-banner__script{
+  position:relative!important;
+  top:-.08em!important;
+  font-size:clamp(6.2rem,8.35vw,11.6rem)!important;
+  line-height:.86!important;
+  padding:.2em .08em .4em .01em!important;
+  margin:-.16em 0 -.22em!important;
+  overflow:visible!important;
+}
+.spb-banner__caption-script{
+  position:relative!important;
+  top:-.07em!important;
+  font-size:clamp(1.72em,1.54em + .72vw,2.08em)!important;
+  line-height:.94!important;
+  vertical-align:.04em!important;
+  padding:.18em .1em .38em .03em!important;
+  margin:-.14em 0 -.3em .05em!important;
+  overflow:visible!important;
+}
+.spb-banner__pill,
+.spb-banner__discover,
+.spb-banner__modal-copy small{
+  position:relative;
+  top:-.04em;
+  font-size:clamp(1.58rem,1.16rem + .9vw,2.45rem)!important;
+  overflow:visible!important;
+}
+@media(max-width:680px){
+  .spb-banner__script{
+    top:-.05em!important;
+    font-size:clamp(5.5rem,24vw,8.1rem)!important;
+    white-space:normal!important;
+    padding-bottom:.42em!important;
+  }
+  .spb-banner__caption-script{
+    top:-.04em!important;
+    font-size:clamp(1.62em,1.45em + 2.5vw,1.96em)!important;
+    white-space:normal!important;
+  }
+}

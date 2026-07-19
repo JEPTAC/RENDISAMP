@@ -15058,3 +15058,112 @@ html.portal-visual-ready :is(.page-hero,.news-page-hero,.home-xmb-banner) .title
     transition:none!important;
   }
 }
+
+/* =========================================================
+   V11.49 · Hullgaria sin subrayados, más grande y elevada
+   La cursiva se sostiene por tamaño, color y composición.
+   ========================================================= */
+
+/* Eliminar por completo las rayas decorativas agregadas a las cursivas. */
+.title-accent-word::after,
+main :is(h1,h2,h3) .title-accent-word::after,
+.projects-psp__heading h1 .title-accent-word::after,
+.projects-psp__summary-copy h2 .title-accent-word::after{
+  content:none!important;
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  background:none!important;
+  animation:none!important;
+}
+
+/* Más presencia y una línea base ligeramente más alta. */
+main :is(h1,h2,h3) .title-accent-word,
+main :is(h1,h2,h3) em.title-accent-word,
+main :is(.page-title,.projects-psp__heading h1,.projects-psp__summary-copy h2) em.title-accent-word,
+.site-footer :is(h2,h3) .title-accent-word{
+  position:relative!important;
+  top:-.09em!important;
+  font-size:clamp(1.82em,1.7em + .56vw,2.12em)!important;
+  line-height:.92!important;
+  vertical-align:.06em!important;
+  padding:.25em .16em .48em .06em!important;
+  margin:-.2em -.02em -.4em 0!important;
+  overflow:visible!important;
+  white-space:nowrap!important;
+}
+
+/* Encabezados de mayor jerarquía: Hullgaria claramente protagonista. */
+main h1 .title-accent-word,
+main .page-title .title-accent-word,
+.projects-psp__heading h1 .title-accent-word{
+  top:-.11em!important;
+  font-size:clamp(2em,1.82em + .78vw,2.36em)!important;
+  padding-bottom:.52em!important;
+  margin-bottom:-.43em!important;
+}
+
+.home-section__head h2 .title-accent-word,
+.section-head h2 .title-accent-word,
+.year-section__head h2 .title-accent-word,
+.archive-intro h2 .title-accent-word,
+.territory-section-head h2 .title-accent-word,
+.ideas-page__head h2 .title-accent-word,
+.projects-psp__summary-copy h2 .title-accent-word{
+  top:-.1em!important;
+  font-size:clamp(1.92em,1.78em + .66vw,2.22em)!important;
+}
+
+/* Tarjetas y fichas: más grandes sin invadir textos funcionales. */
+main :is(.edition-card,.deal-card,.resource-card,.news-card,.idea-card,
+.territory-focus-card,.publication-card,.dashboard-card) :is(h2,h3) .title-accent-word{
+  top:-.07em!important;
+  font-size:clamp(1.62em,1.5em + .4vw,1.84em)!important;
+  vertical-align:.04em!important;
+  padding:.2em .12em .4em .04em!important;
+  margin:-.16em 0 -.33em!important;
+}
+
+/* Mantener los trazos completos incluso en contenedores ajustados. */
+.has-script-accent,
+.has-script-accent > *,
+main :is(h1,h2,h3):has(.title-accent-word){
+  overflow:visible!important;
+}
+.has-script-accent{
+  min-height:1.42em!important;
+  padding-top:.16em!important;
+  padding-bottom:.34em!important;
+}
+
+@media(max-width:900px){
+  main :is(h1,h2,h3) .title-accent-word,
+  main :is(h1,h2,h3) em.title-accent-word{
+    top:-.08em!important;
+    font-size:clamp(1.76em,1.62em + 1.15vw,2.04em)!important;
+  }
+  main h1 .title-accent-word,
+  main .page-title .title-accent-word{
+    font-size:clamp(1.92em,1.76em + 1.4vw,2.22em)!important;
+  }
+}
+
+@media(max-width:680px){
+  main :is(h1,h2,h3) .title-accent-word,
+  main :is(h1,h2,h3) em.title-accent-word,
+  main :is(.page-title,.projects-psp__heading h1,.projects-psp__summary-copy h2) em.title-accent-word{
+    top:-.05em!important;
+    display:inline-block!important;
+    max-width:100%!important;
+    font-size:clamp(1.7em,1.52em + 3.2vw,2.02em)!important;
+    line-height:.94!important;
+    vertical-align:.04em!important;
+    white-space:normal!important;
+    padding:.22em .08em .44em .03em!important;
+    margin:-.17em 0 -.36em!important;
+  }
+  .has-script-accent{
+    min-height:auto!important;
+    padding-block:.18em .4em!important;
+  }
+}
