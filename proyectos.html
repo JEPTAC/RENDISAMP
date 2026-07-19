@@ -5,7 +5,24 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
-    window.__PORTAL_EXPECTED_BUILD__ = "11.41.0-firebase-rebuild";
+    window.__PORTAL_EXPECTED_BUILD__ = "11.41.0-firebase-repair";
+    (async () => {
+      try {
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(reg => {
+            const urls = [reg.active?.scriptURL, reg.waiting?.scriptURL, reg.installing?.scriptURL].filter(Boolean);
+            return urls.some(url => url.includes("coop-sw.js")) ? reg.unregister() : Promise.resolve(false);
+          }));
+        }
+        if ("caches" in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map(name => caches.delete(name)));
+        }
+      } catch (error) {
+        console.info("[Portal] Limpieza preventiva completada con observaciones.", error);
+      }
+    })();
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -13,131 +30,21 @@
   <meta name="description" content="Módulo independiente de proyectos del portal de Rendición de Cuentas de San Pedro.">
   <link rel="icon" href="assets/favicon.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=11.41.0-firebase-rebuild">
-  <link rel="stylesheet" href="projects-psp.css?v=11.41.0-firebase-rebuild">
+  <link rel="stylesheet" href="styles.css?v=11.41.0-firebase-repair">
+  <link rel="stylesheet" href="assets/proyectos-banner/banner.css?v=1.0.0">
   <title>Proyectos | Rendición de Cuentas de San Pedro</title>
 
   <link rel="preconnect" href="https://accounts.google.com">
 </head>
 <body data-page="projects">
   <div id="siteHeader"></div>
-  <main id="main-content" aria-label="Módulo de proyectos">
-    <section id="proyectos" class="projects-psp-shell" aria-label="Proyectos institucionales">
-      <div id="projectsPsp" class="projects-psp" tabindex="0">
-        <canvas id="projectsAmbientCanvas" class="projects-psp__ambient-canvas" aria-hidden="true"></canvas>
-        <div class="projects-psp__grid" aria-hidden="true"></div>
-        <div class="projects-psp__wash" aria-hidden="true"></div>
-        <div class="projects-psp__wave" aria-hidden="true"></div>
-        <div class="projects-psp__wave projects-psp__wave--two" aria-hidden="true"></div>
-        <div class="projects-psp__noise" aria-hidden="true"></div>
-
-        <div class="projects-psp__layout">
-          <header class="projects-psp__header">
-            <div class="projects-psp__brand">
-              <span class="projects-psp__brand-mark" aria-hidden="true">SP</span>
-              <div><strong>Proyectos de San Pedro</strong><small>Rendición de cuentas · seguimiento institucional</small></div>
-            </div>
-            <nav class="projects-psp__xmb" aria-label="Categorías de proyectos">
-              <button type="button" class="is-active" data-project-category="Todos"><span>◎</span><small>Todos</small></button>
-              <button type="button" data-project-category="Infraestructura"><span>⌂</span><small>Infraestructura</small></button>
-              <button type="button" data-project-category="Social"><span>＋</span><small>Social</small></button>
-              <button type="button" data-project-category="Ambiente"><span>♧</span><small>Ambiente</small></button>
-              <button type="button" data-project-category="Cultura"><span>♪</span><small>Cultura</small></button>
-            </nav>
-            <div class="projects-psp__status">
-              <div class="projects-psp__status-copy"><strong id="projectsClock">--:--</strong><small>San Pedro · Colombia</small></div>
-              <button id="projectsManage" class="projects-psp__manage" type="button" hidden>Gestionar proyectos</button>
-            </div>
-          </header>
-
-          <div class="projects-psp__stage">
-            <div class="projects-psp__info">
-              <span class="projects-psp__eyebrow"><span id="projectsIndex">01</span><b id="projectsEyebrow">PROYECTO INSTITUCIONAL</b></span>
-              <h2 id="projectsTitle">Proyecto <em>01</em></h2>
-              <p id="projectsDescription">Información del proyecto.</p>
-              <div id="projectsTags" class="projects-psp__tags"></div>
-              <button id="projectsOpen" class="projects-psp__open" type="button"><span class="projects-psp__open-icon">↗</span>Ver proyecto</button>
-            </div>
-            <div class="projects-psp__carousel-wrap"><div id="projectsCarousel" class="projects-psp__carousel"></div></div>
-            <aside class="projects-psp__metric">
-              <small>Indicador del proyecto</small>
-              <strong id="projectsMetric">—</strong>
-              <span id="projectsMetricLabel">Por registrar</span>
-              <i id="projectsMetricBar" style="--metric-value:0%"></i>
-              <p id="projectsSecondary">Información por completar.</p>
-            </aside>
-          </div>
-
-          <footer class="projects-psp__footer">
-            <div class="projects-psp__controls">
-              <span><button id="projectsPrev" type="button" aria-label="Proyecto anterior"><b>←</b></button>Anterior</span>
-              <span><button id="projectsNext" type="button" aria-label="Proyecto siguiente"><b>→</b></button>Siguiente</span>
-              <span><b>↕</b>Desplazar</span>
-              <span><b>↵</b>Abrir</span>
-            </div>
-            <div class="projects-psp__progress"><span id="projectsProgressText">01 / 05</span><div><i id="projectsProgressBar"></i></div></div>
-          </footer>
-        </div>
-
-        <div id="projectsDetails" class="projects-psp__details" aria-hidden="true">
-          <button id="projectsDetailsBackdrop" class="projects-psp__overlay" type="button" aria-label="Cerrar detalle"></button>
-          <article>
-            <button id="projectsDetailsClose" class="projects-psp__close" type="button" aria-label="Cerrar">×</button>
-            <div id="projectsDetailsCover" class="projects-psp__details-cover is-empty"><img id="projectsDetailsImage" alt="" hidden></div>
-            <div class="projects-psp__details-content">
-              <span class="projects-psp__eyebrow"><span id="projectsDetailsIndex">01</span><b id="projectsDetailsEyebrow">PROYECTO</b></span>
-              <h3 id="projectsDetailsTitle">Proyecto <em>01</em></h3>
-              <p id="projectsDetailsDescription"></p>
-              <div class="projects-psp__details-grid">
-                <div><small>Objetivo</small><strong id="projectsDetailsObjective"></strong></div>
-                <div><small>Resultado</small><strong id="projectsDetailsResult"></strong></div>
-                <div><small>Próximo paso</small><strong id="projectsDetailsNext"></strong></div>
-              </div>
-              <div id="projectsDetailsGallery" class="projects-psp__gallery"></div>
-            </div>
-          </article>
-        </div>
-
-        <div id="projectsManager" class="projects-psp__manager" aria-hidden="true">
-          <button id="projectsManagerBackdrop" class="projects-psp__overlay" type="button" aria-label="Cerrar gestor"></button>
-          <article>
-            <button id="projectsManagerClose" class="projects-psp__close" type="button" aria-label="Cerrar">×</button>
-            <aside class="projects-manager__sidebar">
-              <h3>Gestión de proyectos</h3><p>Edite entre cinco y diez carpetas sin modificar el diseño del módulo.</p>
-              <div id="projectsManagerList" class="projects-manager__list"></div>
-              <button id="projectsManagerAdd" class="projects-manager__add" type="button">＋ Agregar proyecto</button>
-            </aside>
-            <form id="projectsManagerForm" class="projects-manager__form">
-              <h3>Información del proyecto</h3><p>Los cambios se guardan en el estado general y se sincronizan con Firestore.</p>
-              <input type="hidden" name="id">
-              <label>Título<input name="title" maxlength="100" required></label>
-              <label>Categoría<input name="category" maxlength="80"></label>
-              <label>Tipo<input name="type" maxlength="80"></label>
-              <label>Año<input name="year" maxlength="12"></label>
-              <label>Estado<input name="status" maxlength="80"></label>
-              <label>Ícono<input name="icon" maxlength="3"></label>
-              <label>Color<input name="color" type="color"></label>
-              <label>Indicador<input name="metric" maxlength="40"></label>
-              <label>Etiqueta del indicador<input name="metricLabel" maxlength="100"></label>
-              <label>Avance<input name="progress" type="number" min="0" max="100"></label>
-              <label class="full">Dato complementario<textarea name="secondaryMetric" rows="2"></textarea></label>
-              <label class="full">Descripción<textarea name="description" rows="4"></textarea></label>
-              <label class="full">Etiquetas separadas por coma<input name="tags"></label>
-              <label class="full">Objetivo<textarea name="objective" rows="3"></textarea></label>
-              <label class="full">Resultado<textarea name="result" rows="3"></textarea></label>
-              <label class="full">Próximo paso<textarea name="next" rows="3"></textarea></label>
-              <label class="full">Imagen principal<input name="image" placeholder="https://... o assets/..."></label>
-              <label class="full">Galería, una URL por línea<textarea name="gallery" rows="4"></textarea></label>
-              <div class="projects-manager__actions"><button id="projectsManagerDelete" class="button button-secondary projects-manager__delete" type="button">Eliminar</button><div><button class="button button-primary" type="submit">Guardar proyecto</button></div></div>
-            </form>
-          </article>
-        </div>
-      </div>
-    </section>
+  <main id="main-content" aria-label="Módulo de proyectos" style="min-height:72vh;background:#fff">
+    <div id="sp-projects-banner" data-sp-projects-banner></div>
   </main>
   <div id="siteFooter"></div>
   <div id="globalDialogs"></div>
-  <script src="portal-core-v11409.js?v=11.41.0-firebase-rebuild"></script>
-  <script src="projects-psp.js?v=11.41.0-firebase-rebuild"></script>
+  <script src="portal-core-v11409.js?v=11.41.0-firebase-repair"></script>
+  <script src="assets/proyectos-banner/banner-config.js?v=1.0.0"></script>
+  <script src="assets/proyectos-banner/banner.js?v=1.0.0" defer></script>
 </body>
 </html>
