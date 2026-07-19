@@ -5,7 +5,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
-    window.__PORTAL_EXPECTED_BUILD__ = "11.49.0-script-no-lines";
+    window.__PORTAL_EXPECTED_BUILD__ = "11.52.1-integracion-estable";
     (async () => {
       try {
         if ("serviceWorker" in navigator) {
@@ -27,8 +27,10 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="preload" href="assets/fonts/Hullgaria.otf" as="font" type="font/otf" crossorigin>
   <meta name="description" content="Portal especial de Rendición de Cuentas de San Pedro, Valle del Cauca.">
-  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.49.0-script-no-lines">
+  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.52.1-integracion-estable">
   <link rel="stylesheet" href="assets/inicio-banner/banner.css?v=2.4.0-script-no-lines">
+  <link rel="stylesheet" href="assets/projects-running/projects-running.css?v=11.52.1-integracion-estable">
+  <link rel="stylesheet" href="platform-polish-v1152.css?v=11.52.1-integracion-estable">
   <title>Rendición de Cuentas | San Pedro</title>
 
   <link rel="preconnect" href="https://accounts.google.com">
@@ -38,6 +40,10 @@
   <main id="main-content">
     <section class="home-xmb-banner" aria-label="Galería territorial de la gestión">
       <div id="sp-home-banner" data-sp-home-banner></div>
+    </section>
+
+    <section id="proyectos-en-ejecucion" class="running-projects" data-running-projects data-mode="compact" aria-label="Resumen de proyectos en ejecución">
+      <div class="running-projects__shell"><div class="running-projects__fallback"><div><strong>Proyectos en ejecución</strong><span>Cargando información de seguimiento…</span></div></div></div>
     </section>
 
     <section class="home-section home-section--white">
@@ -81,9 +87,12 @@
     </section>
   </main>
   <div id="siteFooter"></div><div id="globalDialogs"></div>
-  <script src="portal-core-v11409.js?v=11.49.0-script-no-lines"></script>
+  <script src="portal-core-v11409.js?v=11.52.1-integracion-estable"></script>
+  <script src="platform-polish-v1152.js?v=11.52.1-integracion-estable"></script>
   <script src="assets/inicio-banner/banner-config.js?v=2.4.0-script-no-lines"></script>
   <script src="assets/inicio-banner/banner.js?v=2.4.0-script-no-lines" defer></script>
-  <script src="home.js?v=11.43.0-home-banner"></script>
+  <script src="assets/projects-running/projects-running-data.js?v=11.52.1-integracion-estable"></script>
+  <script src="assets/projects-running/projects-running.js?v=11.52.1-integracion-estable" defer></script>
+  <script src="home.js?v=11.52.1-integracion-estable"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
-    window.__PORTAL_EXPECTED_BUILD__ = "11.51.0-projects-functional-banner";
+    window.__PORTAL_EXPECTED_BUILD__ = "11.52.1-integracion-estable";
     (async () => {
       try {
         if ("serviceWorker" in navigator) {
@@ -29,9 +29,12 @@
   <meta name="description" content="Proyectos y avances de la gestión pública de San Pedro.">
   <link rel="icon" href="assets/favicon.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=11.51.0-projects-functional-banner">
-  <link rel="stylesheet" href="projects-psp.css?v=11.51.0-projects-functional-banner">
-  <link rel="stylesheet" href="platform-fixes-v1151.css?v=11.51.0-projects-functional-banner">
+  <link rel="stylesheet" href="styles.css?v=11.52.1-integracion-estable">
+  <link rel="stylesheet" href="projects-psp.css?v=11.52.1-integracion-estable">
+  <link rel="stylesheet" href="assets/projects-featured/banner.css?v=11.52.1-integracion-estable">
+  <link rel="stylesheet" href="assets/projects-running/projects-running.css?v=11.52.1-integracion-estable">
+  <link rel="stylesheet" href="platform-fixes-v1151.css?v=11.52.1-integracion-estable">
+  <link rel="stylesheet" href="platform-polish-v1152.css?v=11.52.1-integracion-estable">
   <title>Proyectos | Rendición de Cuentas de San Pedro</title>
   <link rel="preconnect" href="https://accounts.google.com">
 </head>
@@ -40,18 +43,112 @@
 
   <main id="main-content" class="projects-page-flow" aria-label="Módulo de proyectos">
 
-    <section class="modulo-banner-proyectos" aria-label="Proyectos destacados" style="display:block;width:100%;margin:0;overflow:hidden">
-      <iframe
-        id="featuredProjectsBanner"
-        class="modulo-banner-proyectos__iframe"
-        style="display:block;width:100%;height:clamp(570px,47vw,770px);min-height:570px;border:0;margin:0"
-        src="./banner-proyectos-destacados.html?v=11.51.0-projects-functional-banner"
-        title="Banner interactivo de proyectos destacados"
-        loading="eager"
-        scrolling="no"
-        allow="autoplay; fullscreen"
-        aria-busy="true"
-      ></iframe>
+    <section class="modulo-banner-proyectos" aria-label="Proyectos destacados">
+<div class="featured-projects-host" id="featuredProjectsHost" aria-label="Banner interactivo de proyectos destacados" aria-busy="true">
+
+<section class="fp" id="featuredProjects" aria-label="Proyectos destacados de San Pedro">
+  <div class="fp__line" aria-hidden="true"></div>
+  <header class="fp__header">
+    <div class="fp__brand">
+      <span class="fp__brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4.2c2.1 0 3.8 1.7 3.8 3.8 0 1.8-1.2 3.3-2.9 3.7V7.3a.9.9 0 0 0-1.8 0v4.4A3.8 3.8 0 0 1 12 4.2Z"/><path d="M19.8 12c0 2.1-1.7 3.8-3.8 3.8-1.8 0-3.3-1.2-3.7-2.9h4.4a.9.9 0 1 0 0-1.8h-4.4a3.8 3.8 0 0 1 7.5.9Z"/><path d="M12 19.8A3.8 3.8 0 0 1 8.2 16c0-1.8 1.2-3.3 2.9-3.7v4.4a.9.9 0 1 0 1.8 0v-4.4a3.8 3.8 0 0 1-.9 7.5Z"/><path d="M4.2 12c0-2.1 1.7-3.8 3.8-3.8 1.8 0 3.3 1.2 3.7 2.9H7.3a.9.9 0 1 0 0 1.8h4.4a3.8 3.8 0 0 1-7.5-.9Z"/></svg></span>
+      <span class="fp__brand-text">Rendición de cuentas · San Pedro</span>
+    </div>
+    <div class="fp__admin-actions" id="fpAdminActions" aria-label="Edición del banner" hidden>
+      <button class="fp__admin-btn fp__admin-btn--primary" id="fpAddProject" type="button" title="Agregar un proyecto">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Agregar proyecto</span>
+      </button>
+      <button class="fp__admin-btn" id="fpEditProject" type="button" title="Editar proyecto actual" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-.8 4 4-.8L18.4 8a2.1 2.1 0 0 0-3-3L4 16Z"/><path d="m13.8 6.6 3.6 3.6"/></svg><span>Editar</span>
+      </button>
+    </div>
+  </header>
+  <div class="fp__layout">
+    <aside class="fp__intro">
+      <div class="fp__overline">Portafolio público</div>
+      <h1 class="fp__title">Proyectos <span class="fp__title-script">destacados</span></h1>
+      <p class="fp__desc">Agrega las fotografías y la información de cada iniciativa. El carrete se construye automáticamente y puede recorrerse hacia abajo.</p>
+      <div class="fp__meta">
+        <div class="fp__counter"><strong id="fpCurrent">01</strong><span>/</span><span id="fpTotal">06</span></div>
+        <button class="fp__mode" id="fpAuto" type="button" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg><span>Reproducción automática</span></button>
+        <button class="fp__icon-btn" id="fpSound" type="button" aria-label="Desactivar sonidos" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4.5 9.5v5h3.2l4.3 3.7V5.8L7.7 9.5H4.5Z"/><path d="M15.5 8.2a5 5 0 0 1 0 7.6"/><path d="M18.2 5.8a8.3 8.3 0 0 1 0 12.4"/></svg></button>
+      </div>
+    </aside>
+    <section class="fp__visual" aria-label="Carrete vertical de proyectos">
+      <div class="fp__stage-wrap">
+        <div class="fp__stack">
+          <div class="fp__empty" id="fpEmpty">
+            <div class="fp__empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Z"/><path d="m6.5 16 3.4-3.6 2.5 2.4 2.2-2.3 2.9 3.5"/><circle cx="15.8" cy="9" r="1.2"/></svg></div>
+            <p class="fp__empty-overline">Carrete vacío</p>
+            <h2>Agrega tu primer <span>proyecto</span></h2>
+            <p>Selecciona una fotografía, escribe la información y el banner construirá automáticamente el carrete vertical.</p>
+            <button class="fp__empty-add" id="fpEmptyAdd" type="button" hidden><span>+</span> Agregar proyecto</button>
+          </div>
+          <div class="fp__peek fp__peek--2" id="fpPeek2" aria-hidden="true"></div>
+          <div class="fp__peek fp__peek--1" id="fpPeek1" aria-hidden="true"></div>
+          <article class="fp__card" id="fpCard" tabindex="0" aria-live="polite">
+            <img class="fp__image" id="fpImage" src="assets/cinematica/parque-himno-1600.webp" alt="Vista del parque principal de San Pedro">
+            <div class="fp__shade"></div>
+            <div class="fp__chips"><span class="fp__chip"><span class="fp__chip-dot"></span><span id="fpCategory">Infraestructura</span></span><span class="fp__chip" id="fpYear">VIGENCIA 2026</span></div>
+            <button class="fp__open" id="fpOpen" type="button" aria-label="Abrir proyecto"><svg viewBox="0 0 24 24"><path d="M7.5 16.5 16.5 7.5"/><path d="M10 7.5h6.5V14"/></svg></button>
+            <div class="fp__copy"><p class="fp__kicker" id="fpEyebrow">CONTENIDO INICIAL EDITABLE</p><h2 id="fpTitle">Proyecto de infraestructura</h2><p id="fpDescription">Espacio preparado para presentar una iniciativa prioritaria, sus avances y la evidencia disponible.</p></div>
+            <div class="fp__metrics"><div class="fp__metric"><span>Avance</span><strong id="fpProgress">0 %</strong></div><div class="fp__metric"><span>Vigencia</span><strong id="fpPeriod">2026</strong></div></div>
+          </article>
+        </div>
+      </div>
+      <aside class="fp__reel">
+        <span class="fp__reel-marker" aria-hidden="true"></span>
+        <div class="fp__reel-viewport" id="fpReelViewport"><div class="fp__reel-track" id="fpReelTrack"></div></div>
+      </aside>
+      <div class="fp__hint"><svg viewBox="0 0 24 24"><path d="M12 4v16m0 0-4-4m4 4 4-4"/></svg><span>Rueda o arrastra hacia abajo</span></div>
+    </section>
+  </div>
+</section>
+<dialog class="fp-dialog" id="fpDialog">
+  <img class="fp-dialog__image" id="fpDialogImage" alt="">
+  <div class="fp-dialog__body"><div><p class="fp-dialog__eyebrow" id="fpDialogEyebrow"></p><h3 id="fpDialogTitle"></h3><p class="fp-dialog__desc" id="fpDialogDesc"></p></div><button class="fp-dialog__close" id="fpDialogClose" type="button">Cerrar</button></div>
+</dialog>
+<dialog class="fp-editor" id="fpEditor">
+  <form class="fp-editor__panel" id="fpEditorForm" method="dialog">
+    <header class="fp-editor__header">
+      <div><p>Editor del carrete</p><h2 id="fpEditorHeading">Agregar proyecto</h2></div>
+      <button class="fp-editor__x" id="fpEditorX" type="button" aria-label="Cerrar">×</button>
+    </header>
+    <div class="fp-editor__body">
+      <label class="fp-upload" id="fpUploadZone">
+        <input id="fpProjectImage" name="image" type="file" accept="image/jpeg,image/png,image/webp" required>
+        <img id="fpUploadPreview" alt="Vista previa de la fotografía seleccionada">
+        <span class="fp-upload__placeholder" id="fpUploadPlaceholder">
+          <span class="fp-upload__icon"><svg viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Z"/><path d="m6.5 16 3.4-3.6 2.5 2.4 2.2-2.3 2.9 3.5"/><circle cx="15.8" cy="9" r="1.2"/></svg></span>
+          <strong>Seleccionar fotografía</strong><small>JPG, PNG o WEBP · se optimiza automáticamente</small>
+        </span>
+        <span class="fp-upload__change">Cambiar imagen</span>
+      </label>
+      <div class="fp-editor__grid">
+        <label><span>Título del proyecto *</span><input id="fpFieldTitle" name="title" required maxlength="80" placeholder="Nombre del proyecto"></label>
+        <label><span>Categoría</span><input id="fpFieldCategory" name="category" maxlength="30" placeholder="Infraestructura"></label>
+        <label><span>Etiqueta superior</span><input id="fpFieldEyebrow" name="eyebrow" maxlength="34" placeholder="PROYECTO DESTACADO"></label>
+        <label><span>Vigencia / año</span><input id="fpFieldYear" name="year" maxlength="28" placeholder="VIGENCIA 2026"></label>
+        <label class="fp-editor__wide"><span>Descripción del proyecto *</span><textarea id="fpFieldDescription" name="description" required maxlength="240" rows="3" placeholder="Escribe un párrafo breve, claro y bien organizado."></textarea></label>
+        <label><span>Avance</span><input id="fpFieldProgress" name="progress" maxlength="12" placeholder="75 %"></label>
+        <label><span>Periodo</span><input id="fpFieldPeriod" name="period" maxlength="18" placeholder="2025–2026"></label>
+        <label><span>Color del proyecto</span><input id="fpFieldAccent" name="accent" type="color" value="#2f6ff2"></label>
+        <label class="fp-editor__wide"><span>Texto alternativo de la imagen</span><input id="fpFieldAlt" name="alt" maxlength="150" placeholder="Descripción accesible de la fotografía"></label>
+      </div>
+    </div>
+    <footer class="fp-editor__footer">
+      <button class="fp-editor__delete" id="fpDeleteProject" type="button" hidden>Eliminar proyecto</button>
+      <span class="fp-editor__spacer"></span>
+      <button class="fp-editor__cancel" id="fpEditorCancel" type="button">Cancelar</button>
+      <button class="fp-editor__save" type="submit">Guardar proyecto</button>
+    </footer>
+  </form>
+</dialog>
+
+</div>
+    </section>
+
+    <section id="proyectos-en-ejecucion" class="running-projects" data-running-projects data-mode="full" aria-label="Proyectos en ejecución">
+      <div class="running-projects__shell"><div class="running-projects__fallback"><div><strong>Proyectos en ejecución</strong><span>Cargando información de seguimiento…</span></div></div></div>
     </section>
 
 <section id="proyectos" class="projects-psp-shell" aria-labelledby="projectsModuleTitle">
@@ -224,8 +321,11 @@
   <div id="siteFooter"></div>
   <div id="globalDialogs"></div>
 
-  <script src="portal-core-v11409.js?v=11.51.0-projects-functional-banner"></script>
-  <script src="projects-featured-banner.js?v=11.51.0-projects-functional-banner" defer></script>
-  <script src="projects-psp.js?v=11.51.0-projects-functional-banner" defer></script>
+  <script src="portal-core-v11409.js?v=11.52.1-integracion-estable"></script>
+  <script src="platform-polish-v1152.js?v=11.52.1-integracion-estable"></script>
+  <script src="assets/projects-running/projects-running-data.js?v=11.52.1-integracion-estable"></script>
+  <script src="assets/projects-featured/banner.js?v=11.52.1-integracion-estable" defer></script>
+  <script src="assets/projects-running/projects-running.js?v=11.52.1-integracion-estable" defer></script>
+  <script src="projects-psp.js?v=11.52.1-integracion-estable" defer></script>
 </body>
 </html>

@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const grid = document.querySelector("#featuredYears");
-  grid.innerHTML = years.slice(0,4).map((year,index) => `
+  if (grid) grid.innerHTML = years.slice(0,4).map((year,index) => `
     <article class="edition-card reveal visible ${index === 0 ? "edition-card--featured" : ""}" data-admin-entity="year" data-entity-id="${year.year}">
       <div class="edition-card__visual edition-visual-${index%3}${year.cover ? " has-cover-image" : ""}" ${year.cover ? `style="background-image:linear-gradient(rgba(5,34,78,.12),rgba(5,34,78,.3)),url('${year.cover}')"` : ""}>
         <span class="edition-discount">${year.progress}%</span>
@@ -34,13 +34,16 @@ document.addEventListener("DOMContentLoaded", () => {
     </article>`).join("");
 
   const featureYear = helpers.getYear(2025) || years[0];
-  const legacyHeroProgress = document.querySelector("#homeHeroProgress");
-  if (legacyHeroProgress) legacyHeroProgress.textContent = `${featureYear.progress}%`;
-  document.querySelector("#homeResourceCount").textContent = state.resources.length;
-  document.querySelector("#homeIdeasCount").textContent = state.ideas.length;
+  const homeHeroProgress = document.querySelector("#homeHeroProgress");
+  if (homeHeroProgress) homeHeroProgress.textContent = `${featureYear.progress}%`;
+  const homeResourceCount = document.querySelector("#homeResourceCount");
+  if (homeResourceCount) homeResourceCount.textContent = state.resources.length;
+  const homeIdeasCount = document.querySelector("#homeIdeasCount");
+  if (homeIdeasCount) homeIdeasCount.textContent = state.ideas.length;
 
   const editorialResources = state.resources.filter(r => r.featured).slice(0,3);
-  document.querySelector("#editorialCards").innerHTML = editorialResources.map((item,index) => `
+  const editorialCards = document.querySelector("#editorialCards");
+  if (editorialCards) editorialCards.innerHTML = editorialResources.map((item,index) => `
     <article class="deal-card deal-card--${helpers.escape(item.type)} reveal visible"
       data-admin-entity="resource"
       data-entity-id="${item.id}">
@@ -66,7 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
     </article>`).join("");
 
   const ideas = state.ideas.slice(0,3);
-  document.querySelector("#citizenQuotes").innerHTML = ideas.map(idea => `
+  const citizenQuotes = document.querySelector("#citizenQuotes");
+  if (citizenQuotes) citizenQuotes.innerHTML = ideas.map(idea => `
     <article class="quote-card reveal visible" data-admin-entity="idea" data-entity-id="${idea.id}">
       <div class="quote-symbol">“</div>
       <p>${helpers.escape(idea.description)}</p>
@@ -82,7 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.dispatchEvent(new CustomEvent("portal:rendered"));
 
-  document.querySelector("#newsletterForm").addEventListener("submit", event => {
+  const newsletterForm = document.querySelector("#newsletterForm");
+  if (newsletterForm) newsletterForm.addEventListener("submit", event => {
     event.preventDefault();
     event.target.reset();
     helpers.toast("Suscripción registrada en la demostración.");

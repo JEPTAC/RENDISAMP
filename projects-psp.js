@@ -370,34 +370,25 @@
 
       const animations = targets.map((target, index) => target.animate([
         {
-          opacity: .46,
-          transform: `translate3d(${enterX * (index ? .5 : 1)}px,7px,0) scale(.986)`,
-          filter: "blur(2.4px) saturate(.92)"
+          opacity: .7,
+          transform: `translate3d(${enterX * (index ? .42 : 1)}px,4px,0) scale(.992)`
         },
         {
-          offset: .58,
+          offset: .62,
           opacity: 1,
-          transform: "translate3d(-2px,-2px,0) scale(1.006)",
-          filter: "blur(0) saturate(1.05)"
+          transform: "translate3d(-1px,-1px,0) scale(1.002)"
         },
         {
           opacity: 1,
-          transform: "translate3d(0,0,0) scale(1)",
-          filter: "none"
+          transform: "translate3d(0,0,0) scale(1)"
         }
       ], {
-        duration: index ? 390 : 455,
-        delay: index * 34,
-        easing: "cubic-bezier(.16,.86,.18,1)",
+        duration: index ? 310 : 360,
+        delay: index * 24,
+        easing: "cubic-bezier(.2,.72,.2,1)",
         fill: "both"
       }));
 
-      const wash = root.animate?.([
-        { filter: "brightness(.985)" },
-        { offset: .48, filter: "brightness(1.018)" },
-        { filter: "none" }
-      ], { duration: 520, easing: "ease-out", fill: "none" });
-      if (wash) animations.push(wash);
 
       summaryAnimations = animations;
       Promise.allSettled(animations.map(animation => animation.finished)).finally(() => {
@@ -481,61 +472,39 @@
 
     function animateDockSelection(previousIndex, nextIndex, direction = 1, source = "program") {
       cancelDockSelectionAnimations();
-      root.classList.add("has-selection");
-
-      const folders = qa(".projects-folder", dom.carousel);
-      const nextPosition = visibleIndices.indexOf(nextIndex);
+      if (reducedMotion.matches) return;
       const animations = [];
-
-      folders.forEach(folder => {
+      qa(".projects-folder", dom.carousel).forEach(folder => {
         const index = Number(folder.dataset.projectIndex);
-        const visiblePosition = visibleIndices.indexOf(index);
-        const distance = Math.abs(visiblePosition - nextPosition);
+        const distance = Math.abs(index - nextIndex);
         const front = q(".projects-folder__front", folder);
         const paper = q(".projects-folder__paper", folder);
-
+        if (!front?.animate) return;
         if (index === nextIndex) {
-          if (front?.animate) animations.push(front.animate([
-            { transform: `perspective(760px) translate3d(${direction * 18}px,12px,0) scale(.92) rotateY(${direction * 8}deg)`, filter: "brightness(.9)" },
-            { offset: .48, transform: `perspective(760px) translate3d(${-direction * 3}px,-18px,0) scale(1.06) rotateY(${-direction * 2}deg)`, filter: "brightness(1.12)" },
-            { offset: .76, transform: "perspective(760px) translate3d(0,3px,0) scale(.992) rotateY(.4deg)", filter: "brightness(1.02)" },
-            { transform: "perspective(760px) translate3d(0,0,0) scale(1) rotateY(0)", filter: "none" }
-          ], { duration: 720, easing: "cubic-bezier(.16,.9,.18,1)", fill: "none" }));
-
-          if (paper?.animate) animations.push(paper.animate([
-            { transform: "translate3d(0,-3px,0) scale(.96)", opacity: .76 },
-            { offset: .48, transform: `translate3d(${-direction * 3}px,-31px,0) scale(1.045) rotate(${-direction * .5}deg)`, opacity: 1 },
-            { offset: .75, transform: "translate3d(0,-9px,0) scale(.995)", opacity: 1 },
-            { transform: "translate3d(0,-12px,0) scale(1)", opacity: 1 }
-          ], { duration: 720, easing: "cubic-bezier(.16,.9,.18,1)", fill: "none" }));
-        } else if (index === previousIndex && front?.animate) {
           animations.push(front.animate([
-            { transform: "translate3d(0,-5px,0) scale(1.025)", filter: "brightness(1.05)" },
-            { transform: `translate3d(${-direction * 12}px,7px,0) scale(.94) rotateY(${-direction * 4}deg)`, filter: "brightness(.92)" },
-            { transform: "translate3d(0,0,0) scale(1) rotateY(0)", filter: "none" }
-          ], { duration: 520, easing: "cubic-bezier(.2,.76,.2,1)", fill: "none" }));
-        } else if (distance <= 2 && front?.animate) {
-          const lift = Math.max(3, 10 - distance * 3);
+            { transform: "translate3d(0,-3px,0) scale(1.01)" },
+            { offset: .62, transform: `translate3d(${-direction * 2}px,-14px,0) scale(1.045) rotateY(${-direction * 1.2}deg)` },
+            { transform: "translate3d(0,0,0) scale(1) rotateY(0)" }
+          ], { duration: 470, easing: "cubic-bezier(.2,.78,.2,1)", fill: "none" }));
+          if (paper?.animate) animations.push(paper.animate([
+            { transform: "translate3d(0,-10px,0)" },
+            { offset: .62, transform: "translate3d(0,-22px,0)" },
+            { transform: "translate3d(0,-12px,0)" }
+          ], { duration: 470, easing: "cubic-bezier(.2,.78,.2,1)", fill: "none" }));
+        } else if (index === previousIndex) {
+          animations.push(front.animate([
+            { transform: "translate3d(0,-4px,0) scale(1.015)" },
+            { offset: .55, transform: `translate3d(${-direction * 7}px,3px,0) scale(.975)` },
+            { transform: "translate3d(0,0,0) scale(1)" }
+          ], { duration: 390, easing: "cubic-bezier(.2,.72,.2,1)", fill: "none" }));
+        } else if (distance <= 2) {
           animations.push(front.animate([
             { transform: "translate3d(0,0,0)" },
-            { offset: .48, transform: `translate3d(${direction * (3 - distance) * 4}px,-${lift}px,0)` },
+            { offset: .55, transform: `translate3d(${direction * (3 - distance) * 2}px,-${Math.max(2,7-distance*2)}px,0)` },
             { transform: "translate3d(0,0,0)" }
-          ], {
-            duration: 500 + distance * 55,
-            delay: distance * 28,
-            easing: "cubic-bezier(.2,.82,.2,1)",
-            fill: "none"
-          }));
+          ], { duration: 380 + distance * 35, delay: distance * 18, easing: "cubic-bezier(.2,.72,.2,1)", fill: "none" }));
         }
       });
-
-      const ambient = q(".projects-psp__ambient--one", root);
-      if (ambient?.animate) animations.push(ambient.animate([
-        { transform: "scale(1) translate3d(0,0,0)", opacity: .76 },
-        { transform: "scale(1.11) translate3d(-2%,2%,0)", opacity: 1 },
-        { transform: "scale(1) translate3d(0,0,0)", opacity: .76 }
-      ], { duration: 760, easing: "cubic-bezier(.2,.82,.2,1)", fill: "none" }));
-
       dockSelectionAnimations = animations;
       if (previousIndex !== nextIndex) playSelectionSound(direction, source);
       Promise.allSettled(animations.map(animation => animation.finished)).finally(() => {
@@ -548,22 +517,16 @@
       const front = q(".projects-folder__front", folder);
       const paper = q(".projects-folder__paper", folder);
       const animations = [];
-
       if (front?.animate) animations.push(front.animate([
         { transform: "translate3d(0,0,0) scale(1)" },
-        { offset: .32, transform: "translate3d(0,-17px,0) scale(1.035)" },
-        { offset: .58, transform: "translate3d(0,3px,0) scale(.995)" },
-        { offset: .8, transform: "translate3d(0,-6px,0) scale(1.01)" },
+        { offset: .58, transform: "translate3d(0,-11px,0) scale(1.025)" },
         { transform: "translate3d(0,0,0) scale(1)" }
-      ], { duration: 620, easing: "cubic-bezier(.18,.9,.24,1.12)", fill: "none" }));
-
+      ], { duration: 420, easing: "cubic-bezier(.2,.76,.2,1)", fill: "none" }));
       if (paper?.animate) animations.push(paper.animate([
         { transform: "translate3d(0,-12px,0)" },
-        { offset: .32, transform: "translate3d(0,-29px,0) rotate(-.5deg)" },
-        { offset: .6, transform: "translate3d(0,-9px,0) rotate(.2deg)" },
-        { transform: "translate3d(0,-12px,0) rotate(0)" }
-      ], { duration: 620, easing: "cubic-bezier(.18,.9,.24,1.12)", fill: "none" }));
-
+        { offset: .58, transform: "translate3d(0,-20px,0)" },
+        { transform: "translate3d(0,-12px,0)" }
+      ], { duration: 420, easing: "cubic-bezier(.2,.76,.2,1)", fill: "none" }));
       folder.dataset.selectionSource = source;
       dockSelectionAnimations.push(...animations);
     }
@@ -585,7 +548,7 @@
 
       dom.viewport.classList.add("is-programmatic-scroll");
       const startedAt = performance.now();
-      const duration = clamp(330 + Math.abs(distance) * .28, 360, 560);
+      const duration = clamp(280 + Math.abs(distance) * .2, 300, 460);
       const ease = value => value < .5
         ? 4 * value * value * value
         : 1 - Math.pow(-2 * value + 2, 3) / 2;
@@ -650,8 +613,8 @@
       qa(".projects-folder", dom.carousel).forEach(folder => {
         const isActive = Number(folder.dataset.projectIndex) === activeIndex;
         const hasFocus = document.activeElement === folder;
-        folder.style.setProperty("--dock-scale", hasFocus ? "1.255" : isActive ? "1.19" : ".965");
-        folder.style.setProperty("--dock-lift", hasFocus ? "38px" : isActive ? "30px" : "0px");
+        folder.style.setProperty("--dock-scale", hasFocus ? "1.18" : isActive ? "1.13" : ".985");
+        folder.style.setProperty("--dock-lift", hasFocus ? "28px" : isActive ? "22px" : "0px");
         folder.style.setProperty("--dock-shift-x", "0px");
         folder.style.setProperty("--dock-tilt", "0deg");
         folder.style.setProperty("--dock-z", hasFocus ? "30" : isActive ? "18" : "1");
@@ -669,16 +632,16 @@
         const center = viewportRect.left + folder.offsetLeft - dom.viewport.scrollLeft + folder.offsetWidth / 2;
         const signedDistance = center - pointerX;
         const distance = Math.abs(signedDistance);
-        const influence = clamp(1 - distance / 320, 0, 1);
+        const influence = clamp(1 - distance / 285, 0, 1);
         const nearInfluence = influence * influence * (3 - 2 * influence);
         const isActive = Number(folder.dataset.projectIndex) === activeIndex;
         const hasFocus = document.activeElement === folder;
-        const selected = hasFocus ? .2 : isActive ? .14 : 0;
-        const scale = .965 + nearInfluence * .46 + selected;
-        const lift = nearInfluence * 52 + selected * 120;
+        const selected = hasFocus ? .09 : isActive ? .065 : 0;
+        const scale = .985 + nearInfluence * .22 + selected;
+        const lift = nearInfluence * 30 + selected * 80;
         const pushDirection = signedDistance === 0 ? 0 : Math.sign(signedDistance);
-        const shift = pushDirection * nearInfluence * 38;
-        const tilt = clamp((pointerX - center) / 92, -1, 1) * nearInfluence * 1.7;
+        const shift = pushDirection * nearInfluence * 22;
+        const tilt = clamp((pointerX - center) / 92, -1, 1) * nearInfluence * 1.05;
         folder.style.setProperty("--dock-scale", scale.toFixed(3));
         folder.style.setProperty("--dock-lift", `${lift.toFixed(1)}px`);
         folder.style.setProperty("--dock-shift-x", `${shift.toFixed(1)}px`);
@@ -1131,12 +1094,12 @@
       wheelAccumulator += delta;
       window.clearTimeout(wheelResetTimer);
       wheelResetTimer = window.setTimeout(() => { wheelAccumulator = 0; wheelNavigationLocked = false; }, 180);
-      if (wheelNavigationLocked || Math.abs(wheelAccumulator) < 28) return;
+      if (wheelNavigationLocked || Math.abs(wheelAccumulator) < 42) return;
       const direction = wheelAccumulator > 0 ? 1 : -1;
       wheelAccumulator = 0;
       wheelNavigationLocked = true;
       moveSelection(direction, "wheel");
-      window.setTimeout(() => { wheelNavigationLocked = false; }, 145);
+      window.setTimeout(() => { wheelNavigationLocked = false; }, 260);
     }
     dom.viewport.addEventListener("wheel", handleDockWheel, { passive: false });
 
@@ -1146,7 +1109,7 @@
       const index = Number(folder.dataset.projectIndex);
       const wasActive = index === activeIndex;
       selectProject(index, { scroll: true, focus: false, source: "click" });
-      window.setTimeout(() => openDetails(folder), wasActive || reducedMotion.matches ? 0 : 210);
+      window.setTimeout(() => openDetails(folder), wasActive || reducedMotion.matches ? 0 : 150);
     });
 
     dom.carousel.addEventListener("focusin", event => {

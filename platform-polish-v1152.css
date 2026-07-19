@@ -1,0 +1,220 @@
+/* V11.52 · Pulido visual sobrio e institucional.
+   Capa de ajustes, sin modificar la estructura ni los datos del portal. */
+:root{
+  --shadow:0 18px 48px rgba(9,40,78,.12);
+  --shadow-soft:0 10px 30px rgba(9,40,78,.075);
+}
+html{scroll-behavior:smooth}
+body{
+  --premium-ease:cubic-bezier(.2,.72,.2,1);
+}
+:is(.edition-card,.deal-card,.quote-card,.trust-card,.news-card,.resource-card,.year-selector-card,.dashboard-card){
+  box-shadow:0 10px 30px rgba(9,40,78,.075)!important;
+  transition:transform .3s var(--premium-ease),box-shadow .3s ease,border-color .3s ease!important;
+}
+:is(.edition-card,.deal-card,.quote-card,.trust-card,.news-card,.resource-card,.dashboard-card):hover{
+  transform:translate3d(0,-3px,0)!important;
+  box-shadow:0 17px 40px rgba(9,40,78,.105)!important;
+}
+.button,
+button.button,
+.admin-edit-button,
+.inline-edit-trigger{
+  transition:transform .24s var(--premium-ease),box-shadow .24s ease,background-color .24s ease,color .24s ease!important;
+}
+.button:hover,
+button.button:hover,
+.admin-edit-button:hover,
+.inline-edit-trigger:hover{
+  transform:translate3d(0,-2px,0)!important;
+}
+.reveal{
+  opacity:0;
+  transform:translate3d(0,14px,0)!important;
+  filter:none!important;
+  transition:opacity .52s var(--premium-ease),transform .52s var(--premium-ease)!important;
+}
+.reveal.visible{opacity:1;transform:none!important}
+.home-section__head::after,
+.home-section__head::before,
+.page-hero::after,
+.page-hero::before{
+  animation:none!important;
+}
+.home-section__head::after{opacity:.42!important}
+.page-hero::after{opacity:.58!important;box-shadow:0 0 0 42px rgba(255,255,255,.03),0 0 0 84px rgba(255,255,255,.018)!important}
+.dialog,
+.admin-panel{
+  box-shadow:0 28px 82px rgba(3,20,41,.28)!important;
+}
+.dialog::backdrop,
+.admin-panel::backdrop{
+  background:rgba(3,20,41,.58)!important;
+  backdrop-filter:blur(4px)!important;
+  -webkit-backdrop-filter:blur(4px)!important;
+}
+.dialog[open]{animation:platformDialogIn .32s var(--premium-ease) both!important}
+@keyframes platformDialogIn{from{opacity:0;transform:translate3d(0,12px,0) scale(.985)}to{opacity:1;transform:none}}
+
+/* Participación: conserva identidad, reduce círculos, brillo y profundidad excesiva. */
+html body.page-ideas.claude-page-ideas main#main-content
+.page-hero .page-hero__grid > aside.year-selector-card.ideas-invite-card{
+  min-height:410px!important;
+  border-radius:30px!important;
+  background:
+    radial-gradient(circle at 90% 12%,rgba(255,255,255,.10),transparent 26%),
+    linear-gradient(145deg,#0b3c76 0%,#126cab 58%,#1b9bc8 100%)!important;
+  box-shadow:0 22px 58px rgba(9,57,105,.18),inset 0 1px 0 rgba(255,255,255,.25)!important;
+}
+html body.page-ideas main#main-content .ideas-invite-card::before{
+  right:-64px!important;
+  bottom:-72px!important;
+  width:190px!important;
+  height:190px!important;
+  border-width:1px!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+html body.page-ideas main#main-content .ideas-invite-card::after{
+  width:10px!important;
+  height:10px!important;
+  border-width:3px!important;
+  box-shadow:0 0 0 7px rgba(255,212,123,.08)!important;
+}
+html body.page-ideas main#main-content .ideas-invite-card h2{
+  font-size:clamp(2.05rem,2.8vw,3.25rem)!important;
+  line-height:1.02!important;
+}
+html body.page-ideas main#main-content .ideas-invite-card h2 em{
+  font-size:1.18em!important;
+  text-shadow:none!important;
+}
+html body.page-ideas main#main-content .ideas-invite-card .button{
+  box-shadow:0 12px 28px rgba(0,35,78,.16)!important;
+}
+html body.page-ideas main#main-content .ideas-invite-card .button:hover{
+  box-shadow:0 16px 34px rgba(0,35,78,.2)!important;
+}
+
+/* Módulo de carpetas: profundidad controlada y sin sensación de recarga. */
+body.page-projects .projects-psp,
+body.page-projects .projects-psp__summary,
+body.page-projects .projects-psp__dock-region{
+  transition:background-color .4s ease,border-color .4s ease,box-shadow .4s ease!important;
+}
+body.page-projects .projects-folder{
+  transition:transform .34s var(--premium-ease),filter .34s ease,opacity .34s ease!important;
+}
+body.page-projects .projects-folder:not(.is-active){filter:saturate(.88) brightness(.98)!important}
+body.page-projects .projects-folder.is-active{filter:saturate(1) brightness(1.01)!important}
+body.page-projects .projects-psp__summary-copy,
+body.page-projects .projects-psp__metric{filter:none!important}
+body.page-projects .projects-psp__ambient{animation:none!important;opacity:.62!important}
+body.page-projects .projects-sheet,
+body.page-projects .projects-manager__panel{box-shadow:0 28px 82px rgba(3,20,41,.25)!important}
+body.page-projects .projects-psp__details,
+body.page-projects .projects-manager{backdrop-filter:blur(4px)!important;-webkit-backdrop-filter:blur(4px)!important}
+
+/* Integración visual continua entre banner, ejecución y carpetas. */
+body.page-projects .featured-projects-host + .running-projects,
+body.page-projects .running-projects + .projects-psp-shell{margin-top:-1px}
+body.page-projects .projects-psp-shell{border-top:0!important}
+
+@media(max-width:760px){
+  :is(.edition-card,.deal-card,.quote-card,.trust-card,.news-card,.resource-card):hover{transform:none!important}
+  html body.page-ideas.claude-page-ideas main#main-content .page-hero .page-hero__grid > aside.year-selector-card.ideas-invite-card{min-height:360px!important;border-radius:26px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .reveal,.dialog[open]{animation:none!important;transition:none!important;transform:none!important;filter:none!important}
+}
+
+/* V11.52.1 · Refinamiento adicional: movimientos controlados y sin adornos invasivos. */
+.title-accent-word::after,
+.fp__title-script::after,
+.running-projects__title em::after{display:none!important;content:none!important}
+
+.cd-reveal{
+  transform:translate3d(0,14px,0)!important;
+  filter:none!important;
+  transition:opacity .52s var(--premium-ease),transform .58s var(--premium-ease)!important;
+}
+.cd-reveal.cd-visible{transform:none!important;filter:none!important}
+
+html.portal-visual-ready :is(.page-hero,.news-page-hero,.home-xmb-banner) :is(h1,h2).has-script-accent,
+.cd-section.cd-visible :is(h1,h2,h3).has-script-accent{
+  animation:platformTitleRefined .58s var(--premium-ease) both!important;
+}
+html.portal-visual-ready :is(.page-hero,.news-page-hero,.home-xmb-banner) .title-accent-word,
+.cd-section.cd-visible .title-accent-word{
+  animation:platformScriptRefined .68s var(--premium-ease) .06s both!important;
+}
+@keyframes platformTitleRefined{from{opacity:.25;transform:translate3d(0,12px,0)}to{opacity:1;transform:none}}
+@keyframes platformScriptRefined{from{opacity:0;transform:translate3d(-.05em,.12em,0) scale(.96)}to{opacity:1;transform:none}}
+
+@media(hover:hover) and (pointer:fine){
+  .claude-studio :is(.edition-card,.deal-card,.resource-library-card,.news-card,.news-feature-card,.idea-card,.territory-focus-card,.trust-card,.quote-card):hover{
+    transform:translate3d(0,-3px,0)!important;
+    filter:none!important;
+    box-shadow:0 17px 40px rgba(7,45,87,.105)!important;
+  }
+  .claude-studio :is(.button,button,[role="button"]):not(.cd-section-rail button):hover{
+    transform:translateY(-2px)!important;
+  }
+}
+
+.motion-polish{filter:none!important;translate:0 10px!important}
+.motion-polish.motion-in{filter:none!important;translate:0 0!important}
+.motion-media-active :is(img,video,picture,.admin-banner-slide,.hero-banner-slide){
+  translate:calc(var(--media-x,0) * -2px) calc(var(--media-y,0) * -2px)!important;
+  scale:1.008!important;
+}
+
+/* Los fondos mantienen profundidad, pero dejan de competir permanentemente con el contenido. */
+.bs-hero-atmosphere__ribbon,
+.bs-hero-atmosphere__orbit,
+.bs-hero-atmosphere__particles,
+.bs-hero-atmosphere__flare,
+.cd-ambient__orb,
+.cd-ambient__line,
+.cd-ambient__ribbon,
+.cd-ambient__rings,
+.hero-adaptive-stage > span,
+.hero-adaptive-lines,
+body.page-home .home-highlights::before,
+body.page-home .home-highlights::after{
+  animation:none!important;
+}
+.cd-ambient{opacity:.62!important}
+.hero-adaptive-stage{opacity:.72!important}
+
+/* Integración directa del banner: visible aun antes de Firebase o JavaScript. */
+body.page-projects .projects-page-flow > .modulo-banner-proyectos{
+  display:block!important;
+  min-height:clamp(560px,48vw,780px);
+  visibility:visible!important;
+  opacity:1!important;
+  overflow:visible!important;
+}
+body.page-projects .featured-projects-host{
+  display:block!important;
+  min-height:clamp(540px,46vw,740px)!important;
+  visibility:visible!important;
+  opacity:1!important;
+  position:relative;
+  z-index:1;
+}
+body.page-projects .featured-projects-host[aria-busy="true"]{
+  background:linear-gradient(145deg,#f8fbff,#edf5fc);
+}
+body.page-projects .modulo-banner-proyectos + .running-projects{
+  margin-top:clamp(-28px,-1.8vw,-14px);
+  padding-top:clamp(78px,6vw,104px);
+}
+body.page-projects .running-projects + .projects-psp-shell{
+  margin-top:-1px;
+}
+
+@media(max-width:760px){
+  body.page-projects .projects-page-flow > .modulo-banner-proyectos{min-height:740px;padding-inline:8px}
+  body.page-projects .featured-projects-host{min-height:720px!important}
+  body.page-projects .modulo-banner-proyectos + .running-projects{margin-top:-12px;padding-top:68px}
+}
