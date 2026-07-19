@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const BUILD = "11.50-proyectos-fluid-dock";
+  const BUILD = "11.51-proyectos-continuous-dock";
   const MIN_PROJECTS = 5;
   const MAX_PROJECTS = 10;
   const PALETTE = [
@@ -356,48 +356,51 @@
       const metric = dom.metric?.closest(".projects-psp__metric");
       const targets = [copy, metric].filter(Boolean);
 
+      cancelSummaryAnimations();
+      commitSummaryContent(project);
+
       if (initial || reducedMotion.matches || !targets.length || typeof targets[0].animate !== "function") {
-        cancelSummaryAnimations();
-        commitSummaryContent(project);
         root.classList.remove("is-project-switching");
         return;
       }
 
       const sequence = ++summaryTransitionSequence;
-      cancelSummaryAnimations();
       root.classList.add("is-project-switching");
+      const enterX = direction >= 0 ? 22 : -22;
 
-      const outX = direction >= 0 ? -18 : 18;
-      const outAnimations = targets.map((target, index) => target.animate([
-        { opacity: 1, transform: "translate3d(0,0,0) scale(1)", filter: "blur(0)" },
-        { opacity: .12, transform: `translate3d(${outX * (index ? .55 : 1)}px,-3px,0) scale(.985)`, filter: "blur(4px)" }
+      const animations = targets.map((target, index) => target.animate([
+        {
+          opacity: .46,
+          transform: `translate3d(${enterX * (index ? .5 : 1)}px,7px,0) scale(.986)`,
+          filter: "blur(2.4px) saturate(.92)"
+        },
+        {
+          offset: .58,
+          opacity: 1,
+          transform: "translate3d(-2px,-2px,0) scale(1.006)",
+          filter: "blur(0) saturate(1.05)"
+        },
+        {
+          opacity: 1,
+          transform: "translate3d(0,0,0) scale(1)",
+          filter: "none"
+        }
       ], {
-        duration: index ? 150 : 175,
-        easing: "cubic-bezier(.4,0,.7,.2)",
+        duration: index ? 390 : 455,
+        delay: index * 34,
+        easing: "cubic-bezier(.16,.86,.18,1)",
         fill: "both"
       }));
 
-      summaryAnimations = outAnimations;
+      const wash = root.animate?.([
+        { filter: "brightness(.985)" },
+        { offset: .48, filter: "brightness(1.018)" },
+        { filter: "none" }
+      ], { duration: 520, easing: "ease-out", fill: "none" });
+      if (wash) animations.push(wash);
 
-      Promise.allSettled(outAnimations.map(animation => animation.finished)).then(() => {
-        if (sequence !== summaryTransitionSequence) return;
-
-        commitSummaryContent(project);
-        const inX = direction >= 0 ? 24 : -24;
-        const inAnimations = targets.map((target, index) => target.animate([
-          { opacity: 0, transform: `translate3d(${inX * (index ? .55 : 1)}px,8px,0) scale(.975)`, filter: "blur(5px)" },
-          { offset: .68, opacity: 1, transform: "translate3d(-2px,-2px,0) scale(1.006)", filter: "blur(0)" },
-          { opacity: 1, transform: "translate3d(0,0,0) scale(1)", filter: "blur(0)" }
-        ], {
-          duration: index ? 390 : 440,
-          delay: index * 28,
-          easing: "cubic-bezier(.16,.86,.18,1)",
-          fill: "both"
-        }));
-
-        summaryAnimations = inAnimations;
-        return Promise.allSettled(inAnimations.map(animation => animation.finished));
-      }).finally(() => {
+      summaryAnimations = animations;
+      Promise.allSettled(animations.map(animation => animation.finished)).finally(() => {
         if (sequence !== summaryTransitionSequence) return;
         summaryAnimations = [];
         root.classList.remove("is-project-switching");
@@ -632,13 +635,13 @@
         triggerSelectionBounce(q(`.projects-folder[data-project-index="${activeIndex}"]`, dom.carousel), source);
         return;
       }
-      selectProject(visibleIndices[nextPosition], { scroll: true, focus: true, source });
+      selectProject(visibleIndices[nextPosition], { scroll: true, focus: source === "keyboard", source });
     }
 
     function selectBoundary(which, source = "keyboard") {
       if (!visibleIndices.length) return;
       const index = which === "start" ? visibleIndices[0] : visibleIndices[visibleIndices.length - 1];
-      selectProject(index, { scroll: true, focus: true, source });
+      selectProject(index, { scroll: true, focus: source === "keyboard", source });
     }
 
     function resetDockMagnification() {
@@ -706,7 +709,7 @@
       const nearest = nearestFolderToViewportCenter();
       if (!nearest) return;
       const index = Number(nearest.dataset.projectIndex);
-      selectProject(index, { scroll: true, focus: true, source: "drag" });
+      selectProject(index, { scroll: true, focus: false, source: "drag" });
     }
 
     function handleDockNavigationKey(event) {
@@ -747,9 +750,11 @@
     function lockDialogViewport() {
       if (document.body.classList.contains("projects-dialog-open")) return;
       dialogScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
       document.documentElement.classList.add("projects-dialog-open");
       document.body.classList.add("projects-dialog-open");
       document.body.style.top = `-${dialogScrollY}px`;
+      document.body.style.paddingRight = scrollbarWidth ? `${scrollbarWidth}px` : "";
     }
 
     function unlockDialogViewport() {
@@ -757,6 +762,7 @@
       document.documentElement.classList.remove("projects-dialog-open");
       document.body.classList.remove("projects-dialog-open");
       document.body.style.removeProperty("top");
+      document.body.style.removeProperty("padding-right");
       window.scrollTo({ top: dialogScrollY, left: 0, behavior: "auto" });
     }
 
@@ -1138,8 +1144,9 @@
       const folder = event.target.closest(".projects-folder");
       if (!folder || pointerMoved || suppressNextClick) return;
       const index = Number(folder.dataset.projectIndex);
-      selectProject(index, { scroll: true, focus: true, source: "click" });
-      openDetails(folder);
+      const wasActive = index === activeIndex;
+      selectProject(index, { scroll: true, focus: false, source: "click" });
+      window.setTimeout(() => openDetails(folder), wasActive || reducedMotion.matches ? 0 : 210);
     });
 
     dom.carousel.addEventListener("focusin", event => {

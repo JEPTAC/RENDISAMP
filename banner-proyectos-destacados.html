@@ -5,21 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <title>Proyectos destacados · San Pedro</title>
-<!-- Integración RENDISAMP V11.50 -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+<link rel="preload" href="./assets/fonts/Hullgaria.otf" as="font" type="font/otf" crossorigin>
 <style>
-@font-face{
-  font-family:"Hullgaria";
-  src:url("./assets/fonts/Hullgaria.otf") format("opentype");
-  font-display:swap;
-  font-style:normal;
-  font-weight:400;
-}
+@font-face{font-family:"Hullgaria";src:url("./assets/fonts/Hullgaria.otf") format("opentype");font-display:swap;font-style:normal;font-weight:400}
 :root{
   --font-ui:"Century Gothic","Apple Gothic","Trebuchet MS",Arial,sans-serif;
-  --font-script:"Hullgaria","Satisfy","Segoe Script","Brush Script MT",cursive;
+  --font-script:"Hullgaria","Segoe Script","Brush Script MT",cursive;
   --page:#f3f7fc;
   --ink:#071327;
   --muted:#60718a;
@@ -28,17 +19,17 @@
   --accent-soft:#b9d1ff;
 }
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:var(--page);font-family:var(--font-ui);color:var(--ink)}
+html,body{margin:0;min-height:100%;background:transparent;font-family:var(--font-ui);color:var(--ink)}
 button{font:inherit}
-body{display:grid;place-items:start center;padding:10px 0 18px;overflow-x:hidden}
+body{display:block;width:100%;padding:0;overflow:hidden;background:transparent}
 .fp{
   position:relative;
-  width:min(1600px,calc(100vw - 20px));
-  height:clamp(520px,47vw,760px);
-  max-height:calc(100svh - 20px);
+  width:100%;
+  height:clamp(560px,47vw,760px);
+  max-height:none;
   min-height:500px;
   overflow:hidden;
-  border-radius:34px;
+  border-radius:clamp(22px,2vw,34px);
   isolation:isolate;
   background:
     radial-gradient(circle at 78% 10%,rgba(var(--accent-rgb),.08),transparent 26%),
@@ -176,7 +167,7 @@ body{display:grid;place-items:start center;padding:10px 0 18px;overflow-x:hidden
   .fp__metrics{display:none}.fp__copy{max-width:72%}.fp__reel{min-height:300px}
 }
 @media (max-width:760px){
-  body{padding:0}.fp{width:100vw;min-height:720px;height:auto;max-height:none;border-radius:0;padding-bottom:22px}
+  body{padding:0}.fp{width:100%;min-height:720px;height:auto;max-height:none;border-radius:0;padding-bottom:22px}
   .fp__header{height:68px;padding:13px 18px 7px}.fp__status{display:none}.fp__brand-text{font-size:10px}
   .fp__layout{height:auto;display:block;padding:0 16px}.fp__intro{padding:24px 4px 20px;display:block}.fp__intro::after{display:none}
   .fp__title{font-size:47px;max-width:100%}.fp__desc{margin-top:18px;font-size:13px;line-height:1.58}.fp__meta{margin-top:18px}
@@ -187,7 +178,7 @@ body{display:grid;place-items:start center;padding:10px 0 18px;overflow-x:hidden
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 /* Editor y estado vacío */
-.fp__admin-actions{display:flex;align-items:center;gap:8px}
+.fp__admin-actions{display:flex;align-items:center;gap:8px}.fp__admin-actions[hidden]{display:none!important}.fp__empty-add[hidden]{display:none!important}
 .fp__admin-btn{height:38px;border:0;border-radius:13px;padding:0 12px;display:flex;align-items:center;gap:7px;color:#667991;background:rgba(255,255,255,.70);box-shadow:0 10px 25px rgba(20,48,88,.07),inset 0 0 0 1px rgba(255,255,255,.86);backdrop-filter:blur(12px);cursor:pointer;font-size:10px;font-weight:700;letter-spacing:.03em;transition:.2s ease}
 .fp__admin-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .fp__admin-btn:hover:not(:disabled){transform:translateY(-1px);color:var(--accent);box-shadow:0 13px 30px rgba(20,48,88,.11),inset 0 0 0 1px rgba(var(--accent-rgb),.18)}
@@ -226,6 +217,7 @@ body{display:grid;place-items:start center;padding:10px 0 18px;overflow-x:hidden
 @media(max-width:980px){.fp__admin-btn span{display:none}.fp__admin-btn{width:38px;padding:0;justify-content:center}.fp-editor__grid{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.fp__admin-actions{gap:5px}.fp__admin-btn{width:34px;height:34px;border-radius:11px}.fp-editor__body{padding:14px}.fp-editor__header,.fp-editor__footer{padding-left:14px;padding-right:14px}.fp-upload{height:170px}.fp-editor__grid{grid-template-columns:1fr}.fp-editor__wide{grid-column:auto}.fp-editor__footer{flex-wrap:wrap}.fp-editor__delete{order:3;width:100%}}
 
+.fp-save-notice{position:fixed;z-index:120;left:50%;bottom:18px;max-width:min(420px,calc(100vw - 28px));padding:11px 16px;border-radius:13px;color:#fff;background:rgba(7,24,48,.92);box-shadow:0 16px 42px rgba(4,18,42,.22);font-size:11px;font-weight:700;text-align:center;opacity:0;transform:translate3d(-50%,12px,0);transition:.24s ease}.fp-save-notice.is-visible{opacity:1;transform:translate3d(-50%,0,0)}
 </style>
 </head>
 <body>
@@ -236,7 +228,7 @@ body{display:grid;place-items:start center;padding:10px 0 18px;overflow-x:hidden
       <span class="fp__brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4.2c2.1 0 3.8 1.7 3.8 3.8 0 1.8-1.2 3.3-2.9 3.7V7.3a.9.9 0 0 0-1.8 0v4.4A3.8 3.8 0 0 1 12 4.2Z"/><path d="M19.8 12c0 2.1-1.7 3.8-3.8 3.8-1.8 0-3.3-1.2-3.7-2.9h4.4a.9.9 0 1 0 0-1.8h-4.4a3.8 3.8 0 0 1 7.5.9Z"/><path d="M12 19.8A3.8 3.8 0 0 1 8.2 16c0-1.8 1.2-3.3 2.9-3.7v4.4a.9.9 0 1 0 1.8 0v-4.4a3.8 3.8 0 0 1-.9 7.5Z"/><path d="M4.2 12c0-2.1 1.7-3.8 3.8-3.8 1.8 0 3.3 1.2 3.7 2.9H7.3a.9.9 0 1 0 0 1.8h4.4a3.8 3.8 0 0 1-7.5-.9Z"/></svg></span>
       <span class="fp__brand-text">Rendición de cuentas · San Pedro</span>
     </div>
-    <div class="fp__admin-actions" aria-label="Edición del banner">
+    <div class="fp__admin-actions" id="fpAdminActions" aria-label="Edición del banner" hidden>
       <button class="fp__admin-btn fp__admin-btn--primary" id="fpAddProject" type="button" title="Agregar un proyecto">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Agregar proyecto</span>
       </button>
@@ -267,7 +259,7 @@ body{display:grid;place-items:start center;padding:10px 0 18px;overflow-x:hidden
             <p class="fp__empty-overline">Carrete vacío</p>
             <h2>Agrega tu primer <span>proyecto</span></h2>
             <p>Selecciona una fotografía, escribe la información y el banner construirá automáticamente el carrete vertical.</p>
-            <button class="fp__empty-add" id="fpEmptyAdd" type="button"><span>+</span> Agregar proyecto</button>
+            <button class="fp__empty-add" id="fpEmptyAdd" type="button" hidden><span>+</span> Agregar proyecto</button>
           </div>
           <div class="fp__peek fp__peek--2" id="fpPeek2" aria-hidden="true"></div>
           <div class="fp__peek fp__peek--1" id="fpPeek1" aria-hidden="true"></div>
@@ -332,6 +324,8 @@ body{display:grid;place-items:start center;padding:10px 0 18px;overflow-x:hidden
 <script>
 const DEFAULT_PROJECTS = [];
 const STORAGE_KEY = 'san-pedro-proyectos-destacados-reel-v2';
+const INTEGRATED_MODE = window.parent !== window;
+let CAN_EDIT = !INTEGRATED_MODE;
 const root = document.documentElement;
 const $ = selector => document.querySelector(selector);
 const stage = $('#fpCard');
@@ -362,8 +356,11 @@ const uploadZone = $('#fpUploadZone');
 const uploadPreview = $('#fpUploadPreview');
 const editBtn = $('#fpEditProject');
 const deleteBtn = $('#fpDeleteProject');
+const adminActions = $('#fpAdminActions');
+const emptyAdd = $('#fpEmptyAdd');
+const exportBtn = $('#fpExport');
 
-let PROJECTS = loadProjects();
+let PROJECTS = INTEGRATED_MODE ? [] : loadProjects();
 let active = 0;
 let auto = true;
 let sound = true;
@@ -407,6 +404,10 @@ function loadProjects() {
 }
 
 function saveProjects() {
+  if (INTEGRATED_MODE) {
+    window.parent.postMessage({type:'SP_FEATURED_PROJECTS_SAVE',projects:PROJECTS}, location.origin);
+    return;
+  }
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(PROJECTS));
   } catch (error) {
@@ -425,8 +426,24 @@ function mixHex(a, b, amount) {
   return `#${channel('r')}${channel('g')}${channel('b')}`;
 }
 
+function syncAdminUi() {
+  if (adminActions) adminActions.hidden = !CAN_EDIT;
+  if (emptyAdd) emptyAdd.hidden = !CAN_EDIT;
+  if (exportBtn) exportBtn.hidden = INTEGRATED_MODE;
+  document.documentElement.classList.toggle('can-edit', CAN_EDIT);
+  document.documentElement.classList.toggle('is-guest', !CAN_EDIT);
+}
+
+function reportHeight() {
+  const height = Math.ceil(document.documentElement.scrollHeight || document.body.scrollHeight || 0);
+  if (INTEGRATED_MODE && height) {
+    window.parent.postMessage({type:'SP_FEATURED_PROJECTS_RESIZE',height}, location.origin);
+  }
+}
+
 function setEmptyState() {
   const isEmpty = PROJECTS.length === 0;
+  syncAdminUi();
   visual.classList.toggle('is-empty', isEmpty);
   empty.hidden = !isEmpty;
   editBtn.disabled = isEmpty;
@@ -435,6 +452,18 @@ function setEmptyState() {
   total.textContent = String(PROJECTS.length).padStart(2, '0');
   current.textContent = isEmpty ? '00' : String(active + 1).padStart(2, '0');
   if (isEmpty) {
+    const overline = empty.querySelector('.fp__empty-overline');
+    const heading = empty.querySelector('h2');
+    const copy = empty.querySelector('p:last-of-type');
+    if (CAN_EDIT) {
+      if (overline) overline.textContent = 'Carrete vacío';
+      if (heading) heading.innerHTML = 'Agrega tu primer <span>proyecto</span>';
+      if (copy) copy.textContent = 'Carga las fotografías y la información para construir el banner destacado.';
+    } else {
+      if (overline) overline.textContent = 'Portafolio público';
+      if (heading) heading.innerHTML = 'Proyectos <span>en preparación</span>';
+      if (copy) copy.textContent = 'La Administración Municipal está preparando los proyectos que se destacarán en este espacio.';
+    }
     clearInterval(timer);
     reelTrack.innerHTML = '';
     image.removeAttribute('src');
@@ -586,6 +615,7 @@ function endDrag(event) {
 }
 
 function openEditor(mode) {
+  if (!CAN_EDIT) return;
   editorMode = mode;
   pendingImage = '';
   editorForm.reset();
@@ -618,8 +648,8 @@ async function optimizeImage(file) {
   if (!file.type.startsWith('image/')) throw new Error('Selecciona un archivo de imagen válido.');
   const source = await fileToDataUrl(file);
   const bitmap = await loadImage(source);
-  const maxWidth = 1800;
-  const maxHeight = 1100;
+  const maxWidth = 1200;
+  const maxHeight = 675;
   const ratio = Math.min(1, maxWidth / bitmap.naturalWidth, maxHeight / bitmap.naturalHeight);
   const width = Math.max(1, Math.round(bitmap.naturalWidth * ratio));
   const height = Math.max(1, Math.round(bitmap.naturalHeight * ratio));
@@ -630,7 +660,13 @@ async function optimizeImage(file) {
   context.fillStyle = '#ffffff';
   context.fillRect(0, 0, width, height);
   context.drawImage(bitmap, 0, 0, width, height);
-  return canvas.toDataURL('image/jpeg', .84);
+  let quality = .82;
+  let result = canvas.toDataURL('image/jpeg', quality);
+  while (result.length > 130000 && quality > .46) {
+    quality -= .07;
+    result = canvas.toDataURL('image/jpeg', quality);
+  }
+  return result;
 }
 
 function fileToDataUrl(file) {
@@ -684,6 +720,7 @@ function formProject() {
 }
 
 function exportHtml() {
+  if (INTEGRATED_MODE) return;
   if (!PROJECTS.length) {
     alert('Agrega al menos un proyecto antes de guardar una copia.');
     return;
@@ -704,6 +741,36 @@ function exportHtml() {
 }
 
 refresh(false);
+syncAdminUi();
+
+if (INTEGRATED_MODE) {
+  window.addEventListener('message', event => {
+    if (event.origin !== location.origin || event.source !== window.parent) return;
+    const data = event.data || {};
+    if (data.type === 'SP_FEATURED_PROJECTS_INIT') {
+      CAN_EDIT = Boolean(data.canEdit);
+      PROJECTS = Array.isArray(data.projects) ? data.projects.map(normalizeProject).filter(project => project.image).slice(0,8) : [];
+      active = Math.min(active, Math.max(0, PROJECTS.length - 1));
+      refresh(false);
+      syncAdminUi();
+      requestAnimationFrame(reportHeight);
+    } else if (data.type === 'SP_FEATURED_PROJECTS_SAVE_RESULT') {
+      if (data.ok && Array.isArray(data.projects)) PROJECTS = data.projects.map(normalizeProject).filter(project => project.image).slice(0,8);
+      if (data.message) {
+        const notice = document.createElement('div');
+        notice.className = 'fp-save-notice';
+        notice.textContent = data.message;
+        document.body.appendChild(notice);
+        requestAnimationFrame(() => notice.classList.add('is-visible'));
+        setTimeout(() => { notice.classList.remove('is-visible'); setTimeout(() => notice.remove(),240); }, 1800);
+      }
+      refresh(false);
+    } else if (data.type === 'SP_FEATURED_PROJECTS_REQUEST_SIZE') {
+      reportHeight();
+    }
+  });
+  window.parent.postMessage({type:'SP_FEATURED_PROJECTS_READY'}, location.origin);
+}
 
 stage.addEventListener('wheel', onWheel, {passive:false});
 reelViewport.addEventListener('wheel', onWheel, {passive:false});
@@ -747,10 +814,10 @@ soundBtn.addEventListener('click', () => {
 
 $('#fpDialogClose').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
-$('#fpAddProject').addEventListener('click', () => openEditor('add'));
-$('#fpEmptyAdd').addEventListener('click', () => openEditor('add'));
-editBtn.addEventListener('click', () => openEditor('edit'));
-$('#fpExport').addEventListener('click', exportHtml);
+$('#fpAddProject').addEventListener('click', () => { if (CAN_EDIT) openEditor('add'); });
+$('#fpEmptyAdd').addEventListener('click', () => { if (CAN_EDIT) openEditor('add'); });
+editBtn.addEventListener('click', () => { if (CAN_EDIT) openEditor('edit'); });
+$('#fpExport').addEventListener('click', () => { if (!INTEGRATED_MODE) exportHtml(); });
 $('#fpEditorX').addEventListener('click', () => editor.close());
 $('#fpEditorCancel').addEventListener('click', () => editor.close());
 editor.addEventListener('click', event => { if (event.target === editor) editor.close(); });
@@ -765,6 +832,7 @@ uploadZone.addEventListener('drop', event => {
 
 editorForm.addEventListener('submit', event => {
   event.preventDefault();
+  if (!CAN_EDIT) return;
   const project = formProject();
   if (!project.image) { alert('Selecciona una fotografía para el proyecto.'); return; }
   if (!project.title || !project.description) { alert('Completa el título y la descripción.'); return; }
@@ -777,7 +845,7 @@ editorForm.addEventListener('submit', event => {
 });
 
 deleteBtn.addEventListener('click', () => {
-  if (!PROJECTS.length) return;
+  if (!CAN_EDIT || !PROJECTS.length) return;
   if (!confirm(`¿Eliminar “${PROJECTS[active].title}” del carrete?`)) return;
   PROJECTS.splice(active, 1);
   active = Math.max(0, Math.min(active, PROJECTS.length - 1));
@@ -786,7 +854,9 @@ deleteBtn.addEventListener('click', () => {
   refresh(false);
 });
 
-new ResizeObserver(updateReel).observe(reelViewport);
+new ResizeObserver(() => { updateReel(); reportHeight(); }).observe(document.documentElement);
+window.addEventListener('load', reportHeight, {once:true});
+window.addEventListener('resize', reportHeight, {passive:true});
 ['pointerdown','keydown','wheel','touchstart'].forEach(eventName => window.addEventListener(eventName, ensureAudio, {once:true, passive:true}));
 </script>
 </body>

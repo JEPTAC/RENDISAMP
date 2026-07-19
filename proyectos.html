@@ -5,7 +5,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
-    window.__PORTAL_EXPECTED_BUILD__ = "11.49.0-script-no-lines";
+    window.__PORTAL_EXPECTED_BUILD__ = "11.51.0-projects-functional-banner";
     (async () => {
       try {
         if ("serviceWorker" in navigator) {
@@ -29,24 +29,28 @@
   <meta name="description" content="Proyectos y avances de la gestión pública de San Pedro.">
   <link rel="icon" href="assets/favicon.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=11.49.0-script-no-lines">
-  <link rel="stylesheet" href="projects-psp.css?v=11.50.0-fluid-dock">
-  <link rel="stylesheet" href="platform-fixes-v1150.css?v=11.50.0-isolated-fixes">
+  <link rel="stylesheet" href="styles.css?v=11.51.0-projects-functional-banner">
+  <link rel="stylesheet" href="projects-psp.css?v=11.51.0-projects-functional-banner">
+  <link rel="stylesheet" href="platform-fixes-v1151.css?v=11.51.0-projects-functional-banner">
   <title>Proyectos | Rendición de Cuentas de San Pedro</title>
   <link rel="preconnect" href="https://accounts.google.com">
 </head>
-<body data-page="projects">
+<body class="page-projects claude-page-projects" data-page="projects">
   <div id="siteHeader"></div>
 
   <main id="main-content" class="projects-page-flow" aria-label="Módulo de proyectos">
 
-    <section class="modulo-banner-proyectos" aria-label="Proyectos destacados">
+    <section class="modulo-banner-proyectos" aria-label="Proyectos destacados" style="display:block;width:100%;margin:0;overflow:hidden">
       <iframe
+        id="featuredProjectsBanner"
         class="modulo-banner-proyectos__iframe"
-        src="./banner-proyectos-destacados.html"
+        style="display:block;width:100%;height:clamp(570px,47vw,770px);min-height:570px;border:0;margin:0"
+        src="./banner-proyectos-destacados.html?v=11.51.0-projects-functional-banner"
         title="Banner interactivo de proyectos destacados"
         loading="eager"
+        scrolling="no"
         allow="autoplay; fullscreen"
+        aria-busy="true"
       ></iframe>
     </section>
 
@@ -220,7 +224,8 @@
   <div id="siteFooter"></div>
   <div id="globalDialogs"></div>
 
-  <script src="portal-core-v11409.js?v=11.49.0-script-no-lines"></script>
-  <script src="projects-psp.js?v=11.50.0-fluid-dock" defer></script>
+  <script src="portal-core-v11409.js?v=11.51.0-projects-functional-banner"></script>
+  <script src="projects-featured-banner.js?v=11.51.0-projects-functional-banner" defer></script>
+  <script src="projects-psp.js?v=11.51.0-projects-functional-banner" defer></script>
 </body>
 </html>

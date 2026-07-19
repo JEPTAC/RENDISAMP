@@ -1,0 +1,367 @@
+/* =========================================================
+   V11.51 · Integración funcional y aislada
+   - Banner de Proyectos: tamaño real, sin iframe 300x150,
+     altura sincronizada y transición continua hacia carpetas.
+   - Tarjeta de participación: composición más equilibrada.
+   Este archivo está deliberadamente limitado a Proyectos e Ideas.
+   ========================================================= */
+
+/* ---------- Banner real de Proyectos ---------- */
+.projects-page-flow {
+  overflow-x: clip;
+}
+
+.projects-page-flow > .modulo-banner-proyectos {
+  position: relative;
+  z-index: 3;
+  width: min(1840px, 100%);
+  margin: 0 auto;
+  padding: clamp(10px, 1.1vw, 20px) clamp(10px, 1.15vw, 22px) 0;
+  overflow: visible;
+  background: transparent;
+}
+
+.projects-page-flow > .modulo-banner-proyectos::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -4px 0 -90px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 88% 10%, rgba(50, 156, 222, .13), transparent 28%),
+    linear-gradient(180deg, #f3f7fc 0%, rgba(243, 247, 252, .96) 72%, rgba(243, 247, 252, 0) 100%);
+}
+
+.projects-page-flow .modulo-banner-proyectos__iframe {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: clamp(570px, 47vw, 770px);
+  min-height: 570px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: clamp(22px, 2vw, 34px);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 10%, rgba(48, 143, 211, .12), transparent 31%),
+    linear-gradient(145deg, #f8fbff, #eef5fc);
+  box-shadow: 0 24px 70px rgba(19, 62, 107, .12);
+  opacity: 0;
+  transform: translate3d(0, 14px, 0) scale(.995);
+  transition:
+    height .48s cubic-bezier(.2, .82, .2, 1),
+    opacity .42s ease,
+    transform .58s cubic-bezier(.16, .86, .18, 1);
+}
+
+.projects-page-flow .modulo-banner-proyectos__iframe.is-ready {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.projects-page-flow > .modulo-banner-proyectos + .projects-psp-shell {
+  position: relative;
+  z-index: 2;
+  margin-top: clamp(-42px, -2.6vw, -22px);
+  padding-top: clamp(76px, 6vw, 108px);
+  background:
+    linear-gradient(180deg, rgba(243, 247, 252, 0) 0, #f2f8fc 94px, #edf6fb 100%);
+}
+
+@media (max-width: 1120px) {
+  .projects-page-flow .modulo-banner-proyectos__iframe {
+    height: clamp(610px, 63vw, 760px);
+    min-height: 610px;
+  }
+}
+
+@media (max-width: 760px) {
+  .projects-page-flow > .modulo-banner-proyectos {
+    padding: 8px 0 0;
+  }
+
+  .projects-page-flow .modulo-banner-proyectos__iframe {
+    height: 900px;
+    min-height: 760px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .projects-page-flow > .modulo-banner-proyectos + .projects-psp-shell {
+    margin-top: -18px;
+    padding-top: 58px;
+  }
+}
+
+/* Evita saltos de ancho al abrir la ficha de carpetas. */
+html.projects-dialog-open,
+body.projects-dialog-open {
+  scrollbar-gutter: stable;
+}
+
+body.projects-dialog-open {
+  width: 100%;
+}
+
+/* ---------- Tarjeta de participación ciudadana ---------- */
+body.page-ideas main#main-content .page-hero__grid > aside.ideas-invite-card {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: center;
+  min-height: 430px;
+  padding: clamp(30px, 3.2vw, 48px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .75);
+  border-radius: clamp(28px, 2.5vw, 40px);
+  color: #fff;
+  background:
+    radial-gradient(circle at 88% 14%, rgba(88, 210, 255, .38), transparent 29%),
+    radial-gradient(circle at 5% 100%, rgba(112, 83, 224, .28), transparent 35%),
+    linear-gradient(145deg, #0a356d 0%, #1269ad 56%, #1fa8d4 100%);
+  box-shadow:
+    0 30px 76px rgba(10, 59, 107, .25),
+    inset 0 1px 0 rgba(255, 255, 255, .32);
+}
+
+body.page-ideas main#main-content .ideas-invite-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: -82px;
+  bottom: -112px;
+  width: 280px;
+  height: 280px;
+  border: 34px solid rgba(255, 255, 255, .09);
+  border-radius: 50%;
+}
+
+body.page-ideas main#main-content .ideas-invite-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 28px;
+  right: 30px;
+  width: 15px;
+  height: 15px;
+  border: 4px solid rgba(255, 255, 255, .76);
+  border-radius: 50%;
+  background: #ffd47b;
+  box-shadow: 0 0 0 10px rgba(255, 212, 123, .12), 0 0 30px rgba(255, 212, 123, .42);
+}
+
+body.page-ideas main#main-content .ideas-invite-card__eyebrow {
+  width: max-content;
+  margin-bottom: 22px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  border-radius: 999px;
+  color: #e9f8ff;
+  background: rgba(255, 255, 255, .11);
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+body.page-ideas main#main-content .ideas-invite-card h2 {
+  max-width: 13ch;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2.2rem, 3.1vw, 3.7rem);
+  line-height: .98;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+
+body.page-ideas main#main-content .ideas-invite-card h2 em {
+  display: inline-block;
+  position: relative;
+  top: .04em;
+  margin-left: .08em;
+  padding: .06em .06em .18em;
+  overflow: visible;
+  color: #ffd06f;
+  font-family: "Hullgaria", "Segoe Script", "Brush Script MT", cursive;
+  font-size: 1.26em;
+  font-style: normal;
+  font-weight: 400;
+  line-height: .8;
+  letter-spacing: 0;
+  text-shadow: 0 10px 26px rgba(0, 20, 58, .24);
+}
+
+body.page-ideas main#main-content .ideas-invite-card__copy {
+  max-width: 37ch;
+  margin: 22px 0 0;
+  color: rgba(239, 249, 255, .9);
+  font-size: clamp(.95rem, 1.05vw, 1.08rem);
+  line-height: 1.7;
+}
+
+body.page-ideas main#main-content .ideas-invite-card .button {
+  width: max-content;
+  min-width: min(100%, 260px);
+  margin-top: 28px;
+  padding: 14px 22px;
+  border: 1px solid rgba(255, 255, 255, .78);
+  border-radius: 16px;
+  color: #0a3e70;
+  background: #fff;
+  box-shadow: 0 16px 34px rgba(0, 35, 78, .2);
+  font-size: .94rem;
+  font-weight: 900;
+  transition: transform .25s ease, box-shadow .25s ease, color .25s ease;
+}
+
+body.page-ideas main#main-content .ideas-invite-card .button:hover {
+  transform: translate3d(0, -3px, 0);
+  color: #166ead;
+  box-shadow: 0 21px 42px rgba(0, 35, 78, .27);
+}
+
+body.page-ideas main#main-content .ideas-invite-card__note {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 18px;
+  color: rgba(234, 247, 255, .76);
+  font-size: .76rem;
+  line-height: 1.45;
+}
+
+body.page-ideas main#main-content .ideas-invite-card__note::before {
+  content: "✓";
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: #0d5b92;
+  background: #9ee9d4;
+  font-weight: 900;
+}
+
+@media (max-width: 760px) {
+  body.page-ideas main#main-content .page-hero__grid > aside.ideas-invite-card {
+    min-height: 360px;
+    padding: 30px 24px;
+    border-radius: 28px;
+  }
+
+  body.page-ideas main#main-content .ideas-invite-card h2 {
+    max-width: 15ch;
+    font-size: clamp(2.25rem, 10vw, 3.3rem);
+  }
+
+  body.page-ideas main#main-content .ideas-invite-card .button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projects-page-flow .modulo-banner-proyectos__iframe,
+  body.page-ideas main#main-content .ideas-invite-card .button {
+    transition: none !important;
+  }
+}
+
+/* Actualizaciones del Dock sin reconstrucción visual. */
+body.page-projects .projects-psp__dock-viewport {
+  scroll-behavior: auto !important;
+  overscroll-behavior: contain;
+}
+
+body.page-projects .projects-psp__dock-viewport.is-programmatic-scroll {
+  scroll-snap-type: none !important;
+}
+
+body.page-projects .projects-psp.is-project-switching .projects-psp__summary {
+  pointer-events: none;
+}
+
+body.page-projects .projects-psp__summary-copy,
+body.page-projects .projects-psp__metric,
+body.page-projects .projects-folder,
+body.page-projects .projects-folder__front,
+body.page-projects .projects-folder__paper,
+body.page-projects .projects-folder__back {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+body.page-projects .projects-psp__summary-copy,
+body.page-projects .projects-psp__metric {
+  will-change: transform, opacity, filter;
+}
+
+/* Blindaje frente a reglas históricas con !important. */
+html body.page-ideas.claude-page-ideas main#main-content
+.page-hero .page-hero__grid > aside.year-selector-card.ideas-invite-card {
+  display: grid !important;
+  align-content: center !important;
+  justify-content: initial !important;
+  gap: 0 !important;
+  min-height: 430px !important;
+  padding: clamp(30px, 3.2vw, 48px) !important;
+  border: 1px solid rgba(255,255,255,.75) !important;
+  border-radius: clamp(28px,2.5vw,40px) !important;
+  color: #fff !important;
+  background:
+    radial-gradient(circle at 88% 14%,rgba(88,210,255,.38),transparent 29%),
+    radial-gradient(circle at 5% 100%,rgba(112,83,224,.28),transparent 35%),
+    linear-gradient(145deg,#0a356d 0%,#1269ad 56%,#1fa8d4 100%) !important;
+  box-shadow: 0 30px 76px rgba(10,59,107,.25), inset 0 1px 0 rgba(255,255,255,.32) !important;
+}
+
+html body.page-ideas.claude-page-ideas main#main-content
+.ideas-invite-card :is(.ideas-invite-card__eyebrow,h2,.ideas-invite-card__copy,.ideas-invite-card__note) {
+  color: #fff !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+html body.page-ideas.claude-page-ideas main#main-content
+.ideas-invite-card .ideas-invite-card__eyebrow {
+  color: #e9f8ff !important;
+  background: rgba(255,255,255,.11) !important;
+}
+
+html body.page-ideas.claude-page-ideas main#main-content
+.ideas-invite-card h2 em {
+  color: #ffd06f !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: #ffd06f !important;
+}
+
+html body.page-ideas.claude-page-ideas main#main-content
+.ideas-invite-card .ideas-invite-card__copy {
+  color: rgba(239,249,255,.9) !important;
+}
+
+html body.page-ideas.claude-page-ideas main#main-content
+.ideas-invite-card #openIdeaForm {
+  color: #0a3e70 !important;
+  -webkit-text-fill-color: #0a3e70 !important;
+  background: #fff !important;
+  border-color: rgba(255,255,255,.78) !important;
+  text-shadow: none !important;
+}
+
+html body.page-ideas.claude-page-ideas main#main-content
+.ideas-invite-card .ideas-invite-card__note {
+  color: rgba(234,247,255,.76) !important;
+}
+
+@media (max-width:760px) {
+  html body.page-ideas.claude-page-ideas main#main-content
+  .page-hero .page-hero__grid > aside.year-selector-card.ideas-invite-card {
+    min-height: 360px !important;
+    padding: 30px 24px !important;
+    border-radius: 28px !important;
+  }
+}
