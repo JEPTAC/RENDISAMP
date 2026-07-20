@@ -390,12 +390,10 @@
 }
 
 /* =========================================================
-   V2.6.0 · Corrección definitiva y aislada del título izquierdo
-   Las líneas se dibujan desde CSS para no depender de versiones
-   anteriores del JavaScript ni de saltos automáticos del navegador.
+   V2.6.1 · Título izquierdo limpio y estructural
+   Un único origen del texto: banner-config.js + banner.js.
    ========================================================= */
-.spb-banner__eyebrow,
-.spb-banner__description{
+.spb-banner__eyebrow{
   color:#0b467f!important;
   -webkit-text-fill-color:#0b467f!important;
   text-shadow:none!important;
@@ -406,54 +404,74 @@
   max-width:100%!important;
   margin:0!important;
   overflow:visible!important;
+  color:#0b467f!important;
+  -webkit-text-fill-color:#0b467f!important;
+  text-shadow:none!important;
   font-size:clamp(2.55rem,3.05vw,3.65rem)!important;
   line-height:.98!important;
   letter-spacing:-.052em!important;
-  color:#0b467f!important;
-  -webkit-text-fill-color:#0b467f!important;
-  text-shadow:none!important;
-}
-.spb-banner__title > *{
-  display:none!important;
 }
 .spb-banner__title::before,
 .spb-banner__title::after{
+  content:none!important;
+  display:none!important;
+}
+.spb-banner__title-line{
   display:block!important;
   width:max-content!important;
   max-width:100%!important;
-  white-space:nowrap!important;
-  color:#0b467f!important;
-  -webkit-text-fill-color:#0b467f!important;
-  text-shadow:none!important;
+  color:inherit!important;
+  -webkit-text-fill-color:inherit!important;
   background:none!important;
-  -webkit-background-clip:border-box!important;
-  background-clip:border-box!important;
+  text-shadow:none!important;
 }
-.spb-banner__title::before{
-  content:"Conozca la Gestión.";
+.spb-banner__title-line--one{
+  white-space:nowrap!important;
 }
-.spb-banner__title::after{
-  content:"Construyamos";
+.spb-banner__title-line--two{
   margin-top:.08em!important;
+  white-space:nowrap!important;
 }
 .spb-banner__script{
   display:block!important;
   clear:both!important;
   margin-top:.08em!important;
+  color:var(--spb-cursive-color,var(--spb-accent))!important;
+  -webkit-text-fill-color:var(--spb-cursive-color,var(--spb-accent))!important;
   text-shadow:none!important;
+}
+.spb-banner__description{
+  max-width:620px!important;
+  margin:clamp(16px,1.6vw,24px) 0 0!important;
+  padding:.12em .06em .2em 0!important;
+  color:#0b467f!important;
+  -webkit-text-fill-color:#0b467f!important;
+  font-family:var(--spb-script)!important;
+  font-size:clamp(1.55rem,1.8vw,2.15rem)!important;
+  font-weight:400!important;
+  line-height:1.08!important;
+  letter-spacing:0!important;
+  text-shadow:none!important;
+  overflow:visible!important;
 }
 @media(max-width:1160px){
   .spb-banner__title{
     font-size:clamp(2.35rem,3.75vw,3.35rem)!important;
   }
 }
+@media(max-width:980px){
+  .spb-banner__title-line--one,
+  .spb-banner__title-line--two{
+    white-space:normal!important;
+    width:auto!important;
+  }
+}
 @media(max-width:680px){
   .spb-banner__title{
     font-size:clamp(2.15rem,9.8vw,3rem)!important;
   }
-  .spb-banner__title::before,
-  .spb-banner__title::after{
-    width:auto!important;
-    white-space:normal!important;
+  .spb-banner__description{
+    font-size:clamp(1.5rem,7.2vw,2rem)!important;
+    line-height:1.04!important;
   }
 }

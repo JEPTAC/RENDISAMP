@@ -30,10 +30,10 @@
         <section class="spb-banner__left">
           <div class="spb-banner__eyebrow">${escapeHtml(config.eyebrow)}</div>
           <h2 class="spb-banner__title" aria-label="${escapeHtml([config.titleLine1,config.titleLine2,config.scriptWord].filter(Boolean).join(' '))}">
-            <span class="spb-banner__title-line spb-banner__title-line--one" style="display:block!important;white-space:nowrap!important;font-size:.86em!important;width:max-content!important;max-width:100%!important">${escapeHtml(config.titleLine1)}</span>
-            <span class="spb-banner__title-line spb-banner__title-line--two" style="display:block!important;white-space:nowrap!important;width:max-content!important;max-width:100%!important">${escapeHtml(config.titleLine2)}</span>
+            <span class="spb-banner__title-line spb-banner__title-line--one">${escapeHtml(config.titleLine1)}</span>
+            <span class="spb-banner__title-line spb-banner__title-line--two">${escapeHtml(config.titleLine2)}</span>
           </h2>
-          <span class="spb-banner__script" style="display:block!important">${escapeHtml(config.scriptWord)}</span>
+          <span class="spb-banner__script">${escapeHtml(config.scriptWord)}</span>
           <p class="spb-banner__description">${escapeHtml(config.description)}</p>
           <button class="spb-banner__transport" type="button" data-spb-transport aria-label="Pausar reproducción automática">
             <span class="spb-banner__count"><strong data-spb-current>01</strong> <span>/ <span data-spb-total>${String(slides.length).padStart(2,'0')}</span></span></span>
