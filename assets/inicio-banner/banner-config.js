@@ -72,7 +72,7 @@ window.SP_HOME_BANNER_CONFIG = {
       soft: "#fff5c9",
       cursiveColor: "#c45a08",
       compactColor: "#6f4a00",
-      captionTitleColor: "#fff8df",
+      captionTitleColor: "#ffffff",
       captionDescriptionColor: "#ffffff"
     },
     {

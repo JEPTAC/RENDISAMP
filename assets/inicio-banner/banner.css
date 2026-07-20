@@ -143,9 +143,6 @@
 
 /* Todas las piezas cursivas adoptan el color temático de cada fotografía. */
 .spb-banner__script,
-.spb-banner__pill,
-.spb-banner__discover,
-.spb-banner__caption-script,
 .spb-banner__modal-copy small{
   color:var(--spb-cursive-color);
   transition:color .58s ease,text-shadow .58s ease;
@@ -237,6 +234,8 @@
 
 /* Las etiquetas cursivas mantienen contraste sobre las fotografías. */
 .spb-banner__pill{
+  color:#ffffff;
+  -webkit-text-fill-color:#ffffff;
   text-shadow:0 3px 12px rgba(0,0,0,.62);
   border-color:rgba(255,255,255,.2);
 }
@@ -301,7 +300,8 @@
   max-width:100%;
   padding:.12em .12em .31em .05em;
   margin:-.1em 0 -.25em .06em;
-  color:var(--spb-cursive-color,var(--spb-accent));
+  color:#ffffff;
+  -webkit-text-fill-color:#ffffff;
   font-size:clamp(1.5em,1.38em + .55vw,1.78em)!important;
   line-height:.9!important;
   vertical-align:-.16em;

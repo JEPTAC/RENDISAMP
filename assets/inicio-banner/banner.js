@@ -43,7 +43,7 @@
         <section class="spb-banner__right">
           <div class="spb-banner__console" data-spb-console>
             <div class="spb-banner__screen">
-              <div class="spb-banner__viewport" data-spb-viewport aria-label="Galería territorial del inicio. Usa el scroll, las flechas del teclado o un clic para cambiar. Doble clic para conocer la historia.">
+              <div class="spb-banner__viewport" data-spb-viewport aria-label="Galería territorial del inicio. Usa el scroll, las flechas del teclado o un clic para cambiar.">
                 <div data-spb-scenes>${slides.map((slide,i)=>`<div class="spb-banner__scene${i===0?' is-active':''}" data-index="${i}"><img src="${escapeHtml(asset(config,slide.image))}" alt="${escapeHtml(slide.alt || slide.title)}"></div>`).join('')}</div>
                 <div class="spb-banner__shade"></div>
                 <div class="spb-banner__top"><span class="spb-banner__pill" data-spb-tag></span><span class="spb-banner__pill" data-spb-year></span></div>
@@ -57,7 +57,6 @@
                 <div class="spb-banner__caption" data-spb-caption>
                   <h2><span class="spb-banner__caption-main" data-spb-title-main></span><em class="spb-banner__caption-script" data-spb-title-script></em></h2>
                   <p data-spb-subtitle></p>
-                  <span class="spb-banner__discover">doble clic para descubrir</span>
                 </div>
               </div>
             </div>
@@ -118,8 +117,8 @@
       root.style.setProperty('--spb-soft',slide.soft || '#dbe8ff');
       root.style.setProperty('--spb-cursive-color',slide.cursiveColor || accent);
       root.style.setProperty('--spb-compact-color',slide.compactColor || '#4d6076');
-      root.style.setProperty('--spb-caption-title',slide.captionTitleColor || '#ffffff');
-      root.style.setProperty('--spb-caption-description',slide.captionDescriptionColor || '#ffffff');
+      root.style.setProperty('--spb-caption-title','#ffffff');
+      root.style.setProperty('--spb-caption-description','#ffffff');
       if(modal){
         modal.style.setProperty('--spb-accent',accent);
         modal.style.setProperty('--spb-accent-rgb',readableRgb(accent).join(','));
