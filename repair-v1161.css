@@ -276,3 +276,157 @@ body.page-news .news-detail__content p:first-child::first-letter{
 .drive-media-dialog__progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#126db0,#32b9df);transition:width .2s ease}
 .drive-media-dialog__progress span{position:absolute;top:12px;left:0;font-size:.72rem;color:#5a7895}
 @media(max-width:620px){.drive-media-dialog__actions{grid-template-columns:1fr}.drive-media-dialog header,.drive-media-dialog__actions,.drive-media-dialog footer{padding-left:18px;padding-right:18px}}
+
+/* V11.61.13 · Vigencias individuales: hero proporcional y no invasivo
+   Aplica solo a páginas de vigencia: rendicion.html, rendicion-2025/2026/2027
+   y futuras páginas que conserven main[data-year-page="true"]. */
+body[data-page="year"] main[data-year-page="true"] > .page-hero{
+  min-height:clamp(330px,43vh,470px)!important;
+  padding:clamp(30px,4vw,54px) 0 clamp(34px,4.6vw,60px)!important;
+  overflow:hidden!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero::before{
+  height:54%!important;
+  inset:auto -10% -34% 36%!important;
+  opacity:.72!important;
+  filter:none!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero::after{
+  height:28%!important;
+  bottom:-17%!important;
+  opacity:.78!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .page-hero__grid{
+  min-height:clamp(245px,34vh,340px)!important;
+  grid-template-columns:minmax(0,1.04fr) minmax(280px,.70fr)!important;
+  gap:clamp(22px,4vw,48px)!important;
+  align-items:center!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .page-hero__grid > div:first-child{
+  max-width:720px!important;
+  padding-right:0!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .page-hero__badge{
+  min-height:25px!important;
+  padding:0 10px!important;
+  font-size:9px!important;
+  letter-spacing:.14em!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero h1{
+  max-width:720px!important;
+  margin:8px 0 10px!important;
+  font-size:clamp(2.45rem,4.05vw,4.35rem)!important;
+  line-height:.96!important;
+  letter-spacing:-.055em!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero h1 .signature,
+body[data-page="year"] main[data-year-page="true"] > .page-hero h1 em,
+body[data-page="year"] main[data-year-page="true"] > .page-hero h1 .hullgaria,
+body[data-page="year"] main[data-year-page="true"] > .page-hero h1 [class*="script"],
+body[data-page="year"] main[data-year-page="true"] > .page-hero h1 [class*="hand"]{
+  font-size:1.04em!important;
+  line-height:.9!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero h2{
+  max-width:650px!important;
+  margin:0 0 10px!important;
+  font-size:clamp(1.05rem,1.55vw,1.45rem)!important;
+  line-height:1.26!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero p{
+  max-width:610px!important;
+  margin:0!important;
+  font-size:clamp(.86rem,1.02vw,.98rem)!important;
+  line-height:1.55!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-card{
+  width:min(100%,330px)!important;
+  min-height:0!important;
+  padding:clamp(18px,2vw,22px)!important;
+  border-radius:20px!important;
+  box-shadow:0 14px 34px rgba(9,50,91,.10)!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-card > span{
+  font-size:9px!important;
+  letter-spacing:.08em!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-card h2{
+  margin:10px 0 14px!important;
+  font-size:clamp(1.15rem,1.55vw,1.55rem)!important;
+  line-height:1.12!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-card select{
+  min-height:42px!important;
+  padding:0 12px!important;
+  border-radius:11px!important;
+  font-size:.9rem!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-stats{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin-top:12px!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-stats > div{
+  min-height:62px!important;
+  padding:10px 12px!important;
+  border-radius:12px!important;
+  gap:2px!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-stats strong{
+  font-size:clamp(1.05rem,1.55vw,1.28rem)!important;
+  line-height:1!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-stats span{
+  font-size:.55rem!important;
+  line-height:1.1!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .page-hero__scene,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif-canvas{
+  overflow:hidden!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .page-hero__scene [class*="scene-"]{
+  transform:scale(.72)!important;
+  transform-origin:center!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--festival-main,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--mobility-festival,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--sports-main{
+  max-height:clamp(170px,25vh,260px)!important;
+  max-width:clamp(160px,22vw,270px)!important;
+}
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--music-parade,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--headline-festival,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--notes-a,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--notes-b,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--notes-route,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--notes-route-b,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--notes-sport,
+body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--notes-sport-b{
+  opacity:.72!important;
+}
+@media (max-width:900px){
+  body[data-page="year"] main[data-year-page="true"] > .page-hero{
+    min-height:0!important;
+    padding:34px 0 46px!important;
+  }
+  body[data-page="year"] main[data-year-page="true"] > .page-hero .page-hero__grid{
+    grid-template-columns:1fr!important;
+    min-height:0!important;
+    gap:20px!important;
+  }
+  body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-card{width:100%!important;max-width:none!important}
+  body[data-page="year"] main[data-year-page="true"] > .page-hero .page-hero__scene{opacity:.42!important}
+}
+@media (max-width:620px){
+  body[data-page="year"] main[data-year-page="true"] > .page-hero h1{
+    font-size:clamp(2.15rem,10.5vw,3.25rem)!important;
+  }
+  body[data-page="year"] main[data-year-page="true"] > .page-hero h2{
+    font-size:clamp(1rem,5vw,1.25rem)!important;
+  }
+  body[data-page="year"] main[data-year-page="true"] > .page-hero p{
+    font-size:.9rem!important;
+  }
+  body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-stats>div{min-height:58px!important}
+}
