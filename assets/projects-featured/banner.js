@@ -61,6 +61,7 @@ let pendingImage = '';
 let lastPortalSignature = '';
 function normalizeProject(project = {}) {
   const accent = /^#[0-9a-f]{6}$/i.test(project.accent || '') ? project.accent : '#2f6ff2';
+  const textColor = /^#[0-9a-f]{6}$/i.test(project.textColor || '') ? project.textColor : '#ffffff';
   const rgb = hexToRgb(accent);
   return {
     id: String(project.id || `featured-${Math.random().toString(36).slice(2, 9)}`),
@@ -72,6 +73,7 @@ function normalizeProject(project = {}) {
     progress: project.progress ?? '—',
     period: project.period ?? '—',
     accent,
+    textColor,
     rgb: `${rgb.r},${rgb.g},${rgb.b}`,
     soft: mixHex(accent, '#ffffff', .68),
     image: String(project.image || FALLBACK_IMAGE),
@@ -200,7 +202,7 @@ function syncFromPortal({ force = false } = {}) {
     return;
   }
   const normalized = incoming.map(normalizeProject).slice(0, 8);
-  const signature = JSON.stringify(normalized.map(project => [project.id, project.title, project.image, project.progress, project.accent]));
+  const signature = JSON.stringify(normalized.map(project => [project.id, project.title, project.image, project.progress, project.accent, project.textColor]));
   if (!force && signature === lastPortalSignature) return;
   lastPortalSignature = signature;
   PROJECTS = normalized;
@@ -310,6 +312,7 @@ function applyProject(animate = true) {
   root.style.setProperty('--accent', project.accent);
   root.style.setProperty('--accent-rgb', project.rgb);
   root.style.setProperty('--accent-soft', project.soft);
+  root.style.setProperty('--fp-photo-text', project.textColor || '#ffffff');
   image.classList.remove('is-fallback');
   image.src = project.image;
   image.alt = project.alt;
@@ -390,6 +393,7 @@ function openEditor(mode) {
   pendingImage = '';
   editorForm.reset();
   $('#fpFieldAccent').value = '#2f6ff2';
+  $('#fpFieldTextColor').value = '#ffffff';
   uploadZone.classList.remove('has-image');
   uploadPreview.removeAttribute('src');
   imageInput.required = mode === 'add';
@@ -405,6 +409,7 @@ function openEditor(mode) {
     $('#fpFieldProgress').value = project.progress;
     $('#fpFieldPeriod').value = project.period;
     $('#fpFieldAccent').value = project.accent;
+    $('#fpFieldTextColor').value = project.textColor || '#ffffff';
     $('#fpFieldAlt').value = project.alt;
     uploadPreview.src = project.image;
     uploadZone.classList.add('has-image');
@@ -475,6 +480,7 @@ function formProject() {
   const existing = editorMode === 'edit' ? PROJECTS[active] : null;
   const selectedImage = pendingImage || existing?.image || '';
   const accent = String(form.get('accent') || '#2f6ff2');
+  const textColor = String(form.get('textColor') || '#ffffff');
   return normalizeProject({
     title: String(form.get('title') || '').trim(),
     category: String(form.get('category') || '').trim() || 'Proyecto',
@@ -484,6 +490,7 @@ function formProject() {
     progress: String(form.get('progress') || '').trim() || '—',
     period: String(form.get('period') || '').trim() || '—',
     accent,
+    textColor,
     alt: String(form.get('alt') || '').trim() || `Fotografía de ${String(form.get('title') || 'proyecto').trim()}`,
     image: selectedImage
   });

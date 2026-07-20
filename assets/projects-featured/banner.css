@@ -9,6 +9,7 @@
   --accent:#2f6ff2;
   --accent-rgb:47,111,242;
   --accent-soft:#b9d1ff;
+  --fp-photo-text:#ffffff;
 }
 .featured-projects-host,.featured-projects-host *,.featured-projects-host *::before,.featured-projects-host *::after{box-sizing:border-box}
 .featured-projects-host button{font:inherit}
@@ -248,4 +249,43 @@
 @media(max-width:760px){
   .featured-projects-host{min-height:720px}
   .featured-projects-host .fp{min-height:720px;border-radius:22px}
+}
+
+
+/* V11.61.14 — Texto del banner de Proyectos desde la fuente real.
+   No es una capa visual nueva: define el color canónico de los textos que viven dentro de la fotografía. */
+.featured-projects-host .fp__card,
+.featured-projects-host .fp__reel-item{
+  --fp-readable-text:var(--fp-photo-text,#ffffff);
+}
+.featured-projects-host .fp__card .fp__chip,
+.featured-projects-host .fp__card .fp__chip *,
+.featured-projects-host .fp__card .fp__open,
+.featured-projects-host .fp__card .fp__copy,
+.featured-projects-host .fp__card .fp__copy *,
+.featured-projects-host .fp__card .fp__kicker,
+.featured-projects-host .fp__card #fpTitle,
+.featured-projects-host .fp__card #fpDescription,
+.featured-projects-host .fp__card .fp__metrics,
+.featured-projects-host .fp__card .fp__metrics *,
+.featured-projects-host .fp__hint,
+.featured-projects-host .fp__hint *,
+.featured-projects-host .fp__reel-title,
+.featured-projects-host .fp__reel-index{
+  color:var(--fp-readable-text)!important;
+  -webkit-text-fill-color:var(--fp-readable-text)!important;
+}
+.featured-projects-host .fp__card #fpTitle,
+.featured-projects-host .fp__card #fpDescription{
+  background:none!important;
+  background-image:none!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.56)!important;
+}
+.featured-projects-host .fp__card .fp__kicker,
+.featured-projects-host .fp__card .fp__metric span,
+.featured-projects-host .fp__card .fp__metric strong{
+  opacity:1!important;
+}
+.featured-projects-host .fp-editor input[type="color"]{
+  min-height:40px;
 }
