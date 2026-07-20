@@ -532,3 +532,208 @@ body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--notes
   }
 }
 
+
+/* V11.61.23 · Recursos: reconstrucción real del hero, sin depender de .page-hero */
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123{
+  position:relative;
+  isolation:isolate;
+  min-height:0!important;
+  padding:clamp(38px,4.8vw,66px) 0 clamp(36px,4.4vw,60px)!important;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 86% 28%, rgba(28,142,208,.28), transparent 34%),
+    radial-gradient(circle at 18% 92%, rgba(255,255,255,.88), transparent 38%),
+    linear-gradient(118deg,#f6fbff 0%,#eef7ff 52%,#b9e2fb 100%);
+  border-bottom:1px solid rgba(12,86,142,.10);
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123::before{
+  content:"";
+  position:absolute;
+  inset:auto -8% 12% 48%;
+  height:120px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.58);
+  transform:rotate(-5deg);
+  opacity:.64;
+  pointer-events:none;
+  z-index:-1;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(250px,320px);
+  align-items:center;
+  gap:clamp(28px,7vw,110px);
+  width:100%;
+  max-width:1260px;
+  min-height:0;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__copy{
+  min-width:0;
+  max-width:760px;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__badge{
+  display:inline-flex;
+  align-items:center;
+  max-width:100%;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.72);
+  box-shadow:0 10px 28px rgba(12,64,112,.08);
+  color:#c4144f;
+  font-size:clamp(.62rem,.78vw,.72rem);
+  font-weight:800;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  line-height:1;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123 h1{
+  margin:clamp(16px,2vw,24px) 0 clamp(18px,2.4vw,30px);
+  color:#102f5d;
+  font-size:clamp(2.85rem,5.3vw,5.65rem);
+  line-height:.96;
+  letter-spacing:-.07em;
+  font-weight:900;
+  text-wrap:balance;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123 h1 span{
+  display:block;
+  max-width:100%;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123 h1 em{
+  display:inline-block;
+  margin-left:.12em;
+  color:#5c36d8;
+  font-family:"Hullgaria","Brush Script MT",cursive;
+  font-size:1.08em;
+  line-height:.72;
+  font-style:normal;
+  font-weight:400;
+  letter-spacing:0;
+  transform:translateY(.12em);
+  text-shadow:0 10px 22px rgba(92,54,216,.16);
+  white-space:nowrap;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123 p{
+  max-width:620px;
+  margin:0;
+  color:#486a91;
+  font-size:clamp(.96rem,1.08vw,1.08rem);
+  line-height:1.68;
+  font-weight:650;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__card{
+  position:relative;
+  width:100%;
+  min-height:240px;
+  padding:clamp(22px,2.4vw,30px);
+  border:1px solid rgba(86,76,185,.16);
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 22% 0%, rgba(111,72,216,.12), transparent 34%),
+    linear-gradient(155deg,rgba(255,255,255,.96),rgba(248,251,255,.86));
+  box-shadow:0 24px 62px rgba(10,55,96,.13);
+  overflow:hidden;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__card::before{
+  content:"";
+  position:absolute;
+  width:130px;
+  height:130px;
+  left:-34px;
+  top:-38px;
+  border-radius:50%;
+  border:26px solid rgba(111,72,216,.10);
+  pointer-events:none;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__card > span{
+  position:relative;
+  z-index:1;
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  padding:7px 12px;
+  border-radius:999px;
+  background:rgba(111,72,216,.10);
+  color:#5a31d3;
+  font-size:.7rem;
+  font-weight:850;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  line-height:1;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__card h2{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin:24px 0 18px;
+  color:#102f5d;
+  font-size:clamp(1.28rem,1.8vw,1.7rem);
+  line-height:1;
+  font-weight:900;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__card h2 strong{
+  color:#6b38dd;
+  font-size:clamp(3rem,5vw,4.5rem);
+  line-height:.78;
+  letter-spacing:-.08em;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__card h2 span{
+  color:#102f5d;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__card p{
+  position:relative;
+  z-index:1;
+  max-width:240px;
+  padding-top:18px;
+  border-top:1px solid rgba(16,47,93,.12);
+  color:#2c4b73;
+  font-size:clamp(.9rem,1vw,.98rem);
+  line-height:1.55;
+  font-weight:750;
+}
+:is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__button{
+  position:absolute;
+  right:22px;
+  bottom:22px;
+  display:grid;
+  place-items:center;
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#0b79bf,#6a46db);
+  color:#fff!important;
+  text-decoration:none;
+  font-size:1rem;
+  font-weight:900;
+  box-shadow:0 16px 32px rgba(25,77,150,.22);
+}
+
+@media (max-width:980px){
+  :is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__grid{
+    grid-template-columns:1fr;
+    gap:24px;
+  }
+  :is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__card{
+    max-width:520px;
+  }
+}
+@media (max-width:640px){
+  :is(body[data-page="resources"], body.page-resources) .resources-hero-v116123{
+    padding:30px 0 38px!important;
+  }
+  :is(body[data-page="resources"], body.page-resources) .resources-hero-v116123 h1{
+    font-size:clamp(2.35rem,12vw,3.35rem);
+  }
+  :is(body[data-page="resources"], body.page-resources) .resources-hero-v116123 h1 em{
+    display:block;
+    margin:.02em 0 0;
+    font-size:1.18em;
+  }
+  :is(body[data-page="resources"], body.page-resources) .resources-hero-v116123__card{
+    min-height:220px;
+    border-radius:24px;
+  }
+}
