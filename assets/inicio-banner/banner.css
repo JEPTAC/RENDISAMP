@@ -447,3 +447,21 @@
   border-left-color:#fff!important;
   border-right-color:#fff!important;
 }
+
+/* =========================================================
+   V2.5.1 · Corrección puntual solicitada
+   Solo el texto institucional del bloque izquierdo vuelve a azul.
+   ========================================================= */
+.spb-banner__eyebrow,
+.spb-banner__title,
+.spb-banner__title span,
+.spb-banner__description{
+  color:#0b3f75!important;
+  -webkit-text-fill-color:#0b3f75!important;
+}
+
+/* La palabra Hullgaria conserva el color temático de la escena. */
+.spb-banner__script{
+  color:var(--spb-cursive-color,var(--spb-accent))!important;
+  -webkit-text-fill-color:var(--spb-cursive-color,var(--spb-accent))!important;
+}
