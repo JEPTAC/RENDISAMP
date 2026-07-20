@@ -674,11 +674,11 @@
       qa(".projects-folder", dom.carousel).forEach(folder => {
         const isActive = Number(folder.dataset.projectIndex) === activeIndex;
         const hasFocus = document.activeElement === folder;
-        folder.style.setProperty("--dock-scale", hasFocus ? "1.18" : isActive ? "1.13" : ".985");
-        folder.style.setProperty("--dock-lift", hasFocus ? "28px" : isActive ? "22px" : "0px");
+        folder.style.setProperty("--dock-scale", hasFocus ? "1.36" : isActive ? "1.30" : ".90");
+        folder.style.setProperty("--dock-lift", hasFocus ? "38px" : isActive ? "34px" : "0px");
         folder.style.setProperty("--dock-shift-x", "0px");
         folder.style.setProperty("--dock-tilt", "0deg");
-        folder.style.setProperty("--dock-z", hasFocus ? "30" : isActive ? "18" : "1");
+        folder.style.setProperty("--dock-z", hasFocus ? "50" : isActive ? "42" : "1");
       });
     }
 
@@ -693,15 +693,15 @@
         const center = viewportRect.left + folder.offsetLeft - dom.viewport.scrollLeft + folder.offsetWidth / 2;
         const signedDistance = center - pointerX;
         const distance = Math.abs(signedDistance);
-        const influence = clamp(1 - distance / 285, 0, 1);
+        const influence = clamp(1 - distance / 310, 0, 1);
         const nearInfluence = influence * influence * (3 - 2 * influence);
         const isActive = Number(folder.dataset.projectIndex) === activeIndex;
         const hasFocus = document.activeElement === folder;
-        const selected = hasFocus ? .09 : isActive ? .065 : 0;
-        const scale = .985 + nearInfluence * .22 + selected;
-        const lift = nearInfluence * 30 + selected * 80;
+        const selected = hasFocus ? .18 : isActive ? .15 : 0;
+        const scale = .90 + nearInfluence * .34 + selected;
+        const lift = nearInfluence * 38 + selected * 112;
         const pushDirection = signedDistance === 0 ? 0 : Math.sign(signedDistance);
-        const shift = pushDirection * nearInfluence * 22;
+        const shift = pushDirection * nearInfluence * 32;
         const tilt = clamp((pointerX - center) / 92, -1, 1) * nearInfluence * 1.05;
         folder.style.setProperty("--dock-scale", scale.toFixed(3));
         folder.style.setProperty("--dock-lift", `${lift.toFixed(1)}px`);
