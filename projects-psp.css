@@ -1258,3 +1258,347 @@ body.projects-dialog-open{
   .projects-folder.is-selection-leaving .projects-folder__front,
   .projects-folder.is-selection-neighbor,.projects-psp.is-selection-transition .projects-psp__ambient--one{animation:none!important}
 }
+
+/* =========================================================
+   V11.61.16 · Compactación proporcional del módulo Carpetas
+   Objetivo: que la sección se vea completa en una pantalla común
+   sin alterar la lógica, ids ni eventos de projects-psp.js.
+   ========================================================= */
+@media (min-width: 901px){
+  .projects-psp-shell{
+    margin-top:clamp(14px,2vw,28px)!important;
+    padding-bottom:clamp(34px,4vw,58px)!important;
+    background:linear-gradient(to bottom,rgba(241,248,253,.92),rgba(239,247,252,.98))!important;
+  }
+
+  .projects-psp{
+    width:min(1440px,92vw)!important;
+    border-radius:clamp(24px,2vw,34px)!important;
+    box-shadow:0 24px 62px rgba(24,82,127,.055), inset 0 1px 0 rgba(255,255,255,.88)!important;
+  }
+
+  .projects-psp__layout{
+    padding:clamp(24px,2.7vw,42px) clamp(28px,4vw,60px) clamp(18px,2vw,28px)!important;
+  }
+
+  .projects-psp__header{
+    align-items:center!important;
+    gap:clamp(22px,3vw,44px)!important;
+  }
+
+  .projects-psp__heading{
+    flex:1 1 auto!important;
+    max-width:min(760px,58vw)!important;
+  }
+
+  .projects-psp__kicker{
+    font-size:8.5px!important;
+    letter-spacing:.15em!important;
+  }
+
+  .projects-psp__kicker::before{
+    width:6px!important;
+    height:6px!important;
+    box-shadow:0 0 0 4px rgba(var(--projects-accent-rgb),.09)!important;
+  }
+
+  .projects-psp__heading h1{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:baseline!important;
+    column-gap:.28em!important;
+    row-gap:.04em!important;
+    margin:8px 0 0!important;
+    font-size:clamp(35px,3.4vw,58px)!important;
+    line-height:.94!important;
+    letter-spacing:-.056em!important;
+  }
+
+  .projects-psp__heading h1 em{
+    flex:0 1 auto!important;
+    font-size:1.08em!important;
+    line-height:.92!important;
+    padding:.02em .1em .18em .02em!important;
+    margin:-.04em 0 -.1em!important;
+    white-space:nowrap!important;
+  }
+
+  .projects-psp__heading p{
+    max-width:560px!important;
+    margin:10px 0 0!important;
+    font-size:12px!important;
+    line-height:1.48!important;
+  }
+
+  .projects-psp__header-actions{
+    gap:8px!important;
+    align-self:center!important;
+  }
+
+  .projects-psp__filters{
+    gap:6px!important;
+  }
+
+  .projects-psp__filters button,
+  .projects-psp__manage{
+    min-height:30px!important;
+    padding:0 11px!important;
+    font-size:7.5px!important;
+    box-shadow:0 7px 18px rgba(15,72,117,.04)!important;
+  }
+
+  .projects-psp__summary{
+    grid-template-columns:minmax(0,1fr) minmax(205px,270px)!important;
+    align-items:center!important;
+    gap:clamp(22px,3vw,44px)!important;
+    margin-top:clamp(18px,2.3vw,30px)!important;
+  }
+
+  .projects-psp__eyebrow{
+    gap:9px!important;
+    font-size:8px!important;
+    letter-spacing:.13em!important;
+  }
+
+  .projects-psp__eyebrow>span{
+    width:28px!important;
+    height:28px!important;
+    font-size:8px!important;
+  }
+
+  .projects-psp__summary h2{
+    margin:10px 0 0!important;
+    font-size:clamp(30px,3vw,50px)!important;
+    line-height:.94!important;
+  }
+
+  .projects-psp__summary h2 em{
+    font-size:1.02em!important;
+    padding:.02em .08em .16em .02em!important;
+    margin:-.04em 0 -.08em!important;
+  }
+
+  .projects-psp__summary-copy>p{
+    max-width:640px!important;
+    margin:11px 0 0!important;
+    font-size:12px!important;
+    line-height:1.55!important;
+  }
+
+  .projects-psp__tags{
+    gap:6px!important;
+    margin-top:10px!important;
+  }
+
+  .projects-psp__tags span{
+    padding:5px 9px!important;
+    font-size:7.5px!important;
+    box-shadow:0 5px 14px rgba(15,72,117,.025)!important;
+  }
+
+  .projects-psp__metric{
+    padding:15px 16px!important;
+    border-radius:19px!important;
+    box-shadow:0 12px 32px rgba(15,72,117,.055)!important;
+  }
+
+  .projects-psp__metric small{
+    font-size:7.5px!important;
+    letter-spacing:.12em!important;
+  }
+
+  .projects-psp__metric strong{
+    margin-top:6px!important;
+    font-size:clamp(24px,2.1vw,36px)!important;
+  }
+
+  .projects-psp__metric span{
+    margin-top:3px!important;
+    font-size:8px!important;
+    line-height:1.35!important;
+  }
+
+  .projects-psp__metric-track{
+    height:4px!important;
+    margin-top:10px!important;
+  }
+
+  .projects-psp__metric p{
+    margin-top:8px!important;
+    font-size:9px!important;
+    line-height:1.38!important;
+  }
+
+  .projects-psp__dock-region{
+    grid-template-columns:36px minmax(0,1fr) 36px!important;
+    gap:8px!important;
+    margin-top:clamp(18px,2.2vw,30px)!important;
+  }
+
+  .projects-psp__dock-arrow{
+    width:34px!important;
+    height:34px!important;
+    box-shadow:0 8px 18px rgba(15,72,117,.055)!important;
+  }
+
+  .projects-psp__dock-viewport{
+    padding:34px 28px 26px!important;
+    scroll-behavior:auto!important;
+  }
+
+  .projects-psp__dock{
+    gap:clamp(14px,1.45vw,24px)!important;
+    padding:0 16px 14px!important;
+  }
+
+  .projects-psp__dock::after{
+    height:42px!important;
+    border-radius:18px!important;
+    box-shadow:0 12px 30px rgba(20,75,118,.07), inset 0 1px 0 rgba(255,255,255,.92)!important;
+  }
+
+  .projects-folder{
+    flex-basis:clamp(116px,8.7vw,144px)!important;
+    width:clamp(116px,8.7vw,144px)!important;
+  }
+
+  .projects-folder__back,
+  .projects-folder__paper,
+  .projects-folder__front{
+    border-radius:14px!important;
+  }
+
+  .projects-folder__paper{
+    inset:8% 7% 16%!important;
+  }
+
+  .projects-folder__front{
+    padding:11px 11px 9px!important;
+  }
+
+  .projects-folder__icon{
+    width:26px!important;
+    height:26px!important;
+    border-radius:8px!important;
+    font-size:7.5px!important;
+  }
+
+  .projects-folder__index{
+    font-size:7px!important;
+  }
+
+  .projects-folder__category{
+    font-size:6px!important;
+    letter-spacing:.12em!important;
+  }
+
+  .projects-folder__title{
+    margin-top:4px!important;
+    font-size:clamp(12.5px,1vw,16px)!important;
+    line-height:1.03!important;
+    padding-bottom:2px!important;
+  }
+
+  .projects-folder__title em{
+    font-size:1.22em!important;
+    padding:.02em .08em .14em .02em!important;
+    margin:-.03em 0 -.08em!important;
+  }
+
+  .projects-folder__meta{
+    margin-top:6px!important;
+    padding-top:6px!important;
+    font-size:5.8px!important;
+  }
+
+  .projects-folder:hover .projects-folder__paper,
+  .projects-folder:focus-visible .projects-folder__paper,
+  .projects-folder.is-active .projects-folder__paper{
+    transform:translateY(-9px)!important;
+  }
+
+  .projects-folder.is-active::after{
+    bottom:-18px!important;
+    width:6px!important;
+    height:6px!important;
+    box-shadow:0 0 0 5px rgba(var(--projects-accent-rgb),.09)!important;
+  }
+
+  .projects-psp__footer{
+    margin-top:2px!important;
+    padding-top:12px!important;
+  }
+
+  .projects-psp__footer p,
+  .projects-psp__progress{
+    font-size:7.5px!important;
+    letter-spacing:.055em!important;
+  }
+
+  .projects-psp__progress>div{
+    width:94px!important;
+    height:3px!important;
+  }
+}
+
+@media (min-width:901px) and (max-height:780px){
+  .projects-psp__layout{
+    padding-top:22px!important;
+    padding-bottom:16px!important;
+  }
+  .projects-psp__heading h1{
+    font-size:clamp(32px,3.05vw,50px)!important;
+  }
+  .projects-psp__heading p{
+    margin-top:8px!important;
+  }
+  .projects-psp__summary{
+    margin-top:16px!important;
+  }
+  .projects-psp__summary h2{
+    font-size:clamp(28px,2.75vw,44px)!important;
+  }
+  .projects-psp__summary-copy>p{
+    margin-top:8px!important;
+  }
+  .projects-psp__dock-region{
+    margin-top:14px!important;
+  }
+  .projects-psp__dock-viewport{
+    padding-top:30px!important;
+    padding-bottom:22px!important;
+  }
+  .projects-folder{
+    flex-basis:clamp(108px,8vw,132px)!important;
+    width:clamp(108px,8vw,132px)!important;
+  }
+  .projects-psp__metric{
+    padding:13px 14px!important;
+  }
+}
+
+@media (max-width:900px){
+  .projects-psp-shell{
+    margin-top:18px!important;
+  }
+  .projects-psp__layout{
+    padding:26px 18px 22px!important;
+  }
+  .projects-psp__heading h1{
+    font-size:clamp(34px,10vw,48px)!important;
+  }
+  .projects-psp__heading h1 em,
+  .projects-psp__summary h2 em{
+    font-size:1.12em!important;
+  }
+  .projects-psp__summary{
+    margin-top:26px!important;
+  }
+  .projects-psp__dock-region{
+    margin-top:22px!important;
+  }
+  .projects-psp__dock-viewport{
+    padding-top:46px!important;
+    padding-bottom:30px!important;
+  }
+}
