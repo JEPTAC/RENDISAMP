@@ -30,7 +30,7 @@
   <link rel="icon" href="assets/favicon.png">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css?v=11.61.0-reparacion-controlada">
-  <link rel="stylesheet" href="projects-psp.css?v=11.61.20-proyectos-psp-reestructura">
+  <link rel="stylesheet" href="projects-psp.css?v=11.61.21-proyectos-psp-layout-limpio">
   <link rel="stylesheet" href="assets/projects-featured/banner.css?v=11.61.14-proyectos-texto-blanco">
   <link rel="stylesheet" href="assets/projects-running/projects-running.css?v=11.61.15-running-compacto">
   <link rel="stylesheet" href="platform-fixes-v1151.css?v=11.61.0-reparacion-controlada">
@@ -163,11 +163,12 @@
           <header class="projects-psp__header">
             <div class="projects-psp__heading">
               <span class="projects-psp__kicker">Gestión visible · San Pedro</span>
-              <h1 id="projectsModuleTitle">Proyectos que <em>transforman</em></h1>
+              <h1 id="projectsModuleTitle"><span class="projects-psp__title-main">Proyectos que</span><em>transforman</em></h1>
               <p>Explore cada carpeta y conozca su propósito, avances, resultados y evidencias.</p>
             </div>
+          </header>
 
-            <div class="projects-psp__header-actions">
+          <div class="projects-psp__header-actions">
               <nav class="projects-psp__filters" aria-label="Filtrar proyectos por categoría">
                 <button type="button" class="is-active" data-project-category="Todos">Todos</button>
                 <button type="button" data-project-category="Infraestructura">Infraestructura</button>
@@ -176,8 +177,7 @@
                 <button type="button" data-project-category="Ambiente">Ambiente</button>
               </nav>
               <button id="projectsManage" class="projects-psp__manage" type="button" hidden>Administrar proyectos</button>
-            </div>
-          </header>
+          </div>
 
           <div class="projects-psp__summary" aria-live="polite">
             <div class="projects-psp__summary-copy">
@@ -329,7 +329,7 @@
   <script src="assets/projects-running/projects-running-data.js?v=11.61.0-reparacion-controlada"></script>
   <script src="assets/projects-featured/banner.js?v=11.61.14-proyectos-texto-blanco" defer></script>
   <script src="assets/projects-running/projects-running.js?v=11.61.0-reparacion-controlada" defer></script>
-  <script src="projects-psp.js?v=11.61.20-proyectos-psp-reestructura" defer></script>
+  <script src="projects-psp.js?v=11.61.21-proyectos-psp-layout-limpio" defer></script>
   <script src="repair-v1161.js?v=11.61.0-reparacion-controlada"></script>
 </body>
 </html>
