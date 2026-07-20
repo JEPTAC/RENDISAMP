@@ -19661,3 +19661,208 @@ body.page-ideas .idea-board{
     animation:none!important;
   }
 }
+
+/* =========================================================
+   Home newsletter · V11.61.11
+   Corrección directa del bloque de suscripción en Inicio.
+   ========================================================= */
+.home-newsletter.newsletter-bar{
+  padding:clamp(30px,4vw,54px) 0!important;
+  background:
+    radial-gradient(circle at 94% 12%, rgba(108,190,245,.28), transparent 24%),
+    linear-gradient(180deg,#eef7ff 0%,#e4f1fb 100%)!important;
+  position:relative;
+  overflow:hidden;
+}
+.home-newsletter.newsletter-bar::before{
+  content:"";
+  position:absolute;
+  inset:-18% auto auto 8%;
+  width:360px;
+  height:360px;
+  border-radius:50%;
+  background:rgba(255,255,255,.22);
+  filter:blur(16px);
+  pointer-events:none;
+}
+.home-newsletter .newsletter-box.newsletter-box--home{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+  display:grid!important;
+  grid-template-columns:minmax(280px,420px) minmax(520px,1fr)!important;
+  align-items:center!important;
+  gap:clamp(28px,5vw,72px)!important;
+  min-height:0!important;
+  padding:clamp(32px,4.5vw,58px)!important;
+  border-radius:30px!important;
+  color:#fff!important;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255,255,255,.14), transparent 22%),
+    linear-gradient(135deg,#08264d 0%,#0a5f9c 54%,#1aa4cf 100%)!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  box-shadow:0 24px 58px rgba(10,69,128,.18)!important;
+}
+.home-newsletter .newsletter-box.newsletter-box--home::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.09),rgba(255,255,255,0) 42%),
+    radial-gradient(circle at 98% 95%,rgba(255,255,255,.16),transparent 24%);
+  pointer-events:none;
+}
+.home-newsletter .newsletter-box.newsletter-box--home::after{
+  content:"";
+  position:absolute;
+  left:clamp(24px,4vw,54px);
+  right:clamp(24px,4vw,54px);
+  bottom:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.36),transparent)!important;
+  pointer-events:none;
+}
+.home-newsletter .newsletter-copy{
+  min-width:0;
+}
+.home-newsletter .newsletter-copy h2{
+  margin:0 0 14px!important;
+  max-width:12ch;
+  color:#fff!important;
+  font-size:clamp(2.15rem,3.8vw,4rem)!important;
+  line-height:.95!important;
+  letter-spacing:-.055em!important;
+  text-shadow:none!important;
+}
+.home-newsletter .newsletter-title-script{
+  display:inline-block;
+  margin-top:.08em;
+  color:#ffd66b!important;
+  font-family:"Hullgaria","Brother Signature","Segoe Script","Brush Script MT",cursive!important;
+  font-size:1.14em!important;
+  font-weight:400!important;
+  line-height:.72!important;
+  letter-spacing:0!important;
+  text-shadow:0 10px 22px rgba(0,0,0,.16)!important;
+  transform:translateY(.06em);
+  white-space:nowrap;
+}
+.home-newsletter .newsletter-copy p{
+  margin:0!important;
+  color:rgba(255,255,255,.84)!important;
+  font-size:.72rem!important;
+  line-height:1.55!important;
+  font-weight:700!important;
+}
+.home-newsletter .newsletter-copy b{
+  color:#fff!important;
+}
+.home-newsletter .newsletter-form.newsletter-form--home{
+  width:100%!important;
+  min-width:0!important;
+  display:grid!important;
+  gap:12px!important;
+  align-items:start!important;
+}
+.home-newsletter .newsletter-form__main{
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(340px,1fr) auto;
+  gap:0;
+  align-items:stretch;
+}
+.home-newsletter .newsletter-form__main input{
+  width:100%!important;
+  min-height:58px!important;
+  padding:0 20px!important;
+  border:1px solid rgba(255,255,255,.24)!important;
+  border-right:0!important;
+  border-radius:16px 0 0 16px!important;
+  background:rgba(255,255,255,.16)!important;
+  color:#fff!important;
+  outline:none!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+.home-newsletter .newsletter-form__main input::placeholder{
+  color:rgba(255,255,255,.72)!important;
+}
+.home-newsletter .newsletter-form__main input:focus{
+  background:rgba(255,255,255,.20)!important;
+  border-color:rgba(255,255,255,.62)!important;
+  box-shadow:0 0 0 4px rgba(117,210,255,.22)!important;
+}
+.home-newsletter .newsletter-form__main button{
+  min-height:58px!important;
+  padding:0 24px!important;
+  border-radius:0 16px 16px 0!important;
+  border:1px solid rgba(255,255,255,.30)!important;
+  background:linear-gradient(135deg,#ffffff 0%,#dff5ff 100%)!important;
+  color:#074376!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  box-shadow:0 16px 34px rgba(3,34,70,.18)!important;
+}
+.home-newsletter .newsletter-form__main button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 20px 40px rgba(3,34,70,.22)!important;
+}
+.home-newsletter .newsletter-consent{
+  width:100%;
+  display:grid;
+  grid-template-columns:18px 1fr;
+  gap:10px;
+  align-items:start;
+  margin:0!important;
+  color:rgba(255,255,255,.88)!important;
+  font-size:.72rem!important;
+  line-height:1.45!important;
+  font-weight:600!important;
+}
+.home-newsletter .newsletter-consent input{
+  width:15px!important;
+  height:15px!important;
+  margin:3px 0 0!important;
+  accent-color:#ffd66b;
+  border-radius:4px!important;
+}
+.home-newsletter .newsletter-consent span{
+  color:rgba(255,255,255,.88)!important;
+}
+
+@media(max-width:980px){
+  .home-newsletter .newsletter-box.newsletter-box--home{
+    grid-template-columns:1fr!important;
+    gap:22px!important;
+  }
+  .home-newsletter .newsletter-copy h2{
+    max-width:100%;
+  }
+  .home-newsletter .newsletter-form__main{
+    grid-template-columns:1fr auto;
+  }
+}
+@media(max-width:640px){
+  .home-newsletter.newsletter-bar{
+    padding:28px 0 42px!important;
+  }
+  .home-newsletter .newsletter-box.newsletter-box--home{
+    padding:26px 20px!important;
+    border-radius:24px!important;
+  }
+  .home-newsletter .newsletter-copy h2{
+    font-size:clamp(2rem,12vw,3.2rem)!important;
+  }
+  .home-newsletter .newsletter-form__main{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .home-newsletter .newsletter-form__main input,
+  .home-newsletter .newsletter-form__main button{
+    border-radius:15px!important;
+    border:1px solid rgba(255,255,255,.28)!important;
+  }
+  .home-newsletter .newsletter-consent{
+    font-size:.68rem!important;
+  }
+}

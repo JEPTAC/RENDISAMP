@@ -27,7 +27,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="preload" href="assets/fonts/Hullgaria.otf" as="font" type="font/otf" crossorigin>
   <meta name="description" content="Portal especial de Rendición de Cuentas de San Pedro, Valle del Cauca.">
-  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.61.0-reparacion-controlada">
+  <link rel="icon" href="assets/favicon.png"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css?v=11.61.11-newsletter-root">
   <link rel="stylesheet" href="assets/inicio-banner/banner.css?v=3.0.10-control-limpio">
   <link rel="stylesheet" href="assets/projects-running/projects-running.css?v=11.61.0-reparacion-controlada">
   <link rel="stylesheet" href="platform-polish-v1152.css?v=11.61.0-reparacion-controlada">
@@ -80,10 +80,22 @@
       </div>
     </section>
 
-    <section class="newsletter-bar">
-      <div class="site-shell newsletter-box reveal">
-        <div><h2>Reciba nuevas publicaciones</h2><p><b id="homeResourceCount">0</b> recursos se encuentran disponibles actualmente.</p></div>
-        <form id="newsletterForm" aria-label="Suscripción a publicaciones"><input type="email" placeholder="Correo electrónico" required><button class="button button-primary">Suscribirme</button></form>
+    <section class="newsletter-bar home-newsletter" aria-labelledby="homeNewsletterTitle">
+      <div class="site-shell newsletter-box newsletter-box--home reveal">
+        <div class="newsletter-copy">
+          <h2 id="homeNewsletterTitle">Reciba nuevas <span class="newsletter-title-script">publicaciones</span></h2>
+          <p><b id="homeResourceCount">0</b> recursos se encuentran disponibles actualmente.</p>
+        </div>
+        <form id="newsletterForm" class="newsletter-form newsletter-form--home" aria-label="Suscripción a publicaciones">
+          <div class="newsletter-form__main">
+            <input type="email" name="email" placeholder="Correo electrónico" autocomplete="email" required>
+            <button class="button button-primary" type="submit">Suscribirme</button>
+          </div>
+          <label class="newsletter-consent">
+            <input type="checkbox" name="consent" required>
+            <span>Acepto el tratamiento de mis datos para recibir actualizaciones seleccionadas. Puedo cancelar la suscripción posteriormente.</span>
+          </label>
+        </form>
       </div>
     </section>
   </main>
