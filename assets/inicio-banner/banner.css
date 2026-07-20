@@ -143,22 +143,22 @@
   gap:13px;
   margin-top:clamp(24px,2.5vw,40px);
   padding:13px 20px;
-  border:0;
+  border:1px solid rgba(0,119,182,.18);
   border-radius:999px;
-  background:rgba(21,43,67,.66);
-  color:#fff;
-  box-shadow:0 14px 34px rgba(34,54,78,.1),inset 0 1px 0 rgba(255,255,255,.22);
+  background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(237,249,255,.9));
+  color:#0777b6;
+  box-shadow:0 14px 30px rgba(0,96,150,.11),inset 0 1px 0 rgba(255,255,255,.95);
   cursor:pointer;
-  backdrop-filter:blur(16px);
-  transition:transform .25s ease,box-shadow .25s ease;
+  backdrop-filter:blur(14px);
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
 }
-.spb-banner__transport:hover{transform:translateY(-2px);box-shadow:0 18px 38px rgba(34,54,78,.14),inset 0 1px 0 rgba(255,255,255,.28)}
-.spb-banner__count{font-size:.88rem;color:#fff}
-.spb-banner__count strong{font-size:1.02rem}
-.spb-banner__count span{color:#fff}
-.spb-banner__play{width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid #fff}
-.spb-banner__transport.is-paused .spb-banner__play{width:10px;height:12px;border:0;border-left:3px solid #fff;border-right:3px solid #fff}
-.spb-banner__transport-label{color:#fff;font-size:.76rem}
+.spb-banner__transport:hover{transform:translateY(-2px);border-color:rgba(0,153,214,.34);box-shadow:0 18px 34px rgba(0,96,150,.15),inset 0 1px 0 rgba(255,255,255,.98)}
+.spb-banner__count{font-size:.88rem;color:#149bd7;font-weight:700;letter-spacing:.02em}
+.spb-banner__count strong{font-size:1.02rem;color:#006eb0}
+.spb-banner__count span{color:#f0a31f}
+.spb-banner__play{width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid #149bd7;filter:drop-shadow(0 2px 5px rgba(0,119,182,.16))}
+.spb-banner__transport.is-paused .spb-banner__play{width:10px;height:12px;border:0;border-left:3px solid #149bd7;border-right:3px solid #149bd7}
+.spb-banner__transport-label{color:#0777b6;font-size:.76rem;font-weight:700}
 
 .spb-banner__right{min-width:0;perspective:1500px}
 .spb-banner__console{position:relative;transform-style:preserve-3d;transition:transform .3s ease}
