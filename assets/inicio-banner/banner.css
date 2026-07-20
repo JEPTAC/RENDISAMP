@@ -390,132 +390,70 @@
 }
 
 /* =========================================================
-   V2.5 · Corrección puntual: todos los textos del banner en blanco
+   V2.6.0 · Corrección definitiva y aislada del título izquierdo
+   Las líneas se dibujan desde CSS para no depender de versiones
+   anteriores del JavaScript ni de saltos automáticos del navegador.
    ========================================================= */
-.spb-banner,
 .spb-banner__eyebrow,
-.spb-banner__title,
-.spb-banner__title span,
-.spb-banner__script,
-.spb-banner__description,
-.spb-banner__transport,
-.spb-banner__count,
-.spb-banner__count strong,
-.spb-banner__count span,
-.spb-banner__transport-label,
-.spb-banner__pill,
-.spb-banner__caption,
-.spb-banner__caption h2,
-.spb-banner__caption-main,
-.spb-banner__caption-script,
-.spb-banner__caption p,
-.spb-banner__discover{
-  color:#fff!important;
-  -webkit-text-fill-color:#fff!important;
-}
-
-/* Contraste controlado sin alterar la composición aprobada. */
-.spb-banner__eyebrow,
-.spb-banner__title,
-.spb-banner__script,
 .spb-banner__description{
-  text-shadow:0 3px 16px rgba(0,0,0,.42),0 1px 2px rgba(0,0,0,.48)!important;
+  color:#0b467f!important;
+  -webkit-text-fill-color:#0b467f!important;
+  text-shadow:none!important;
 }
-.spb-banner__caption-main,
-.spb-banner__caption-script,
-.spb-banner__caption p,
-.spb-banner__pill,
-.spb-banner__discover{
-  text-shadow:0 4px 18px rgba(0,0,0,.78),0 1px 3px rgba(0,0,0,.92)!important;
-}
-
-/* El control inferior deja de ser blanco para que sus letras blancas sean legibles. */
-.spb-banner__transport{
-  background:rgba(7,22,39,.62)!important;
-  border:1px solid rgba(255,255,255,.34)!important;
-  box-shadow:0 14px 34px rgba(4,15,29,.2),inset 0 1px 0 rgba(255,255,255,.18)!important;
-  backdrop-filter:blur(16px) saturate(1.06);
-}
-.spb-banner__transport:hover{
-  background:rgba(7,22,39,.76)!important;
-  box-shadow:0 18px 38px rgba(4,15,29,.26),inset 0 1px 0 rgba(255,255,255,.22)!important;
-}
-.spb-banner__play{
-  border-left-color:#fff!important;
-}
-.spb-banner__transport.is-paused .spb-banner__play{
-  border-left-color:#fff!important;
-  border-right-color:#fff!important;
-}
-
-/* =========================================================
-   V2.5.1 · Corrección puntual solicitada
-   Solo el texto institucional del bloque izquierdo vuelve a azul.
-   ========================================================= */
-.spb-banner__eyebrow,
-.spb-banner__title,
-.spb-banner__title span,
-.spb-banner__description{
-  color:#0b3f75!important;
-  -webkit-text-fill-color:#0b3f75!important;
-}
-
-/* La palabra Hullgaria conserva el color temático de la escena. */
-.spb-banner__script{
-  color:var(--spb-cursive-color,var(--spb-accent))!important;
-  -webkit-text-fill-color:var(--spb-cursive-color,var(--spb-accent))!important;
-}
-
-/* =========================================================
-   V2.5.2 · Ajuste puntual solicitado
-   - "Construyamos" permanece en una línea independiente.
-   - Se elimina la sombra negra del bloque izquierdo.
-   - El título usa un degradado azul sobrio.
-   No modifica imágenes, animaciones ni estructura del banner.
-   ========================================================= */
 .spb-banner__title{
   display:block!important;
   width:100%!important;
   max-width:100%!important;
+  margin:0!important;
   overflow:visible!important;
-  font-size:clamp(2.7rem,3.65vw,4.55rem)!important;
-  line-height:.96!important;
-  letter-spacing:-.055em!important;
+  font-size:clamp(2.55rem,3.05vw,3.65rem)!important;
+  line-height:.98!important;
+  letter-spacing:-.052em!important;
+  color:#0b467f!important;
+  -webkit-text-fill-color:#0b467f!important;
   text-shadow:none!important;
 }
-.spb-banner__title span{
+.spb-banner__title > *{
+  display:none!important;
+}
+.spb-banner__title::before,
+.spb-banner__title::after{
   display:block!important;
-  width:100%!important;
+  width:max-content!important;
   max-width:100%!important;
   white-space:nowrap!important;
-  color:#0b3f75!important;
-  -webkit-text-fill-color:#0b3f75!important;
+  color:#0b467f!important;
+  -webkit-text-fill-color:#0b467f!important;
+  text-shadow:none!important;
+  background:none!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+}
+.spb-banner__title::before{
+  content:"Conozca la Gestión.";
+}
+.spb-banner__title::after{
+  content:"Construyamos";
+  margin-top:.08em!important;
+}
+.spb-banner__script{
+  display:block!important;
+  clear:both!important;
+  margin-top:.08em!important;
   text-shadow:none!important;
 }
-.spb-banner__title span + span{
-  margin-top:.06em!important;
-}
-@supports ((-webkit-background-clip:text) or (background-clip:text)){
-  .spb-banner__title span{
-    background:linear-gradient(105deg,#083968 0%,#0a5795 48%,#2875cc 100%)!important;
-    -webkit-background-clip:text!important;
-    background-clip:text!important;
-    color:transparent!important;
-    -webkit-text-fill-color:transparent!important;
+@media(max-width:1160px){
+  .spb-banner__title{
+    font-size:clamp(2.35rem,3.75vw,3.35rem)!important;
   }
 }
-.spb-banner__eyebrow,
-.spb-banner__description,
-.spb-banner__script{
-  text-shadow:none!important;
-}
-
 @media(max-width:680px){
   .spb-banner__title{
-    font-size:clamp(2.45rem,11vw,3.65rem)!important;
-    line-height:.98!important;
+    font-size:clamp(2.15rem,9.8vw,3rem)!important;
   }
-  .spb-banner__title span{
+  .spb-banner__title::before,
+  .spb-banner__title::after{
+    width:auto!important;
     white-space:normal!important;
   }
 }
