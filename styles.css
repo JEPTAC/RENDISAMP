@@ -19663,7 +19663,7 @@ body.page-ideas .idea-board{
 }
 
 /* =========================================================
-   Home newsletter · V11.61.11
+   Home newsletter · V11.61.12
    Corrección directa del bloque de suscripción en Inicio.
    ========================================================= */
 .home-newsletter.newsletter-bar{
@@ -19807,7 +19807,7 @@ body.page-ideas .idea-board{
   transform:translateY(-1px);
   box-shadow:0 20px 40px rgba(3,34,70,.22)!important;
 }
-.home-newsletter .newsletter-consent{
+.home-newsletter .subscription-consent{
   width:100%;
   display:grid;
   grid-template-columns:18px 1fr;
@@ -19819,16 +19819,20 @@ body.page-ideas .idea-board{
   line-height:1.45!important;
   font-weight:600!important;
 }
-.home-newsletter .newsletter-consent input{
+.home-newsletter .subscription-consent input{
   width:15px!important;
   height:15px!important;
   margin:3px 0 0!important;
   accent-color:#ffd66b;
   border-radius:4px!important;
 }
-.home-newsletter .newsletter-consent span{
+.home-newsletter .subscription-consent span{
   color:rgba(255,255,255,.88)!important;
 }
+
+/* El formulario funcional de suscripción usa .subscription-consent generado por subscriptions.js.
+   La clase antigua .newsletter-consent queda anulada para evitar duplicados visuales. */
+.home-newsletter .newsletter-consent{display:none!important;}
 
 @media(max-width:980px){
   .home-newsletter .newsletter-box.newsletter-box--home{
@@ -19862,7 +19866,7 @@ body.page-ideas .idea-board{
     border-radius:15px!important;
     border:1px solid rgba(255,255,255,.28)!important;
   }
-  .home-newsletter .newsletter-consent{
+  .home-newsletter .subscription-consent{
     font-size:.68rem!important;
   }
 }
