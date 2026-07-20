@@ -1,5 +1,6 @@
 (function(){
   "use strict";
+  const BUILD="3.0.0-canonical";
   const API = window.SPHomeBanner = window.SPHomeBanner || {};
   const mounted = new Map();
 
@@ -55,7 +56,7 @@
                   <button class="spb-banner__progress" type="button" data-spb-progress aria-label="Pausar reproducción automática"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="spb-banner__track" cx="18" cy="18" r="16"></circle><circle class="spb-banner__meter" data-spb-meter cx="18" cy="18" r="16"></circle></svg><span class="spb-banner__pause-icon"></span></button>
                 </div>
                 <div class="spb-banner__caption" data-spb-caption>
-                  <h2><span class="spb-banner__caption-main" data-spb-title-main></span><em class="spb-banner__caption-script" data-spb-title-script></em></h2>
+                  <h2><span class="spb-banner__caption-main" data-spb-title-main></span><span class="spb-banner__caption-script" data-spb-title-script></span></h2>
                   <p data-spb-subtitle></p>
                 </div>
               </div>
@@ -72,7 +73,7 @@
     if(!root) throw new Error('No se encontró el contenedor del banner.');
     if(mounted.has(root)) mounted.get(root).destroy();
     const config=deepClone(inputConfig || window.SP_HOME_BANNER_CONFIG || {});
-    root.classList.add('spb-banner'); root.setAttribute('tabindex','0'); root.innerHTML=markup(config);
+    root.classList.add('spb-banner'); root.dataset.spbBuild=BUILD; root.setAttribute('tabindex','0'); root.innerHTML=markup(config);
 
     const slides=config.slides || [];
     const sceneEls=[...root.querySelectorAll('.spb-banner__scene')];

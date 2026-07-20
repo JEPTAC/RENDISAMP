@@ -14476,7 +14476,6 @@ main :is(.section-kicker,.section-label,.eyebrow,.page-hero__badge,.cd-section-m
 main :is(h1,h2) .title-accent-word,
 main :is(.page-title,.projects-psp__heading h1,.projects-psp__summary-copy h2) em,
 .site-footer h2 .title-accent-word,
-.spb-banner :is(.spb-banner__script,.spb-banner__caption-script,.spb-banner__discover,.spb-banner__pill),
 .projects-psp :is(.projects-psp__heading h1 em,.projects-psp__summary-copy h2 em,.projects-folder__title em){
   position:relative!important;
   z-index:2!important;
@@ -14590,7 +14589,7 @@ main .button,
 }
 
 /* Contraste de manuscritos sobre fotografía o fondos oscuros. */
-:is(.year-hero,.editorial-feature,.participation-promo,.resource-feature,.news-feature,.news-card__cover,.story-cover,.resource-card__cover,.publication-modal__media,.territory-stage,.spb-banner__viewport,.projects-folder__front,[class*="media-shade"]) :is(.title-accent-word,.spb-banner__caption-script,.spb-banner__discover,.projects-folder__title em){
+:is(.year-hero,.editorial-feature,.participation-promo,.resource-feature,.news-feature,.news-card__cover,.story-cover,.resource-card__cover,.publication-modal__media,.territory-stage,.projects-folder__front,[class*="media-shade"]) :is(.title-accent-word,.projects-folder__title em){
   color:var(--portal-script-on-dark)!important;
   -webkit-text-fill-color:currentColor!important;
   text-shadow:0 2px 2px rgba(0,0,0,.88),0 10px 30px rgba(0,0,0,.58),0 0 1px #000!important;
@@ -14598,41 +14597,6 @@ main .button,
 :is(.year-hero,.editorial-feature,.participation-promo,.resource-feature,.news-feature,.news-card__cover,.story-cover,.resource-card__cover,.publication-modal__media,.territory-stage) :is(h1,h2,h3,p){
   position:relative;
   z-index:2;
-}
-
-/* Banner: Hullgaria grande, sólida y colores administrables por escena. */
-.spb-banner{
-  --spb-script:var(--portal-font-script)!important;
-}
-.spb-banner__script{
-  color:var(--spb-cursive-color,var(--spb-accent))!important;
-  font-size:clamp(4.6rem,6.8vw,8.6rem)!important;
-  line-height:1.06!important;
-  padding-block:.13em .34em!important;
-}
-.spb-banner__caption h2{
-  max-width:min(88%,760px)!important;
-  overflow:visible!important;
-  line-height:1.02!important;
-}
-.spb-banner__caption-script{
-  color:var(--spb-cursive-color,var(--spb-accent))!important;
-  font-size:clamp(1.22em,1.08em + .55vw,1.55em)!important;
-  line-height:1.12!important;
-}
-.spb-banner__caption p{
-  max-width:min(76%,680px)!important;
-  color:var(--spb-caption-description,#fff)!important;
-  font-family:var(--portal-font-ui)!important;
-  font-size:clamp(.9rem,.82rem + .22vw,1.05rem)!important;
-  font-weight:700!important;
-  line-height:1.42!important;
-  letter-spacing:-.018em!important;
-  text-shadow:0 2px 3px rgba(0,0,0,.92),0 8px 24px rgba(0,0,0,.55)!important;
-}
-.spb-banner__pill,.spb-banner__discover{
-  color:#fff!important;
-  -webkit-text-fill-color:currentColor!important;
 }
 
 /* Proyectos: color por carpeta, sin perder contraste. */
@@ -14677,19 +14641,9 @@ body.high-contrast .title-accent-word{
     white-space:normal!important;
     text-wrap:balance!important;
   }
-  .spb-banner__script{
-    font-size:clamp(4rem,18vw,6.4rem)!important;
-  }
-  .spb-banner__caption h2,.spb-banner__caption p{
-    max-width:100%!important;
-  }
-  .spb-banner__caption-script{
-    font-size:1.22em!important;
-    white-space:normal!important;
-  }
 }
 @media(prefers-reduced-motion:reduce){
-  .title-accent-word,.spb-banner__script,.spb-banner__caption-script{
+  .title-accent-word{
     transition:none!important;
     animation:none!important;
   }
@@ -14864,51 +14818,6 @@ main :is(.edition-card,.deal-card,.resource-card,.news-card,.idea-card,
   white-space:nowrap!important;
 }
 
-/* Banner principal: “confianza” y palabras de cada fotografía dominantes. */
-.spb-banner__left,
-.spb-banner__title,
-.spb-banner__caption,
-.spb-banner__caption h2{
-  overflow:visible!important;
-}
-.spb-banner__script.title-accent-word,
-.spb-banner__script{
-  display:block!important;
-  width:max-content!important;
-  max-width:100%!important;
-  padding:.16em .08em .36em .02em!important;
-  margin:-.12em 0 -.18em!important;
-  color:var(--spb-cursive-color,var(--spb-accent))!important;
-  -webkit-text-fill-color:currentColor!important;
-  font-family:var(--portal-font-script)!important;
-  font-size:clamp(5.4rem,7.65vw,10.4rem)!important;
-  line-height:.82!important;
-  letter-spacing:.002em!important;
-  text-shadow:0 2px 0 rgba(255,255,255,.78),0 12px 34px rgba(var(--spb-accent-rgb),.22)!important;
-  white-space:nowrap!important;
-}
-.spb-banner__caption-script.title-accent-word,
-.spb-banner__caption-script{
-  display:inline-block!important;
-  max-width:100%!important;
-  padding:.12em .12em .31em .05em!important;
-  margin:-.1em 0 -.25em .06em!important;
-  color:var(--spb-cursive-color,var(--spb-accent))!important;
-  -webkit-text-fill-color:currentColor!important;
-  font-size:clamp(1.5em,1.38em + .55vw,1.78em)!important;
-  line-height:.9!important;
-  vertical-align:-.16em!important;
-  white-space:nowrap!important;
-  text-shadow:0 2px 3px rgba(0,0,0,.92),0 10px 28px rgba(0,0,0,.6)!important;
-}
-.spb-banner__pill,
-.spb-banner__discover,
-.spb-banner__modal-copy small{
-  font-size:clamp(1.42rem,1.06rem + .82vw,2.25rem)!important;
-  line-height:1.05!important;
-  overflow:visible!important;
-}
-
 /* =========================================================
    Animación tipográfica: clara, coordinada y sin deformar letras
    ========================================================= */
@@ -14978,17 +14887,6 @@ html.portal-visual-ready :is(.page-hero,.news-page-hero,.home-xmb-banner) .title
   }
 }
 
-/* El cambio de texto del banner mantiene color, escala y entrada notoria. */
-.spb-banner__caption.is-refreshing .spb-banner__caption-main{
-  animation:portalTitleRevealV1148 .66s var(--portal-script-ease) both!important;
-}
-.spb-banner__caption.is-refreshing .spb-banner__caption-script{
-  animation:portalScriptRevealV1148 .88s var(--portal-script-ease) .08s both!important;
-}
-.spb-banner__caption.is-refreshing p{
-  animation:portalTitleRevealV1148 .7s var(--portal-script-ease) .13s both!important;
-}
-
 /* Responsive: nunca resolver el espacio reduciendo la cursiva a un adorno. */
 @media(max-width:900px){
   main :is(h1,h2,h3) .title-accent-word,
@@ -15023,20 +14921,6 @@ html.portal-visual-ready :is(.page-hero,.news-page-hero,.home-xmb-banner) .title
     padding-bottom:.28em!important;
     line-height:1.02!important;
   }
-  .spb-banner__script.title-accent-word,
-  .spb-banner__script{
-    width:auto!important;
-    max-width:100%!important;
-    font-size:clamp(4.9rem,22vw,7.3rem)!important;
-    line-height:.84!important;
-    white-space:normal!important;
-    overflow-wrap:normal!important;
-  }
-  .spb-banner__caption-script.title-accent-word,
-  .spb-banner__caption-script{
-    font-size:clamp(1.44em,1.3em + 2vw,1.64em)!important;
-    white-space:normal!important;
-  }
   .cd-reveal{
     transform:translate3d(0,22px,0) scale(.99)!important;
     filter:blur(3px)!important;
@@ -15049,8 +14933,7 @@ html.portal-visual-ready :is(.page-hero,.news-page-hero,.home-xmb-banner) .title
   .cd-card.cd-visible,
   .has-script-accent,
   .title-accent-word,
-  .title-accent-word::after,
-  .spb-banner__caption.is-refreshing *{
+  .title-accent-word::after{
     opacity:1!important;
     transform:none!important;
     filter:none!important;

@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.61.0-reparacion-controlada";
+  const PORTAL_BUILD = "11.61.9-banner-canonical";
 
   /*
    * Retira definitivamente el service worker experimental de V11.40.2. GitHub Pages no

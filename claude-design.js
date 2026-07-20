@@ -237,7 +237,7 @@
 
     headings.forEach(heading => {
       if (!heading.isConnected) return;
-      if (heading.closest("dialog,.context-editor,.admin-console,.projects-manager,.projects-psp__details,.firebase-google-card,.spb-banner__modal,.edition-card,.deal-card,.resource-card,.news-card,.idea-card,.territory-focus-card,.year-selector-card")) return;
+      if (heading.closest(".spb-banner,dialog,.context-editor,.admin-console,.projects-manager,.projects-psp__details,.firebase-google-card,.edition-card,.deal-card,.resource-card,.news-card,.idea-card,.territory-focus-card,.year-selector-card")) return;
 
       const existing = heading.querySelector(".title-accent-word,em");
       if (existing) {
@@ -287,6 +287,7 @@
 
   function normalizeScriptAccents(root = document) {
     const excluded = [
+      ".spb-banner",
       "dialog",
       ".context-editor",
       ".admin-console",
@@ -305,14 +306,12 @@
       "main .title-accent-word",
       ".site-footer h2 em",
       ".site-footer .title-accent-word",
-      ".spb-banner__script",
-      ".spb-banner__caption-script",
       ".projects-folder__title em"
     ].join(",")).forEach((accent,index) => {
       if (!accent.isConnected || accent.closest(excluded)) return;
       accent.classList.add("title-accent-word");
       accent.style.setProperty("--portal-script-order",String(index % 8));
-      const heading = accent.closest("h1,h2,h3,.page-title,.spb-banner__caption");
+      const heading = accent.closest("h1,h2,h3,.page-title");
       heading?.classList.add("has-script-accent");
     });
   }
