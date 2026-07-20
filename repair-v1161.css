@@ -430,3 +430,105 @@ body[data-page="year"] main[data-year-page="true"] > .page-hero .hero-gif--notes
   }
   body[data-page="year"] main[data-year-page="true"] > .page-hero .year-selector-stats>div{min-height:58px!important}
 }
+
+/* V11.61.22 · Recursos: hero y tarjeta más compactos desde la regla base del módulo */
+:is(body[data-page="resources"], body.page-resources) .page-hero{
+  min-height:clamp(360px,48vh,500px)!important;
+  padding:clamp(28px,4.2vw,58px) 0!important;
+  display:flex!important;
+  align-items:center!important;
+  overflow:hidden!important;
+}
+:is(body[data-page="resources"], body.page-resources) .page-hero__grid{
+  width:100%!important;
+  min-height:0!important;
+  grid-template-columns:minmax(0,1fr) minmax(240px,310px)!important;
+  gap:clamp(28px,5vw,72px)!important;
+  align-items:center!important;
+}
+:is(body[data-page="resources"], body.page-resources) .page-hero__grid > div:first-child{
+  max-width:680px!important;
+}
+:is(body[data-page="resources"], body.page-resources) .page-hero__badge{
+  padding:5px 9px!important;
+  font-size:.66rem!important;
+  letter-spacing:.18em!important;
+}
+:is(body[data-page="resources"], body.page-resources) .page-hero h1{
+  max-width:680px!important;
+  margin:12px 0 20px!important;
+  font-size:clamp(2.45rem,4.35vw,4.7rem)!important;
+  line-height:.98!important;
+  letter-spacing:-.06em!important;
+  text-wrap:balance!important;
+}
+:is(body[data-page="resources"], body.page-resources) .page-hero h1 :is(.signature,.hullgaria,.script-word,em,[class*="script"],[class*="hand"]){
+  display:inline-block!important;
+  font-size:1.04em!important;
+  line-height:.9!important;
+  transform:translateY(.05em)!important;
+}
+:is(body[data-page="resources"], body.page-resources) .page-hero p{
+  max-width:540px!important;
+  margin:0!important;
+  font-size:clamp(.9rem,1.02vw,1rem)!important;
+  line-height:1.55!important;
+}
+:is(body[data-page="resources"], body.page-resources) .year-selector-card{
+  width:min(100%,300px)!important;
+  min-height:0!important;
+  padding:clamp(20px,2.2vw,26px)!important;
+  border-radius:22px!important;
+  box-shadow:0 18px 42px rgba(9,50,91,.10)!important;
+}
+:is(body[data-page="resources"], body.page-resources) .year-selector-card > span{
+  display:inline-flex!important;
+  padding:6px 10px!important;
+  border-radius:999px!important;
+  font-size:.62rem!important;
+  letter-spacing:.11em!important;
+  line-height:1!important;
+}
+:is(body[data-page="resources"], body.page-resources) .year-selector-card h2{
+  display:flex!important;
+  align-items:baseline!important;
+  gap:8px!important;
+  margin:20px 0 18px!important;
+  font-size:clamp(1.25rem,1.7vw,1.6rem)!important;
+  line-height:1.05!important;
+}
+:is(body[data-page="resources"], body.page-resources) .year-selector-card h2 strong{
+  font-size:clamp(2.8rem,4vw,4.1rem)!important;
+  line-height:.9!important;
+}
+:is(body[data-page="resources"], body.page-resources) .year-selector-card p{
+  max-width:210px!important;
+  font-size:clamp(.86rem,1vw,.96rem)!important;
+  line-height:1.55!important;
+}
+:is(body[data-page="resources"], body.page-resources) .year-selector-card::before,
+:is(body[data-page="resources"], body.page-resources) .year-selector-card::after{
+  transform:scale(.72)!important;
+  opacity:.52!important;
+}
+
+@media (max-width:900px){
+  :is(body[data-page="resources"], body.page-resources) .page-hero{
+    min-height:0!important;
+    padding:34px 0 42px!important;
+  }
+  :is(body[data-page="resources"], body.page-resources) .page-hero__grid{
+    grid-template-columns:1fr!important;
+    gap:22px!important;
+  }
+  :is(body[data-page="resources"], body.page-resources) .year-selector-card{
+    width:100%!important;
+    max-width:none!important;
+  }
+}
+@media (max-width:620px){
+  :is(body[data-page="resources"], body.page-resources) .page-hero h1{
+    font-size:clamp(2.25rem,11vw,3.35rem)!important;
+  }
+}
+
