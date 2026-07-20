@@ -29,7 +29,7 @@
       <div class="spb-banner__layout">
         <section class="spb-banner__left">
           <div class="spb-banner__eyebrow">${escapeHtml(config.eyebrow)}</div>
-          <h2 class="spb-banner__title"><span>${escapeHtml(config.titleLine1)}</span><span>${escapeHtml(config.titleLine2)}</span></h2>
+          <h2 class="spb-banner__title"><span>${escapeHtml(config.titleLine1)}</span><br aria-hidden="true"><span>${escapeHtml(config.titleLine2)}</span></h2>
           <span class="spb-banner__script">${escapeHtml(config.scriptWord)}</span>
           <p class="spb-banner__description">${escapeHtml(config.description)}</p>
           <button class="spb-banner__transport" type="button" data-spb-transport aria-label="Pausar reproducción automática">
