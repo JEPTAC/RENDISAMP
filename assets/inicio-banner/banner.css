@@ -465,3 +465,57 @@
   color:var(--spb-cursive-color,var(--spb-accent))!important;
   -webkit-text-fill-color:var(--spb-cursive-color,var(--spb-accent))!important;
 }
+
+/* =========================================================
+   V2.5.2 · Ajuste puntual solicitado
+   - "Construyamos" permanece en una línea independiente.
+   - Se elimina la sombra negra del bloque izquierdo.
+   - El título usa un degradado azul sobrio.
+   No modifica imágenes, animaciones ni estructura del banner.
+   ========================================================= */
+.spb-banner__title{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow:visible!important;
+  font-size:clamp(2.7rem,3.65vw,4.55rem)!important;
+  line-height:.96!important;
+  letter-spacing:-.055em!important;
+  text-shadow:none!important;
+}
+.spb-banner__title span{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  white-space:nowrap!important;
+  color:#0b3f75!important;
+  -webkit-text-fill-color:#0b3f75!important;
+  text-shadow:none!important;
+}
+.spb-banner__title span + span{
+  margin-top:.06em!important;
+}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .spb-banner__title span{
+    background:linear-gradient(105deg,#083968 0%,#0a5795 48%,#2875cc 100%)!important;
+    -webkit-background-clip:text!important;
+    background-clip:text!important;
+    color:transparent!important;
+    -webkit-text-fill-color:transparent!important;
+  }
+}
+.spb-banner__eyebrow,
+.spb-banner__description,
+.spb-banner__script{
+  text-shadow:none!important;
+}
+
+@media(max-width:680px){
+  .spb-banner__title{
+    font-size:clamp(2.45rem,11vw,3.65rem)!important;
+    line-height:.98!important;
+  }
+  .spb-banner__title span{
+    white-space:normal!important;
+  }
+}
