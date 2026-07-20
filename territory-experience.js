@@ -2,7 +2,7 @@
   "use strict";
 
   const STORE_KEY = "sp_territory_experience_v1";
-  const BUILD = "11.25-territorio-ui-responsive";
+  const BUILD = "11.60-territorio-drive-editor";
   const HOME_PATHS = new Set(["","index.html","/"]);
   const CENTER = [3.99557,-76.22805];
 
@@ -351,6 +351,7 @@
     selectedId:null,
     mapObserver:null,
     mapClick:null,
+    pickingPoint:false,
     adminDialog:null,
     editingRecordId:null,
     records:[],
@@ -451,25 +452,46 @@
   }
 
   function refreshRecords() {
+    const seen = new Set();
+    const admin = isAdmin();
     state.records = getStore().records
       .filter(record => record && typeof record === "object")
       .map(record => ({
-        id:record.id || `territory-${crypto.randomUUID?.() || Date.now()}`,
-        category:["impact","work","participation"].includes(record.category)
-          ? record.category
-          : "impact",
-        name:String(record.name || "Punto territorial"),
+        id:String(record.id || `territory-${crypto.randomUUID?.() || Date.now()}`),
+        category:["territory","impact","work","participation"].includes(record.category)
+          ? record.category : "impact",
+        name:String(record.name || record.title || "Punto territorial"),
+        title:String(record.title || record.name || "Punto territorial"),
+        shortDescription:String(record.shortDescription || record.summary || ""),
+        description:String(record.description || ""),
+        address:String(record.address || ""),
         sector:String(record.sector || ""),
-        lat:Number(record.lat),
-        lng:Number(record.lng),
+        lat:Number(record.lat), lng:Number(record.lng),
         people:Number(record.people) || 0,
         status:String(record.status || "En seguimiento"),
         date:String(record.date || ""),
-        description:String(record.description || ""),
-        evidence:String(record.evidence || ""),
-        updatedAt:String(record.updatedAt || "")
+        agency:String(record.agency || record.responsible || ""),
+        evidence:String(record.evidence || record.link || ""),
+        link:String(record.link || record.evidence || ""),
+        icon:String(record.icon || ""),
+        color:String(record.color || ""),
+        order:Number(record.order) || 0,
+        visible:record.visible !== false,
+        publicationStatus:String(record.publicationStatus || (record.published === false ? "draft" : "published")),
+        image:record.image || null,
+        gallery:Array.isArray(record.gallery) ? record.gallery : [],
+        updatedAt:String(record.updatedAt || ""),
+        updatedBy:String(record.updatedBy || "")
       }))
-      .filter(record => Number.isFinite(record.lat) && Number.isFinite(record.lng));
+      .filter(record => Number.isFinite(record.lat) && Number.isFinite(record.lng))
+      .filter(record => admin || (record.visible && record.publicationStatus === "published"))
+      .sort((a,b) => a.order - b.order || a.name.localeCompare(b.name,"es"))
+      .filter(record => {
+        const key = record.id || `${record.category}|${record.name.toLowerCase()}|${record.lat.toFixed(5)}|${record.lng.toFixed(5)}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
   }
 
   function formatNumber(value) {
@@ -714,6 +736,7 @@
       return [
         TERRITORY[0],
         ...URBAN_NEIGHBORHOODS,
+        ...state.records.filter(record => record.category === "territory"),
         ...TERRITORY.slice(1)
       ];
     }
@@ -860,6 +883,7 @@
             <small>${escapeHtml(subtitle)}</small>
           </span>
           <b>${escapeHtml(value)}</b>
+          <span class="territory-result-eye" aria-hidden="true" title="Centrar y acercar en el mapa">◉</span>
         </button>`;
     }).join("");
   }
@@ -872,13 +896,24 @@
     const title = state.section?.querySelector("#territoryDetailTitle");
     const description = state.section?.querySelector("#territoryDetailDescription");
     const meta = state.section?.querySelector("#territoryDetailMeta");
+    const card = state.section?.querySelector("#territoryDetailCard");
+    card?.querySelector(".territory-detail-card__image")?.remove();
+    card?.querySelector(".territory-detail-card__more")?.remove();
 
     if (title) title.textContent = item.name;
     if (description) {
       description.textContent =
-        item.description ||
-        item.note ||
+        item.shortDescription || item.description || item.note ||
         "Información territorial disponible para consulta.";
+    }
+    const imageUrl = window.DriveMedia?.resolveUrl?.(item.image, "") || (typeof item.image === "string" ? item.image : item.image?.displayUrl || "");
+    if (card && imageUrl) {
+      const image = document.createElement("img");
+      image.className = "territory-detail-card__image";
+      image.src = imageUrl;
+      image.alt = `Imagen de ${item.name}`;
+      image.dataset.fallbackSrc = window.DriveMedia?.fallbackImage || "assets/cinematica/iglesia-san-pedro-960.webp";
+      title?.insertAdjacentElement("beforebegin",image);
     }
 
     const chips = [];
@@ -893,8 +928,17 @@
       chips.push(`${item.barrios.length} barrios de cabecera`);
     }
     if (item.referenceNote) chips.push("Ubicación de referencia");
-    if (meta) {
-      meta.innerHTML = chips.map(chip => `<span>${escapeHtml(chip)}</span>`).join("");
+    if (item.address) chips.push(item.address);
+    if (item.agency) chips.push(item.agency);
+    if (meta) meta.innerHTML = chips.map(chip => `<span>${escapeHtml(chip)}</span>`).join("");
+    if (card && (item.link || item.evidence)) {
+      const link = document.createElement("a");
+      link.className = "button button-secondary territory-detail-card__more";
+      link.href = item.link || item.evidence;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "Ampliar información →";
+      meta?.insertAdjacentElement("afterend",link);
     }
 
     if (
@@ -907,15 +951,14 @@
     }
   }
 
-  function createLeafletIcon(category = "territory",label = "") {
-    const icon = category === "neighborhood"
-      ? "B"
-      : (MODES[category]?.icon || "◎");
+  function createLeafletIcon(category = "territory",label = "",item = {}) {
+    const icon = item.icon || (category === "neighborhood" ? "B" : (MODES[category]?.icon || "◎"));
+    const color = /^#[0-9a-f]{6}$/i.test(String(item.color || "")) ? item.color : "";
     return window.L.divIcon({
       className:`territory-leaflet-icon is-${category}`,
       html:`
-        <span class="territory-marker-pulse"></span>
-        <i>${escapeHtml(icon)}</i>
+        <span class="territory-marker-pulse" ${color ? `style="--territory-record-color:${escapeHtml(color)}"` : ""}></span>
+        <i ${color ? `style="background:${escapeHtml(color)}"` : ""}>${escapeHtml(icon)}</i>
         <b>${escapeHtml(label)}</b>`,
       iconSize:[34,34],
       iconAnchor:[17,17],
@@ -925,28 +968,19 @@
 
   function popupHtml(item) {
     const category = item.category || "territory";
-    const details = [];
-    if (item.kind) details.push(item.kind);
-    if (item.sector) details.push(item.sector);
-    if (item.status) details.push(item.status);
+    const imageUrl = window.DriveMedia?.resolveUrl?.(item.image, "") || (typeof item.image === "string" ? item.image : item.image?.displayUrl || "");
+    const details = [item.address,item.sector,item.status,item.date,item.agency].filter(Boolean);
     if (item.people) details.push(`${formatNumber(item.people)} personas`);
     if (item.veredas?.length) details.push(item.veredas.join(", "));
-
+    const target = item.link || item.evidence || "";
     return `
       <div class="territory-popup">
-        <span>${escapeHtml(
-          category === "neighborhood"
-            ? "Barrio de la cabecera"
-            : (MODES[category]?.label || "Territorio")
-        )}</span>
+        ${imageUrl ? `<img class="territory-popup__image" src="${escapeHtml(imageUrl)}" alt="Imagen de ${escapeHtml(item.name)}" onerror="this.src='assets/cinematica/iglesia-san-pedro-960.webp'">` : ""}
+        <span>${escapeHtml(category === "neighborhood" ? "Barrio de la cabecera" : (MODES[category]?.label || "Territorio"))}</span>
         <h3>${escapeHtml(item.name)}</h3>
-        <p>${escapeHtml(item.description || item.note || details.join(" · "))}</p>
-        ${details.length
-          ? `<small>${escapeHtml(details.join(" · "))}</small>`
-          : ""}
-        ${item.referenceNote
-          ? `<em>${escapeHtml(item.referenceNote)}</em>`
-          : ""}
+        <p>${escapeHtml(item.shortDescription || item.description || item.note || "Información territorial disponible.")}</p>
+        ${details.length ? `<div class="territory-popup__meta">${details.map(value => `<span>${escapeHtml(value)}</span>`).join("")}</div>` : ""}
+        ${target ? `<div class="territory-popup__actions"><a href="${escapeHtml(target)}" target="_blank" rel="noopener">Ampliar información →</a></div>` : ""}
       </div>`;
   }
 
@@ -1151,7 +1185,7 @@
       if (!Number.isFinite(item.lat) || !Number.isFinite(item.lng)) return;
       const category = item.category || "territory";
       const marker = window.L.marker([item.lat,item.lng],{
-        icon:createLeafletIcon(category,item.name),
+        icon:createLeafletIcon(category,item.name,item),
         keyboard:true,
         title:item.name,
         territoryId:item.id,
@@ -1380,12 +1414,17 @@
           text.textContent = `Punto seleccionado: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
         }
 
-        if (state.adminDialog?.open) {
-          const form = state.adminDialog.querySelector("#territoryRecordForm");
-          if (form) {
-            form.elements.lat.value = lat.toFixed(6);
-            form.elements.lng.value = lng.toFixed(6);
-          }
+        const form = state.adminDialog?.querySelector("#territoryRecordForm");
+        if (form && (state.adminDialog.open || state.pickingPoint)) {
+          form.elements.lat.value = lat.toFixed(6);
+          form.elements.lng.value = lng.toFixed(6);
+        }
+        if (state.pickingPoint && state.adminDialog) {
+          state.pickingPoint = false;
+          state.section?.classList.remove("is-picking-map-point");
+          if (!state.adminDialog.open) state.adminDialog.showModal();
+          window.setTimeout(() => form?.elements?.name?.focus?.(),80);
+          portal()?.helpers?.toast?.("Punto seleccionado y centrado en el editor.");
         }
       });
 
@@ -1493,75 +1532,28 @@
         <div class="territory-admin-layout">
           <form id="territoryRecordForm" class="territory-record-form">
             <input type="hidden" name="recordId">
-
-            <label>
-              Capa
-              <select name="category" required>
-                <option value="impact">Afectación</option>
-                <option value="work">Obra o respuesta</option>
-                <option value="participation">Participación</option>
-              </select>
-            </label>
-
-            <label>
-              Nombre del registro
-              <input name="name" maxlength="120" required>
-            </label>
-
-            <label>
-              Barrio, vereda, corregimiento o sector
-              <input name="sector" maxlength="120">
-            </label>
-
-            <div class="territory-admin-coordinates">
-              <label>
-                Latitud
-                <input name="lat" type="number" step="0.000001" required>
-              </label>
-              <label>
-                Longitud
-                <input name="lng" type="number" step="0.000001" required>
-              </label>
-            </div>
-
-            <button type="button" class="territory-use-map-center">
-              Usar centro actual del mapa
-            </button>
-
-            <div class="territory-admin-coordinates">
-              <label>
-                Personas afectadas
-                <input name="people" type="number" min="0" step="1">
-              </label>
-              <label>
-                Fecha
-                <input name="date" type="date">
-              </label>
-            </div>
-
-            <label>
-              Estado
-              <input name="status" maxlength="80" value="En seguimiento">
-            </label>
-
-            <label>
-              Descripción
-              <textarea name="description" rows="4" maxlength="900"></textarea>
-            </label>
-
-            <label>
-              Enlace de evidencia
-              <input name="evidence" type="url" placeholder="https://...">
-            </label>
-
-            <div class="territory-admin-form-actions">
-              <button type="button" class="button button-secondary territory-clear-form">
-                Limpiar
-              </button>
-              <button type="submit" class="button button-primary">
-                Guardar punto
-              </button>
-            </div>
+            <label>Categoría<select name="category" required>
+              <option value="territory">Conozca cada lugar</option><option value="impact">Ubique dónde ocurrió</option><option value="work">Siga la respuesta</option><option value="participation">Participación comunitaria</option>
+            </select></label>
+            <label>Título<input name="name" maxlength="120" required></label>
+            <label>Descripción breve<textarea name="shortDescription" rows="2" maxlength="240"></textarea></label>
+            <label>Descripción completa<textarea name="description" rows="5" maxlength="2400"></textarea></label>
+            <label>Dirección<input name="address" maxlength="160"></label>
+            <label>Barrio, vereda, corregimiento o sector<input name="sector" maxlength="120"></label>
+            <div class="territory-admin-coordinates"><label>Latitud<input name="lat" type="number" step="0.000001" required></label><label>Longitud<input name="lng" type="number" step="0.000001" required></label></div>
+            <div class="territory-admin-map-actions"><button type="button" class="territory-use-map-center">Usar centro actual del mapa</button><button type="button" class="territory-pick-map-point">Seleccionar punto directamente en el mapa</button></div>
+            <div class="territory-admin-coordinates"><label>Fecha<input name="date" type="date"></label><label>Personas afectadas<input name="people" type="number" min="0" step="1"></label></div>
+            <label>Estado<input name="status" maxlength="80" value="En seguimiento"></label>
+            <label>Dependencia responsable<input name="agency" maxlength="160"></label>
+            <label>Enlace<input name="link" type="url" placeholder="https://..."></label>
+            <label>Icono<input name="icon" maxlength="12" placeholder="◎"></label>
+            <label>Color del marcador<input name="color" type="color" value="#1678b8"></label>
+            <label>Orden<input name="order" type="number" min="0" step="1" value="0"></label>
+            <label>Estado de publicación<select name="publicationStatus"><option value="published">Publicado</option><option value="draft">Borrador</option><option value="archived">Archivado</option></select></label>
+            <label><input name="visible" type="checkbox" checked> Visible en el portal</label>
+            <div class="territory-drive-field"><label>Imagen principal<input name="imageRef" type="hidden"></label><button type="button" class="button button-secondary territory-drive-main">Seleccionar en Drive</button><div class="territory-drive-preview" data-territory-image-preview></div></div>
+            <div class="territory-drive-field"><label>Galería<input name="galleryRefs" type="hidden"></label><button type="button" class="button button-secondary territory-drive-gallery">Agregar imágenes de Drive</button><div class="territory-drive-preview" data-territory-gallery-preview></div></div>
+            <div class="territory-admin-form-actions"><button type="button" class="button button-secondary territory-clear-form">Limpiar</button><button type="submit" class="button button-primary">Guardar registro</button></div>
           </form>
 
           <section class="territory-admin-records">
@@ -1599,6 +1591,34 @@
         form.elements.lng.value = center.lng.toFixed(6);
       });
 
+    dialog.querySelector(".territory-pick-map-point")?.addEventListener("click",() => {
+      state.pickingPoint = true;
+      dialog.close();
+      state.section?.classList.add("is-picking-map-point");
+      portal()?.helpers?.toast?.("Haga clic en el punto exacto del mapa. El editor se abrirá de nuevo automáticamente.");
+    });
+
+    dialog.querySelector(".territory-drive-main")?.addEventListener("click",async () => {
+      try {
+        const form = dialog.querySelector("#territoryRecordForm");
+        const category = form.elements.category.value || "territory";
+        const moduleByCategory = {territory:"mapaLugares",impact:"mapaAfectaciones",work:"mapaRespuestas",participation:"mapaParticipacion"};
+        const ref = await window.DriveMedia?.choose?.({module:moduleByCategory[category],title:"Imagen principal del registro territorial",publicResource:form.elements.publicationStatus.value === "published",mimeTypes:["image/jpeg","image/png","image/webp"]});
+        if (!ref) return;
+        form.elements.imageRef.value = JSON.stringify(ref);
+        renderDrivePreviews(form);
+      } catch (error) { portal()?.helpers?.toast?.(error.message); }
+    });
+    dialog.querySelector(".territory-drive-gallery")?.addEventListener("click",async () => {
+      try {
+        const form = dialog.querySelector("#territoryRecordForm");
+        const ref = await window.DriveMedia?.choose?.({module:"mapa",title:"Imagen de la galería territorial",publicResource:form.elements.publicationStatus.value === "published",mimeTypes:["image/jpeg","image/png","image/webp"]});
+        if (!ref) return;
+        let gallery=[]; try { gallery=JSON.parse(form.elements.galleryRefs.value || "[]"); } catch {}
+        gallery.push(ref); form.elements.galleryRefs.value=JSON.stringify(gallery.slice(0,12)); renderDrivePreviews(form);
+      } catch (error) { portal()?.helpers?.toast?.(error.message); }
+    });
+
     dialog.querySelector(".territory-clear-form")
       .addEventListener("click",clearAdminForm);
 
@@ -1614,14 +1634,30 @@
     return dialog;
   }
 
+  function parseRef(value, fallback) { try { return JSON.parse(value || fallback); } catch { return JSON.parse(fallback); } }
+  function renderDrivePreviews(form) {
+    if (!form) return;
+    const image = parseRef(form.elements.imageRef?.value,"null");
+    const gallery = parseRef(form.elements.galleryRefs?.value,"[]");
+    const main = form.querySelector("[data-territory-image-preview]");
+    const list = form.querySelector("[data-territory-gallery-preview]");
+    if (main) main.innerHTML = image ? `<img src="${escapeHtml(window.DriveMedia?.resolveUrl?.(image) || image.displayUrl || "")}" alt=""><span>${escapeHtml(image.name || "Imagen principal")}</span>` : "<small>Sin imagen seleccionada</small>";
+    if (list) list.innerHTML = gallery.length ? gallery.map((ref,index) => `<img src="${escapeHtml(window.DriveMedia?.resolveUrl?.(ref) || ref.displayUrl || "")}" alt="Imagen ${index+1}">`).join("") : "<small>Sin galería</small>";
+  }
+
   function clearAdminForm() {
     const form = state.adminDialog?.querySelector("#territoryRecordForm");
     if (!form) return;
     form.reset();
-    form.elements.category.value = "impact";
+    form.elements.category.value = "territory";
     form.elements.status.value = "En seguimiento";
     form.elements.recordId.value = "";
+    form.elements.visible.checked = true;
+    form.elements.publicationStatus.value = "published";
+    form.elements.imageRef.value = "";
+    form.elements.galleryRefs.value = "[]";
     state.editingRecordId = null;
+    renderDrivePreviews(form);
 
     const center = state.mapReady
       ? state.map.getCenter()
@@ -1693,19 +1729,32 @@
     const id = String(formData.get("recordId") || "").trim()
       || `territory-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
 
+    let image = null; let gallery = [];
+    try { image = JSON.parse(String(formData.get("imageRef") || "null")); } catch {}
+    try { gallery = JSON.parse(String(formData.get("galleryRefs") || "[]")); } catch {}
     const record = {
       id,
-      category:String(formData.get("category") || "impact"),
-      name,
+      category:String(formData.get("category") || "territory"),
+      name, title:name,
+      shortDescription:String(formData.get("shortDescription") || "").trim(),
+      description:String(formData.get("description") || "").trim(),
+      address:String(formData.get("address") || "").trim(),
       sector:String(formData.get("sector") || "").trim(),
-      lat,
-      lng,
+      lat,lng,
       people:Math.max(0,Number(formData.get("people")) || 0),
       date:String(formData.get("date") || ""),
       status:String(formData.get("status") || "").trim(),
-      description:String(formData.get("description") || "").trim(),
-      evidence:String(formData.get("evidence") || "").trim(),
-      updatedAt:new Date().toISOString()
+      agency:String(formData.get("agency") || "").trim(),
+      link:String(formData.get("link") || "").trim(),
+      evidence:String(formData.get("link") || "").trim(),
+      icon:String(formData.get("icon") || "").trim(),
+      color:String(formData.get("color") || "#1678b8"),
+      order:Math.max(0,Number(formData.get("order")) || 0),
+      visible:formData.get("visible") === "on",
+      publicationStatus:String(formData.get("publicationStatus") || "published"),
+      image,gallery:Array.isArray(gallery) ? gallery : [],
+      updatedAt:new Date().toISOString(),
+      updatedBy:window.FirebasePortal?.getStatus?.()?.user?.uid || ""
     };
 
     const store = getStore();
@@ -1730,9 +1779,14 @@
 
     state.editingRecordId = id;
     Object.entries(record).forEach(([key,value]) => {
-      if (form.elements[key]) form.elements[key].value = value ?? "";
+      if (!form.elements[key]) return;
+      if (form.elements[key].type === "checkbox") form.elements[key].checked = Boolean(value);
+      else form.elements[key].value = value ?? "";
     });
+    form.elements.imageRef.value = record.image ? JSON.stringify(record.image) : "";
+    form.elements.galleryRefs.value = JSON.stringify(record.gallery || []);
     form.elements.recordId.value = id;
+    renderDrivePreviews(form);
     form.scrollIntoView({behavior:"smooth",block:"start"});
   }
 
@@ -1878,6 +1932,11 @@
         renderResultList();
         renderMapLayers();
       });
+    });
+
+    window.addEventListener("territory:invalidate",() => {
+      if (!state.mapReady) { initMap(); return; }
+      requestAnimationFrame(() => { state.map.invalidateSize({animate:false}); renderMapLayers(); });
     });
 
     window.addEventListener("resize",() => {

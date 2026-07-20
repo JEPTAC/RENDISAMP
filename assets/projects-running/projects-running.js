@@ -9,6 +9,8 @@
   let dialog = null;
   let currentDialogProject = null;
   let lastDialogTrigger = null;
+  let managerDialog = null;
+  let managerImageRef = null;
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -26,6 +28,7 @@
     if (!Number.isFinite(number)) return "23,105,168";
     return `${number >> 16},${(number >> 8) & 255},${number & 255}`;
   };
+  const canManage = () => Boolean(window.Portal?.state?.admin || window.FirebasePortal?.canWrite?.());
   const normalize = (project = {}, index = 0) => {
     const accent = /^#[0-9a-f]{6}$/i.test(String(project.accent || project.color || ""))
       ? String(project.accent || project.color)
@@ -33,7 +36,8 @@
     return {
       id: String(project.id || `running-${index + 1}`),
       title: String(project.title || `Proyecto en ejecución ${index + 1}`).trim(),
-      image: String(project.image || FALLBACK_IMAGE).trim(),
+      image: project.imageRef || project.image || FALLBACK_IMAGE,
+      imageRef: project.imageRef && typeof project.imageRef === "object" ? project.imageRef : (project.image && typeof project.image === "object" ? project.image : null),
       description: String(project.description || "Información del proyecto en preparación.").trim(),
       status: String(project.status || "En ejecución").trim(),
       progress: clamp(Number(project.progress ?? 0), 0, 100),
@@ -45,6 +49,8 @@
       objective: String(project.objective || "Objetivo por registrar.").trim(),
       result: String(project.result || "Resultado por registrar.").trim(),
       next: String(project.next || "Próximo hito por registrar.").trim(),
+      advances:Array.isArray(project.advances) ? project.advances.map(item => String(item)).filter(Boolean).slice(0,8) : [],
+      lastUpdated:String(project.lastUpdated || project.updatedAt || "Por registrar").trim(),
       url: safeUrl(project.url),
       accent,
       rgb: hexToRgb(accent)
@@ -74,8 +80,14 @@
     return normalized;
   }
 
+  function projectImage(project) {
+    if (window.DriveMedia?.resolveUrl) return window.DriveMedia.resolveUrl(project.image,FALLBACK_IMAGE);
+    if (typeof project.image === "string") return project.image || FALLBACK_IMAGE;
+    return project.image?.displayUrl || project.image?.thumbnailUrl || FALLBACK_IMAGE;
+  }
+
   function imageMarkup(project, className = "") {
-    return `<img class="${className}" src="${escapeHtml(project.image)}" alt="Fotografía de ${escapeHtml(project.title)}" loading="lazy" data-running-project-image>`;
+    return `<img class="${className}" src="${escapeHtml(projectImage(project))}" data-fallback-src="${FALLBACK_IMAGE}" alt="Fotografía de ${escapeHtml(project.title)}" loading="lazy" decoding="async" data-running-project-image>`;
   }
 
   function cardMarkup(project, index) {
@@ -109,7 +121,7 @@
             <h2 class="running-projects__title">Proyectos en <em>ejecución</em></h2>
             <p class="running-projects__lead">Conozca los proyectos que avanzan actualmente, su estado y el porcentaje de ejecución reportado.</p>
           </div>
-          <a class="running-projects__all" href="proyectos.html#proyectos-en-ejecucion">Ver todos los proyectos →</a>
+          <div class="running-projects__head-actions"><a class="running-projects__all" href="proyectos.html#proyectos-en-ejecucion">Ver todos los proyectos →</a>${canManage() ? '<button type="button" class="running-projects__manage" data-running-manage>Editar proyectos</button>' : ''}</div>
         </header>
         <div class="running-projects__grid">${visible.map(cardMarkup).join("")}</div>
       </div>`;
@@ -133,6 +145,7 @@
             <h2 class="running-projects__title">Proyectos en <em>ejecución</em></h2>
             <p class="running-projects__lead">Recorra los proyectos activos, consulte su avance y abra una ficha ampliada con información relevante.</p>
           </div>
+          ${canManage() ? '<button type="button" class="running-projects__manage" data-running-manage>Editar proyectos</button>' : ''}
         </header>
         <div class="running-projects__stage" data-running-stage>
           <div class="running-projects__visual">
@@ -184,12 +197,15 @@
     dialog.innerHTML = `<button class="running-projects-dialog__close" type="button" aria-label="Cerrar">×</button><div data-running-dialog-content></div>`;
     document.body.appendChild(dialog);
     dialog.querySelector(".running-projects-dialog__close").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("cancel",event => { event.preventDefault(); dialog.close(); });
     dialog.addEventListener("click", event => {
       const rect = dialog.getBoundingClientRect();
       const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
       if (!inside) dialog.close();
     });
     dialog.addEventListener("close", () => {
+      document.body.classList.remove("modal-open");
+      document.body.style.removeProperty("--scrollbar-compensation");
       lastDialogTrigger?.focus?.({ preventScroll: true });
       currentDialogProject = null;
     });
@@ -222,10 +238,17 @@
             <div><small>Resultado actual</small><strong>${escapeHtml(project.result)}</strong></div>
             <div><small>Siguiente hito</small><strong>${escapeHtml(project.next)}</strong></div>
           </div>
-          ${url ? `<a class="running-projects-dialog__link" href="${escapeHtml(url)}">Ir al proyecto →</a>` : ""}
+          ${project.advances.length ? `<div><small>Principales avances</small><ul class="running-projects-dialog__advances">${project.advances.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul></div>` : ""}
+          <p class="running-projects-dialog__updated">Última actualización: <strong>${escapeHtml(project.lastUpdated)}</strong></p>
+          ${url ? `<a class="running-projects-dialog__link" href="${escapeHtml(url)}">Ver proyecto completo →</a>` : ""}
         </div>
       </div>`;
-    if (!modal.open) modal.showModal();
+    if (!modal.open) {
+      const gap = Math.max(0,window.innerWidth-document.documentElement.clientWidth);
+      document.body.style.setProperty("--scrollbar-compensation",`${gap}px`);
+      document.body.classList.add("modal-open");
+      modal.showModal();
+    }
     requestAnimationFrame(() => modal.querySelector(".running-projects-dialog__close")?.focus({ preventScroll: true }));
   }
 
@@ -257,7 +280,7 @@
     });
     if (image) {
       image.alt = `Fotografía de ${project.title}`;
-      image.src = project.image;
+      image.src = projectImage(project);
       image.dataset.fallbackApplied = "false";
     }
     const bar = root.querySelector("[data-running-progress-bar]");
@@ -279,6 +302,49 @@
     window.setTimeout(() => root.classList.remove("is-switching"), 390);
   }
 
+  function saveRunningProjects(projects, message = "Proyectos actualizados.") {
+    if (!window.Portal?.state?.content) window.Portal.state.content = {};
+    window.Portal.state.content.runningProjects = projects.map(normalize);
+    window.Portal.helpers.save();
+    window.Portal.helpers.toast?.(message);
+    refreshAll();
+  }
+
+  function ensureManagerDialog() {
+    if (managerDialog) return managerDialog;
+    managerDialog = document.createElement("dialog");
+    managerDialog.className = "running-projects-manager dialog";
+    managerDialog.innerHTML = `<button type="button" class="dialog-close" data-running-manager-close aria-label="Cerrar">×</button>
+      <div class="running-projects-manager__layout"><aside><span class="section-kicker">ADMINISTRACIÓN</span><h2>Proyectos en ejecución</h2><div data-running-manager-list></div><button type="button" class="button button-secondary" data-running-manager-add>＋ Crear proyecto</button></aside>
+      <form data-running-manager-form><input type="hidden" name="index"><label>Nombre<input name="title" required maxlength="120"></label><label>Categoría<input name="category" maxlength="60"></label><label>Estado<input name="status" maxlength="60"></label><label>Avance %<input name="progress" type="number" min="0" max="100"></label><label>Fecha de inicio<input name="startDate"></label><label>Finalización estimada<input name="endDate"></label><label>Ubicación<input name="location"></label><label>Área responsable<input name="area"></label><label class="full">Descripción<textarea name="description" required></textarea></label><label class="full">Objetivo<textarea name="objective"></textarea></label><label class="full">Resultado<textarea name="result"></textarea></label><label class="full">Próximo hito<textarea name="next"></textarea></label><label class="full">Principales avances<textarea name="advances" placeholder="Uno por línea"></textarea></label><label>Última actualización<input name="lastUpdated"></label><label>Color<input name="accent" type="color"></label><label class="full">Enlace<input name="url"></label><div class="full running-projects-manager__media"><span data-running-manager-image>Sin imagen seleccionada</span><button type="button" class="button button-secondary" data-running-manager-drive>Elegir imagen en Drive</button></div><div class="full running-projects-manager__actions"><button type="button" class="button button-secondary" data-running-manager-delete>Eliminar</button><button type="submit" class="button button-primary">Guardar cambios</button></div></form></div>`;
+    document.body.appendChild(managerDialog);
+    let working = [];
+    const list = managerDialog.querySelector("[data-running-manager-list]");
+    const form = managerDialog.querySelector("[data-running-manager-form]");
+    const fill = index => {
+      const project = working[index]; if (!project) return;
+      form.elements.index.value = index;
+      ["title","category","status","progress","startDate","endDate","location","area","description","objective","result","next","lastUpdated","accent","url"].forEach(key => { if (form.elements[key]) form.elements[key].value = project[key] ?? ""; });
+      form.elements.advances.value = (project.advances || []).join("\n");
+      managerImageRef = project.imageRef || (typeof project.image === "object" ? project.image : null);
+      managerDialog.querySelector("[data-running-manager-image]").textContent = managerImageRef?.name || (typeof project.image === "string" && project.image !== FALLBACK_IMAGE ? project.image : "Sin imagen seleccionada");
+      [...list.children].forEach((button,i) => button.classList.toggle("is-active", i === index));
+    };
+    const renderList = active => {
+      list.innerHTML = working.map((project,index) => `<button type="button" data-running-manager-index="${index}"><strong>${escapeHtml(project.title)}</strong><small>${escapeHtml(project.status)} · ${project.progress}%</small></button>`).join("");
+      fill(Math.max(0,Math.min(active,working.length-1)));
+    };
+    list.addEventListener("click",event => { const button=event.target.closest("[data-running-manager-index]"); if(button) fill(Number(button.dataset.runningManagerIndex)); });
+    managerDialog.querySelector("[data-running-manager-close]").addEventListener("click",()=>managerDialog.close());
+    managerDialog.addEventListener("click",event=>{if(event.target===managerDialog) managerDialog.close();});
+    managerDialog.querySelector("[data-running-manager-add]").addEventListener("click",()=>{ working.push(normalize({title:"Nuevo proyecto",status:"En preparación",progress:0},working.length)); renderList(working.length-1); });
+    managerDialog.querySelector("[data-running-manager-delete]").addEventListener("click",()=>{ const index=Number(form.elements.index.value); if(!working[index]||!confirm(`¿Eliminar “${working[index].title}”?`))return; working.splice(index,1); if(!working.length)working.push(normalize({},0)); renderList(Math.max(0,index-1)); });
+    managerDialog.querySelector("[data-running-manager-drive]").addEventListener("click",async()=>{ const ref=await window.DriveMedia?.choose?.({modulePath:"Proyectos/En ejecución",accept:"image/*",title:"Imagen del proyecto en ejecución",makePublic:true}); if(!ref)return; managerImageRef=ref; managerDialog.querySelector("[data-running-manager-image]").textContent=ref.name||ref.driveFileId; });
+    form.addEventListener("submit",event=>{ event.preventDefault(); const index=Number(form.elements.index.value); const data=new FormData(form); const current=working[index]||{}; working[index]=normalize({...current,title:data.get("title"),category:data.get("category"),status:data.get("status"),progress:data.get("progress"),startDate:data.get("startDate"),endDate:data.get("endDate"),location:data.get("location"),area:data.get("area"),description:data.get("description"),objective:data.get("objective"),result:data.get("result"),next:data.get("next"),advances:String(data.get("advances")||"").split(/\r?\n/).map(v=>v.trim()).filter(Boolean),lastUpdated:data.get("lastUpdated"),accent:data.get("accent"),url:data.get("url"),imageRef:managerImageRef,image:managerImageRef||current.image,updatedBy:window.FirebasePortal?.getStatus?.()?.user?.uid||"",updatedAt:new Date().toISOString()},index); saveRunningProjects(working,"Proyectos en ejecución guardados."); managerDialog.close(); });
+    managerDialog.openFor = () => { working=getProjects().map(project=>({...project})); renderList(0); managerDialog.showModal(); };
+    return managerDialog;
+  }
+
   function bindInstance(instance) {
     const { root, projects, mode } = instance;
     setFallbackOnError(root);
@@ -288,6 +354,7 @@
       }
     });
     root.addEventListener("click", event => {
+      if (event.target.closest("[data-running-manage]")) { ensureManagerDialog().openFor(); return; }
       const open = event.target.closest("[data-running-open]");
       if (open) {
         const project = projects[Number(open.dataset.runningOpen)];
@@ -342,7 +409,7 @@
   window.RunningProjects = {
     refresh: refreshAll,
     getData: getProjects,
-    schema: ["id","title","image","description","status","progress","startDate","endDate","location","area","category","objective","result","next","url","accent"]
+    schema: ["id","title","image","imageRef","description","status","progress","startDate","endDate","location","area","category","objective","result","next","advances","lastUpdated","url","accent"]
   };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", refreshAll, { once: true });

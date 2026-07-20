@@ -1,10 +1,9 @@
 (() => {
-  const FIREBASE_VERSION = "12.16.0";
+  const FIREBASE_VERSION = "12.15.0";
   const firebaseConfig = {
     apiKey: "AIzaSyD02YaIMxLO2IPAJYZdPY2cWUvpkZDRo2U",
     authDomain: "rendicion-de-cuentas-6aceb.firebaseapp.com",
     projectId: "rendicion-de-cuentas-6aceb",
-    storageBucket: "rendicion-de-cuentas-6aceb.firebasestorage.app",
     messagingSenderId: "509564686428",
     appId: "1:509564686428:web:4e1257b5305dd8b4c51699",
     measurementId: "G-BQ6DLM4ENY"
@@ -89,6 +88,7 @@
       "auth/unauthorized-domain":"Debe autorizar el dominio de GitHub Pages en Firebase Authentication.",
       "permission-denied":"Las reglas de Firestore no permiten esta operación. Publique las reglas incluidas en el paquete.",
       "failed-precondition":"Firestore todavía no se encuentra configurado correctamente.",
+      "resource-exhausted":"El contenido supera el tamaño seguro de Firestore. Use Google Drive para imágenes o archivos pesados.",
       "firebase/cdn-load-failed":"No fue posible cargar el SDK oficial de Firebase. Recargue sin caché y revise que la red permita www.gstatic.com."
     };
     return messages[code] || error?.message || "Ocurrió un error al comunicarse con Firebase.";
@@ -102,9 +102,9 @@
      */
     try {
       const [app, auth, firestore] = await Promise.all([
-        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js"),
-        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"),
-        import("https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js")
+        import("https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js")
       ]);
       return {app,auth,firestore};
     } catch (error) {
@@ -129,9 +129,6 @@
       canWrite:runtime.canWrite,
       isSuperAdmin:runtime.isSuperAdmin,
       emailVerified:Boolean(runtime.user?.emailVerified),
-      uid:runtime.user?.uid || "",
-      projectId:firebaseConfig.projectId,
-      transport:runtime.transport || "default",
       ...extra
     };
   }
@@ -144,30 +141,26 @@
     runtime.initPromise = (async () => {
       try {
         runtime.modules = await loadModules();
-        runtime.app = runtime.modules.app.getApps().length
-          ? runtime.modules.app.getApp()
-          : runtime.modules.app.initializeApp(firebaseConfig);
+        runtime.app = runtime.modules.app.initializeApp(firebaseConfig);
         runtime.auth = runtime.modules.auth.getAuth(runtime.app);
 
         /*
          * Algunas redes, antivirus y proxies reinician los canales
-         * WebChannel de Firestore. La detección automática permite que el SDK
-         * cambie a long polling cuando el entorno lo necesita.
+         * WebChannel de Firestore. Se fuerza únicamente long polling.
+         * No se combina con experimentalAutoDetectLongPolling.
          */
-        try {
-          runtime.db = runtime.modules.firestore.initializeFirestore(
-            runtime.app,
-            {
-              experimentalAutoDetectLongPolling:true,
-              ignoreUndefinedProperties:true
-            }
-          );
-          runtime.transport = "auto-long-polling";
-        } catch (firestoreInitError) {
-          runtime.db = runtime.modules.firestore.getFirestore(runtime.app);
-          runtime.transport = "existing-instance";
-          console.info("[Firebase] Se reutilizó la instancia existente de Firestore.",firestoreInitError);
-        }
+        runtime.db = runtime.modules.firestore.initializeFirestore(
+          runtime.app,
+          {
+            experimentalForceLongPolling:true,
+            experimentalLongPollingOptions:{
+              timeoutSeconds:20
+            },
+            ignoreUndefinedProperties:true
+          }
+        );
+
+        runtime.transport = "forced-long-polling";
         runtime.auth.languageCode = "es";
 
         await runtime.modules.auth.setPersistence(
@@ -211,11 +204,9 @@
         runtime.ready = false;
         emit("firebase:ready", {
           connected:false,
-          error:friendlyError(error),
-          projectId:firebaseConfig.projectId
+          error:friendlyError(error)
         });
         console.warn("[Firebase] No fue posible inicializar.", error);
-        runtime.initPromise = null;
       }
       return runtime;
     })();
@@ -323,8 +314,19 @@
         profile = await createGuestProfile(user);
       }
 
+      let tokenClaims = {};
+      try {
+        tokenClaims = (await runtime.modules.auth.getIdTokenResult(user, options.forceTokenRefresh === true)).claims || {};
+      } catch (claimError) {
+        console.warn("[Firebase] No fue posible leer las reclamaciones del token.", claimError);
+      }
+
       const rawRole =
-        profile.data?.role
+        tokenClaims.role
+        ?? tokenClaims.userRole
+        ?? (tokenClaims.super_admin === true ? "super_admin" : null)
+        ?? (tokenClaims.admin === true ? "admin" : null)
+        ?? profile.data?.role
         ?? profile.data?.rol
         ?? profile.data?.tipoUsuario
         ?? profile.data?.userRole
@@ -362,7 +364,8 @@
         email:user.email || profile.data?.email || "",
         displayName:profile.data?.displayName || profile.data?.name || profile.data?.nombre || user.displayName || "",
         role:normalizedRole,
-        active:profile.data?.active !== false
+        active:profile.data?.active !== false,
+        tokenClaims
       };
       runtime.profileSource = profile.source;
       runtime.role = normalizedRole;
@@ -377,17 +380,8 @@
     emit("firebase:auth", authDetail(options));
   }
 
-  function assertReady() {
-    if (!runtime.modules || !runtime.auth || !runtime.db) {
-      const error = new Error("Firebase no terminó de inicializar. Revise la conexión y la configuración del proyecto.");
-      error.code = runtime.lastError?.code || "failed-precondition";
-      throw error;
-    }
-  }
-
   async function signInEmail(email,password) {
     if (!runtime.ready) await init();
-    assertReady();
     const credential = await runtime.modules.auth.signInWithEmailAndPassword(
       runtime.auth,
       String(email || "").trim(),
@@ -399,7 +393,6 @@
 
   async function signInGoogle() {
     if (!runtime.ready) await init();
-    assertReady();
     const provider = new runtime.modules.auth.GoogleAuthProvider();
     provider.setCustomParameters({prompt:"select_account"});
     const credential = await runtime.modules.auth.signInWithPopup(runtime.auth,provider);
@@ -409,7 +402,6 @@
 
   async function registerEmail(values = {}) {
     if (!runtime.ready) await init();
-    assertReady();
 
     const displayName = String(values.displayName || "").trim();
     const email = String(values.email || "").trim().toLowerCase();
@@ -455,7 +447,6 @@
 
   async function sendPasswordReset(email) {
     if (!runtime.ready) await init();
-    assertReady();
     const value = String(email || "").trim();
     if (!value) throw new Error("Escriba el correo de la cuenta.");
     await runtime.modules.auth.sendPasswordResetEmail(runtime.auth,value);
@@ -611,7 +602,24 @@
   }
 
 
-  const FIRESTORE_ARRAY_MARKER = "__sp_firestore_array_v1__";
+  const FIRESTORE_ARRAY_MARKER = "sp_firestore_array_v1";
+  const LEGACY_FIRESTORE_ARRAY_MARKER = "__sp_firestore_array_v1__";
+  const CLOUD_SCHEMA_VERSION = 11.41;
+  const CLOUD_STATE_COLLECTION = "portalState";
+  const CLOUD_PUBLIC_COLLECTION = "portalPublicState";
+  const CLOUD_EDITS_COLLECTION = "portalEdits";
+  const CLOUD_MAX_DOCUMENT_BYTES = 850_000;
+  const CLOUD_STATE_KEYS = Object.freeze([
+    "years",
+    "resources",
+    "dashboards",
+    "commitments",
+    "citizenRequests",
+    "news",
+    "settings",
+    "content",
+    "pageSettings"
+  ]);
 
   function isPlainRecord(value) {
     if (!value || typeof value !== "object") return false;
@@ -619,13 +627,6 @@
     return prototype === Object.prototype || prototype === null;
   }
 
-  /*
-   * Firestore no acepta arreglos directamente dentro de otros arreglos.
-   * El estado local sí usa esa estructura (por ejemplo years[].sectors),
-   * por lo que se codifican únicamente esos arreglos anidados como mapas
-   * reversibles antes de guardar. La estructura original se reconstruye
-   * al leer desde la nube.
-   */
   function encodeFirestoreValue(value, directArrayItem = false) {
     if (Array.isArray(value)) {
       const items = value.map(item => encodeFirestoreValue(item, true));
@@ -652,9 +653,17 @@
     }
 
     if (isPlainRecord(value)) {
-      const marker = value[FIRESTORE_ARRAY_MARKER];
+      const marker = value[FIRESTORE_ARRAY_MARKER]
+        ?? value[LEGACY_FIRESTORE_ARRAY_MARKER];
       const keys = Object.keys(value);
-      if (keys.length === 1 && Array.isArray(marker)) {
+      if (
+        keys.length === 1
+        && Array.isArray(marker)
+        && (
+          keys[0] === FIRESTORE_ARRAY_MARKER
+          || keys[0] === LEGACY_FIRESTORE_ARRAY_MARKER
+        )
+      ) {
         return marker.map(item => decodeFirestoreValue(item));
       }
 
@@ -669,65 +678,213 @@
     return value;
   }
 
-  function cloudPayload() {
+  function utf8Size(value) {
+    return new TextEncoder().encode(String(value || "")).byteLength;
+  }
+
+  function safeJsonParse(value, fallback = null) {
+    try {
+      return JSON.parse(String(value || ""));
+    } catch {
+      return fallback;
+    }
+  }
+
+  function prepareCloudState() {
     const state = portal()?.state;
     if (!state) throw new Error("El estado del portal no está disponible.");
+
+    const content = isPlainRecord(state.content)
+      ? {...state.content}
+      : {};
+    const contextEdits = isPlainRecord(content.contextEdits)
+      ? content.contextEdits
+      : {};
+    delete content.contextEdits;
+
     return {
-      schemaVersion:10.5,
-      years:state.years,
-      resources:state.resources,
-      dashboards:state.dashboards,
-      commitments:state.commitments,
-      citizenRequests:state.citizenRequests,
-      news:state.news,
-      settings:state.settings,
-      content:state.content,
-      pageSettings:state.pageSettings
+      sections:{
+        years:state.years,
+        resources:state.resources,
+        dashboards:state.dashboards,
+        commitments:state.commitments,
+        citizenRequests:state.citizenRequests,
+        news:state.news,
+        settings:state.settings,
+        content,
+        pageSettings:state.pageSettings
+      },
+      contextEdits
     };
+  }
+
+  function isPublicRecord(record) {
+    if (!record || typeof record !== "object") return true;
+    if (record.hidden === true || record.active === false || record.visible === false || record.published === false) return false;
+    const status = String(record.publicationStatus || record.publishStatus || "").toLowerCase();
+    return !["draft","borrador","hidden","oculto","unpublished","no publicado"].includes(status);
+  }
+
+  function publicArray(value) {
+    return Array.isArray(value) ? value.filter(isPublicRecord).map(item => sanitizePublicValue(item)) : value;
+  }
+
+  function sanitizePublicValue(value) {
+    if (Array.isArray(value)) return publicArray(value);
+    if (!isPlainRecord(value)) return value;
+    const result = {};
+    Object.entries(value).forEach(([key,item]) => {
+      if (["unsubscribeToken","clientSecret","refreshToken","privateKey","accessToken"].includes(key)) return;
+      result[key] = sanitizePublicValue(item);
+    });
+    return result;
+  }
+
+  function preparePublicSections(sections) {
+    return Object.fromEntries(Object.entries(sections).map(([key,value]) => [key,sanitizePublicValue(value)]));
+  }
+
+  function serializeCloudDocument(value, label) {
+    const json = JSON.stringify(value ?? null);
+    const bytes = utf8Size(json);
+    if (bytes > CLOUD_MAX_DOCUMENT_BYTES) {
+      const error = new Error(
+        `El bloque ${label} ocupa ${(bytes / 1024).toFixed(0)} KB y supera el límite seguro de Firestore. ` +
+        "Retire imágenes incrustadas en base64 o súbalas mediante Google Drive."
+      );
+      error.code = "resource-exhausted";
+      throw error;
+    }
+    return {json,bytes};
+  }
+
+  async function readStructuredCloudState() {
+    const {collection,getDocs} = runtime.modules.firestore;
+    const stateCollection = runtime.canWrite ? CLOUD_STATE_COLLECTION : CLOUD_PUBLIC_COLLECTION;
+    const [stateSnapshot,editsSnapshot] = await Promise.all([
+      getDocs(collection(runtime.db,stateCollection)),
+      getDocs(collection(runtime.db,CLOUD_EDITS_COLLECTION))
+    ]);
+
+    if (stateSnapshot.empty) return null;
+
+    const remote = {};
+    let remoteVersion = 0;
+    let validSections = 0;
+
+    stateSnapshot.docs.forEach(snapshot => {
+      const data = snapshot.data() || {};
+      remoteVersion = Math.max(
+        remoteVersion,
+        Number(data.updatedAtMs || 0),
+        Number(data.version || 0)
+      );
+      if (!CLOUD_STATE_KEYS.includes(snapshot.id)) return;
+      if (typeof data.json !== "string") return;
+      const parsed = safeJsonParse(data.json,undefined);
+      if (parsed === undefined) return;
+      remote[snapshot.id] = parsed;
+      validSections += 1;
+    });
+
+    if (!validSections) return null;
+
+    const hasContentDocument = Object.prototype.hasOwnProperty.call(remote,"content");
+    const content = isPlainRecord(remote.content)
+      ? {...remote.content}
+      : {};
+    const contextualEdits = {};
+
+    editsSnapshot.docs.forEach(snapshot => {
+      const data = snapshot.data() || {};
+      const recordId = String(data.recordId || "").trim();
+      if (!recordId || typeof data.json !== "string") return;
+      const record = safeJsonParse(data.json,undefined);
+      if (record !== undefined) contextualEdits[recordId] = record;
+      remoteVersion = Math.max(remoteVersion,Number(data.updatedAtMs || 0));
+    });
+
+    if (hasContentDocument || Object.keys(contextualEdits).length) {
+      content.contextEdits = contextualEdits;
+      remote.content = content;
+    }
+    return {
+      remote,
+      remoteVersion,
+      source:"structured"
+    };
+  }
+
+  async function readLegacyCloudState() {
+    if (!runtime.canWrite) return null;
+    const {doc,getDoc} = runtime.modules.firestore;
+    const snapshot = await getDoc(doc(runtime.db,"portal","main"));
+    if (!snapshot.exists()) return null;
+
+    const remote = decodeFirestoreValue(snapshot.data());
+    return {
+      remote,
+      remoteVersion:
+        remote.updatedAt?.toMillis?.()
+        || Number(remote.updatedAtMs || 0),
+      source:"legacy"
+    };
+  }
+
+  function applyRemoteState(remote = {}) {
+    const state = portal()?.state;
+    if (!state) return;
+
+    ["years","resources","commitments","citizenRequests","news"].forEach(key => {
+      if (Array.isArray(remote[key])) state[key] = remote[key];
+    });
+    ["dashboards","settings","content","pageSettings"].forEach(key => {
+      if (remote[key] && typeof remote[key] === "object") state[key] = remote[key];
+    });
   }
 
   async function hydrateFromCloud() {
     if (!runtime.db || !portal()) return false;
 
     try {
-      const {doc,getDoc,collection,getDocs} = runtime.modules.firestore;
-      const [portalSnapshot,ideasSnapshot] = await Promise.all([
-        getDoc(doc(runtime.db,"portal","main")),
-        getDocs(collection(runtime.db,"ideas"))
-      ]);
-
-      if (!portalSnapshot.exists()) return false;
-
-      const remote = decodeFirestoreValue(portalSnapshot.data());
-      const remoteVersion =
-        remote.updatedAt?.toMillis?.()
-        || Number(remote.updatedAtMs || 0);
-      const localVersion =
-        Number(localStorage.getItem("sp_v9_cloud_version") || 0);
-      const state = portal().state;
-
-      ["years","resources","commitments","citizenRequests","news"].forEach(key => {
-        if (Array.isArray(remote[key])) state[key] = remote[key];
+      const {collection,getDocs} = runtime.modules.firestore;
+      const ideasPromise = getDocs(collection(runtime.db,"ideas"));
+      const structured = await readStructuredCloudState().catch(error => {
+        console.warn("[Firebase] No fue posible leer el esquema estructurado.",error);
+        return null;
       });
-      ["dashboards","settings","content","pageSettings"].forEach(key => {
-        if (remote[key] && typeof remote[key] === "object") state[key] = remote[key];
-      });
+      const cloudState = structured || await readLegacyCloudState();
+      const ideasSnapshot = await ideasPromise;
 
-      const cloudIdeas =
-        ideasSnapshot.docs.map(item => ({id:item.id,...decodeFirestoreValue(item.data())}));
-      if (cloudIdeas.length) state.ideas = cloudIdeas;
+      if (cloudState?.remote) applyRemoteState(cloudState.remote);
+
+      const cloudIdeas = ideasSnapshot.docs.map(item => ({
+        id:item.id,
+        ...decodeFirestoreValue(item.data())
+      }));
+      if (cloudState?.remote) {
+        portal().state.ideas = cloudIdeas;
+      } else if (cloudIdeas.length) {
+        portal().state.ideas = cloudIdeas;
+      }
+
+      if (!cloudState?.remote && !cloudIdeas.length) return false;
+
+      const remoteVersion = Number(cloudState?.remoteVersion || 0);
+      const localVersion = Number(localStorage.getItem("sp_v11_cloud_version") || 0);
 
       portal().helpers.save({localOnly:true});
       portal().applySettings();
-      emit("firebase:data",{source:"cloud",remoteVersion});
+      emit("firebase:data",{
+        source:cloudState?.source || "ideas",
+        remoteVersion
+      });
 
       if (remoteVersion && remoteVersion !== localVersion) {
-        localStorage.setItem("sp_v9_cloud_version",String(remoteVersion));
-        if (!sessionStorage.getItem(`sp_v9_reload_${remoteVersion}`)) {
-          sessionStorage.setItem(`sp_v9_reload_${remoteVersion}`,"1");
-          setTimeout(() => location.reload(),180);
-        }
+        localStorage.setItem("sp_v11_cloud_version",String(remoteVersion));
       }
+      window.dispatchEvent(new CustomEvent("portal:datachange",{detail:{source:"firebase",remoteVersion}}));
+      window.dispatchEvent(new CustomEvent("portal:rendered",{detail:{source:"firebase",remoteVersion}}));
       return true;
     } catch (error) {
       runtime.lastError = error;
@@ -744,18 +901,21 @@
         runtime.lastError = error;
         portal()?.helpers.toast(friendlyError(error));
       });
-    },1100);
+    },800);
+  }
+
+  async function commitInChunks(operations, chunkSize = 350) {
+    const {writeBatch} = runtime.modules.firestore;
+    for (let index = 0; index < operations.length; index += chunkSize) {
+      const batch = writeBatch(runtime.db);
+      operations.slice(index,index + chunkSize).forEach(operation => operation(batch));
+      await batch.commit();
+    }
   }
 
   async function pushAll(options = {}) {
     if (!runtime.ready) await init();
-    assertReady();
-    if (!runtime.user) {
-      const error = new Error("Debe iniciar sesión antes de sincronizar.");
-      error.code = "auth/user-not-found";
-      throw error;
-    }
-    if (!runtime.canWrite) {
+    if (!runtime.canWrite || !runtime.user) {
       throw Object.assign(
         new Error("La cuenta no tiene permisos de edición."),
         {code:"permission-denied"}
@@ -768,52 +928,140 @@
 
     try {
       const {
-        doc,setDoc,collection,getDocs,writeBatch,
-        serverTimestamp,addDoc
+        doc,collection,getDocs,serverTimestamp,addDoc
       } = runtime.modules.firestore;
+      const updatedAtMs = Date.now();
+      const {sections,contextEdits} = prepareCloudState();
+      const publicSections = preparePublicSections(sections);
+      const sectionOperations = [];
 
-      const data = encodeFirestoreValue(cloudPayload());
-      data.updatedAt = serverTimestamp();
-      data.updatedAtMs = Date.now();
-      data.updatedBy = runtime.user.uid;
-      data.updatedByEmail = runtime.user.email || "";
+      Object.entries(sections).forEach(([key,value]) => {
+        const serialized = serializeCloudDocument(value,key);
+        sectionOperations.push(batch => batch.set(
+          doc(runtime.db,CLOUD_STATE_COLLECTION,key),
+          {
+            schemaVersion:CLOUD_SCHEMA_VERSION,
+            key,
+            json:serialized.json,
+            bytes:serialized.bytes,
+            updatedAt:serverTimestamp(),
+            updatedAtMs,
+            updatedBy:runtime.user.uid,
+            updatedByEmail:runtime.user.email || ""
+          },
+          {merge:false}
+        ));
+      });
 
-      await setDoc(doc(runtime.db,"portal","main"),data,{merge:false});
+      Object.entries(publicSections).forEach(([key,value]) => {
+        const serialized = serializeCloudDocument(value,`público ${key}`);
+        sectionOperations.push(batch => batch.set(
+          doc(runtime.db,CLOUD_PUBLIC_COLLECTION,key),
+          {
+            schemaVersion:CLOUD_SCHEMA_VERSION,
+            key,
+            json:serialized.json,
+            bytes:serialized.bytes,
+            updatedAt:serverTimestamp(),
+            updatedAtMs,
+            updatedBy:runtime.user.uid
+          },
+          {merge:false}
+        ));
+      });
+
+      sectionOperations.push(batch => batch.set(
+        doc(runtime.db,CLOUD_STATE_COLLECTION,"meta"),
+        {
+          schemaVersion:CLOUD_SCHEMA_VERSION,
+          source:"RENDISAMP",
+          updatedAt:serverTimestamp(),
+          updatedAtMs,
+          version:updatedAtMs,
+          updatedBy:runtime.user.uid,
+          updatedByEmail:runtime.user.email || ""
+        },
+        {merge:true}
+      ));
+      sectionOperations.push(batch => batch.set(
+        doc(runtime.db,CLOUD_PUBLIC_COLLECTION,"meta"),
+        {schemaVersion:CLOUD_SCHEMA_VERSION,source:"RENDISAMP_PUBLIC",updatedAt:serverTimestamp(),updatedAtMs,version:updatedAtMs,updatedBy:runtime.user.uid},
+        {merge:true}
+      ));
+      await commitInChunks(sectionOperations);
+
+      const existingEdits = await getDocs(collection(runtime.db,CLOUD_EDITS_COLLECTION));
+      const editIds = new Set(Object.keys(contextEdits));
+      const editOperations = [];
+
+      existingEdits.docs.forEach(snapshot => {
+        const recordId = String(snapshot.data()?.recordId || "");
+        if (!editIds.has(recordId)) {
+          editOperations.push(batch => batch.delete(snapshot.ref));
+        }
+      });
+
+      Object.entries(contextEdits).forEach(([recordId,record]) => {
+        const serialized = serializeCloudDocument(record,`edición ${recordId}`);
+        const documentId = encodeURIComponent(recordId).slice(0,1450);
+        editOperations.push(batch => batch.set(
+          doc(runtime.db,CLOUD_EDITS_COLLECTION,documentId),
+          {
+            schemaVersion:CLOUD_SCHEMA_VERSION,
+            recordId,
+            json:serialized.json,
+            bytes:serialized.bytes,
+            updatedAt:serverTimestamp(),
+            updatedAtMs,
+            updatedBy:runtime.user.uid
+          },
+          {merge:false}
+        ));
+      });
+      if (editOperations.length) await commitInChunks(editOperations);
 
       const existingIdeas = await getDocs(collection(runtime.db,"ideas"));
-      const batch = writeBatch(runtime.db);
-      const currentIds =
-        new Set(portal().state.ideas.map(item => item.id));
+      const currentIds = new Set(portal().state.ideas.map(item => item.id));
+      const ideaOperations = [];
 
       existingIdeas.docs.forEach(item => {
-        if (!currentIds.has(item.id)) batch.delete(item.ref);
+        if (!currentIds.has(item.id)) {
+          ideaOperations.push(batch => batch.delete(item.ref));
+        }
       });
 
       portal().state.ideas.forEach(item => {
         const {id,...ideaData} = item;
-        batch.set(
+        ideaOperations.push(batch => batch.set(
           doc(runtime.db,"ideas",id),
           {
             ...encodeFirestoreValue(ideaData),
             updatedAt:serverTimestamp()
           },
           {merge:true}
-        );
+        ));
       });
-
-      await batch.commit();
+      if (ideaOperations.length) await commitInChunks(ideaOperations);
 
       await addDoc(collection(runtime.db,"auditLogs"),{
         action:options.action || "portal_sync",
+        schemaVersion:CLOUD_SCHEMA_VERSION,
         userId:runtime.user.uid,
         email:runtime.user.email || "",
         createdAt:serverTimestamp(),
         page:location.pathname
       });
 
-      localStorage.setItem("sp_v9_cloud_version",String(data.updatedAtMs));
-      emit("firebase:sync",{status:"saved",at:data.updatedAtMs});
+      localStorage.setItem("sp_v11_cloud_version",String(updatedAtMs));
+      emit("firebase:sync",{status:"saved",at:updatedAtMs});
       portal()?.helpers.toast("Cambios sincronizados con Firestore.");
+    } catch (error) {
+      runtime.lastError = error;
+      emit("firebase:sync",{
+        status:"error",
+        error:friendlyError(error)
+      });
+      throw error;
     } finally {
       runtime.syncing = false;
     }
@@ -821,7 +1069,6 @@
 
   async function createPublicIdea(idea) {
     if (!runtime.ready) await init();
-    assertReady();
 
     const {doc,setDoc,serverTimestamp} = runtime.modules.firestore;
     const payload = {
@@ -839,6 +1086,177 @@
       createdAt:serverTimestamp()
     };
     await setDoc(doc(runtime.db,"ideas",idea.id),encodeFirestoreValue(payload),{merge:false});
+    return payload;
+  }
+
+  async function writeAuditLog(action, details = {}) {
+    if (!runtime.ready || !runtime.canWrite || !runtime.user) return;
+    const {addDoc,collection,serverTimestamp} = runtime.modules.firestore;
+    await addDoc(collection(runtime.db,"auditLogs"),{
+      action:String(action || "administrative_update"),
+      ...details,
+      userId:runtime.user.uid,
+      email:runtime.user.email || "",
+      page:location.pathname,
+      createdAt:serverTimestamp()
+    });
+  }
+
+  async function sha256(value) {
+    const bytes = new TextEncoder().encode(String(value || "").trim().toLowerCase());
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2,"0")).join("");
+  }
+
+  function validateSubscription(values = {}) {
+    const email = String(values.email || "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Escriba un correo electrónico válido.");
+    if (values.consent !== true) throw new Error("Debe aceptar el tratamiento de datos para registrar la suscripción.");
+    return {
+      email,
+      consent:true,
+      status:String(values.status || "active"),
+      preferences:Array.isArray(values.preferences) ? values.preferences.slice(0,20) : [],
+      channels:{
+        email:values.channels?.email !== false,
+        web:Boolean(values.channels?.web),
+        internal:Boolean(values.channels?.internal)
+      },
+      source:String(values.source || location.pathname.split("/").pop() || "portal").slice(0,120),
+      publicationIds:Array.isArray(values.publicationIds) ? values.publicationIds.slice(0,50) : []
+    };
+  }
+
+  async function upsertSubscription(values = {}) {
+    if (!runtime.ready) await init();
+    const data = validateSubscription(values);
+    const id = await sha256(data.email);
+    const previousToken = String(values.unsubscribeToken || "").trim();
+    const unsubscribeToken = previousToken || String(crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`);
+    const {doc,setDoc,serverTimestamp} = runtime.modules.firestore;
+    const reference = doc(runtime.db,"subscriptions",id);
+    const payload = previousToken ? {
+      email:data.email,
+      emailHash:id,
+      unsubscribeToken,
+      consent:true,
+      status:"active",
+      preferences:data.preferences,
+      channels:data.channels,
+      source:data.source,
+      updatedAt:serverTimestamp()
+    } : {
+      ...data,
+      emailHash:id,
+      unsubscribeToken,
+      userId:runtime.user?.uid || "",
+      createdAt:serverTimestamp(),
+      updatedAt:serverTimestamp(),
+      lastSentAt:null,
+      lastPublicationId:"",
+      deliveryCount:0
+    };
+    try {
+      await setDoc(reference,payload,{merge:Boolean(previousToken)});
+    } catch (error) {
+      if (!previousToken && String(error?.code || "").includes("permission-denied")) {
+        throw Object.assign(new Error("Este correo ya está suscrito. Para actualizarlo use el mismo navegador o cancele primero la suscripción."),{code:"already-exists"});
+      }
+      throw error;
+    }
+    return {id,email:data.email,unsubscribeToken,status:"active",preferences:data.preferences,channels:data.channels};
+  }
+
+  async function cancelSubscription(values = {}) {
+    if (!runtime.ready) await init();
+    const email = String(values.email || "").trim().toLowerCase();
+    if (!email) throw new Error("Escriba el correo de la suscripción.");
+    const id = await sha256(email);
+    const {doc,setDoc,serverTimestamp} = runtime.modules.firestore;
+    await setDoc(doc(runtime.db,"subscriptions",id),{
+      emailHash:id,
+      email,
+      unsubscribeToken:String(values.unsubscribeToken || ""),
+      status:"cancelled",
+      cancelledAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
+    },{merge:true});
+    return {id,status:"cancelled"};
+  }
+
+  async function listSubscriptions() {
+    if (!runtime.ready) await init();
+    if (!runtime.isSuperAdmin) throw Object.assign(new Error("Solo el superadministrador puede consultar suscripciones."),{code:"permission-denied"});
+    const {collection,getDocs,query,orderBy,limit} = runtime.modules.firestore;
+    const snapshot = await getDocs(query(collection(runtime.db,"subscriptions"),orderBy("updatedAt","desc"),limit(500)));
+    return snapshot.docs.map(item => ({id:item.id,...item.data()}));
+  }
+
+  async function updateSubscriptionAdmin(subscriptionId, values = {}) {
+    if (!runtime.ready) await init();
+    if (!runtime.isSuperAdmin) throw Object.assign(new Error("Solo el superadministrador puede actualizar suscripciones."),{code:"permission-denied"});
+    const id = String(subscriptionId || "").trim();
+    if (!id) throw new Error("Falta el identificador de la suscripción.");
+    const allowedStatus = new Set(["active","paused","cancelled"]);
+    const payload = {
+      status:allowedStatus.has(String(values.status || "")) ? String(values.status) : "active",
+      preferences:Array.isArray(values.preferences) ? values.preferences.slice(0,20) : [],
+      channels:{
+        email:values.channels?.email !== false,
+        web:Boolean(values.channels?.web),
+        internal:Boolean(values.channels?.internal)
+      },
+      updatedAt:runtime.modules.firestore.serverTimestamp(),
+      updatedBy:runtime.user?.uid || ""
+    };
+    if (payload.status === "cancelled") payload.cancelledAt = runtime.modules.firestore.serverTimestamp();
+    await runtime.modules.firestore.setDoc(
+      runtime.modules.firestore.doc(runtime.db,"subscriptions",id),
+      payload,
+      {merge:true}
+    );
+    await writeAuditLog("subscription_update",{subscriptionId:id,status:payload.status});
+    return {id,...payload};
+  }
+
+  async function deleteSubscriptionAdmin(subscriptionId) {
+    if (!runtime.ready) await init();
+    if (!runtime.isSuperAdmin) throw Object.assign(new Error("Solo el superadministrador puede eliminar suscripciones."),{code:"permission-denied"});
+    const id = String(subscriptionId || "").trim();
+    if (!id) throw new Error("Falta el identificador de la suscripción.");
+    await runtime.modules.firestore.deleteDoc(runtime.modules.firestore.doc(runtime.db,"subscriptions",id));
+    await writeAuditLog("subscription_delete",{subscriptionId:id});
+    return {id,deleted:true};
+  }
+
+  async function refreshRoleToken() {
+    if (!runtime.user) return null;
+    await runtime.modules.auth.getIdToken(runtime.user,true);
+    await handleAuthState(runtime.user,{reason:"role_refresh",forceTokenRefresh:true});
+    return authDetail({reason:"role_refresh"});
+  }
+
+  async function getDriveSettings() {
+    if (!runtime.ready) await init();
+    if (!runtime.canWrite) throw Object.assign(new Error("La cuenta no tiene permiso para consultar la configuración de Drive."),{code:"permission-denied"});
+    const {doc,getDoc} = runtime.modules.firestore;
+    const snapshot = await getDoc(doc(runtime.db,"portalSettings","drive"));
+    return snapshot.exists() ? snapshot.data() : null;
+  }
+
+  async function saveDriveSettings(values = {}) {
+    if (!runtime.ready) await init();
+    if (!runtime.isAdmin && !runtime.isSuperAdmin) throw Object.assign(new Error("Solo administradores pueden modificar la estructura central de Drive."),{code:"permission-denied"});
+    const {doc,setDoc,serverTimestamp} = runtime.modules.firestore;
+    const payload = {
+      rootFolderId:String(values.rootFolderId || ""),
+      rootFolderName:String(values.rootFolderName || "Rendición de Cuentas San Pedro"),
+      folderIds:values.folderIds && typeof values.folderIds === "object" ? values.folderIds : {},
+      folderPaths:values.folderPaths && typeof values.folderPaths === "object" ? values.folderPaths : {},
+      updatedAt:serverTimestamp(),
+      updatedBy:runtime.user?.uid || ""
+    };
+    await setDoc(doc(runtime.db,"portalSettings","drive"),payload,{merge:true});
     return payload;
   }
 
@@ -894,36 +1312,6 @@
     });
   });
 
-  async function diagnose() {
-    if (!runtime.ready) await init();
-    assertReady();
-    const result = {
-      projectId:firebaseConfig.projectId,
-      appId:firebaseConfig.appId,
-      authReady:Boolean(runtime.auth),
-      firestoreReady:Boolean(runtime.db),
-      signedIn:Boolean(runtime.user),
-      uid:runtime.user?.uid || "",
-      role:runtime.role || "guest",
-      canWrite:Boolean(runtime.canWrite),
-      profileSource:runtime.profileSource || "",
-      profileError:runtime.profileError ? friendlyError(runtime.profileError) : "",
-      transport:runtime.transport || "default"
-    };
-    if (runtime.user) {
-      try {
-        await runtime.modules.firestore.getDoc(
-          runtime.modules.firestore.doc(runtime.db,"users",runtime.user.uid)
-        );
-        result.profileRead = true;
-      } catch (error) {
-        result.profileRead = false;
-        result.profileReadError = friendlyError(error);
-      }
-    }
-    return result;
-  }
-
   window.FirebasePortal = {
     init,
     signInEmail,
@@ -937,14 +1325,21 @@
     pushAll,
     queueSync,
     createPublicIdea,
+    upsertSubscription,
+    cancelSubscription,
+    listSubscriptions,
+    updateSubscriptionAdmin,
+    deleteSubscriptionAdmin,
+    refreshRoleToken,
     uploadFile,
     uploadDataUrl,
+    getDriveSettings,
+    saveDriveSettings,
     listUserProfiles,
     updateUserAccess,
     normalizeRole,
     roleLabel,
     friendlyError,
-    diagnose,
     canWrite:() => runtime.canWrite,
     isSuperAdmin:() => runtime.isSuperAdmin,
     getStatus:() => ({

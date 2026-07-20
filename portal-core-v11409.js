@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.49.0-script-no-lines";
+  const PORTAL_BUILD = "11.60.0-integral-drive";
 
   /*
    * Retira definitivamente el service worker experimental de V11.40.2. GitHub Pages no
@@ -73,9 +73,9 @@
           overflow:auto!important;
         }
         html.portal-visual-booting body > :not(script):not(style) {
-          opacity:.2!important;
-          filter:blur(2px);
-          transform:translateY(3px);
+          opacity:1!important;
+          filter:none!important;
+          transform:none!important;
           pointer-events:auto;
         }
         html.portal-visual-booting::before {
@@ -881,57 +881,6 @@ helpers.showClickEffect = showClickEffect;
     image.src = value;
   }
 
-  async function compressHeroImage(file) {
-    if (!file?.type?.startsWith("image/")) {
-      throw new Error("Seleccione un archivo de imagen válido.");
-    }
-    if (file.size > 12_000_000) {
-      throw new Error("La fotografía supera 12 MB. Comprímala antes de subirla.");
-    }
-
-    const objectUrl = URL.createObjectURL(file);
-    try {
-      const image = await new Promise((resolve,reject) => {
-        const element = new Image();
-        element.onload = () => resolve(element);
-        element.onerror = () => reject(new Error("No fue posible leer la fotografía."));
-        element.src = objectUrl;
-      });
-
-      const maxWidth = 1600;
-      const maxHeight = 900;
-      let ratio = Math.min(1,maxWidth / image.naturalWidth,maxHeight / image.naturalHeight);
-      let quality = .82;
-      let result = "";
-
-      for (let attempt = 0; attempt < 4; attempt += 1) {
-        const width = Math.max(1,Math.round(image.naturalWidth * ratio));
-        const height = Math.max(1,Math.round(image.naturalHeight * ratio));
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const context = canvas.getContext("2d",{alpha:false});
-        if (!context) throw new Error("El navegador no pudo preparar la imagen.");
-        context.imageSmoothingEnabled = true;
-        context.imageSmoothingQuality = "high";
-        context.fillStyle = "#eaf4fb";
-        context.fillRect(0,0,width,height);
-        context.drawImage(image,0,0,width,height);
-        result = canvas.toDataURL("image/jpeg",quality);
-        if (result.length <= 900_000) return result;
-        ratio *= .84;
-        quality = Math.max(.62,quality - .07);
-      }
-
-      if (result.length > 1_000_000) {
-        throw new Error("La fotografía sigue siendo muy pesada. Use una imagen panorámica más liviana.");
-      }
-      return result;
-    } finally {
-      URL.revokeObjectURL(objectUrl);
-    }
-  }
-
   function applySettings() {
     const root = document.documentElement;
     const s = state.settings;
@@ -1284,8 +1233,9 @@ helpers.showClickEffect = showClickEffect;
                   <label>Texto alternativo
                     <input id="adminHeroImageAlt" type="text" maxlength="180" placeholder="Vista panorámica de San Pedro">
                   </label>
-                  <label>Subir fotografía
-                    <input id="adminHeroImageFile" type="file" accept="image/jpeg,image/png,image/webp">
+                  <label>Fotografía desde Google Drive
+                    <div class="admin-drive-inline"><input id="adminHeroImageFile" type="file" accept="image/jpeg,image/png,image/webp"><button class="button button-secondary" type="button" id="adminHeroDrive">Elegir en Drive</button></div>
+                    <input id="adminHeroDriveRef" type="hidden">
                   </label>
                   <label>Encuadre
                     <select id="adminHeroImagePosition">
@@ -1332,7 +1282,9 @@ helpers.showClickEffect = showClickEffect;
                     <label>Vigencia<select name="year" id="adminResourceYear"></select></label>
                     <label>Tipo<select name="type"><option value="informe">Informe</option><option value="presentacion">Presentación</option><option value="video">Video</option><option value="datos">Datos</option><option value="compromiso">Seguimiento</option><option value="respuesta">Respuesta</option></select></label>
                     <label>Descripción<textarea name="description" rows="3" required></textarea></label>
-                    <label>Enlace<input name="url" value="#"></label>
+                    <label>Enlace o referencia de Drive<input name="url" value="#"></label>
+                    <input name="driveRef" type="hidden">
+                    <button class="button button-secondary" type="button" id="adminResourceDrive">Seleccionar o cargar en Google Drive</button>
                     <button class="button button-primary">Agregar recurso</button>
                   </form>
                 </div>
@@ -1702,7 +1654,7 @@ helpers.showClickEffect = showClickEffect;
         const tab = adminTab.dataset.adminTab;
         document.querySelectorAll(".admin-tab-button").forEach(b => b.classList.toggle("active", b.dataset.adminTab === tab));
         document.querySelectorAll(".admin-tab").forEach(p => p.classList.toggle("active", p.dataset.adminPanel === tab));
-        const titles = {appearance:"Apariencia", years:"Vigencias", resources:"Recursos", ideas:"Ideas ciudadanas", connections:"Conexiones", backup:"Respaldo"};
+        const titles = {appearance:"Apariencia", years:"Vigencias", resources:"Recursos", ideas:"Ideas ciudadanas", subscriptions:"Suscripciones", connections:"Conexiones", backup:"Respaldo"};
         document.querySelector("#adminTitle").textContent = titles[tab];
       }
 
@@ -2062,23 +2014,36 @@ helpers.showClickEffect = showClickEffect;
 
     document.querySelector("#adminHeroImageFile")?.addEventListener("change", async event => {
       const file = event.target.files?.[0];
+      event.target.value = "";
       if (!file) return;
       try {
-        helpers.showLoading("Optimizando fotografía del banner…");
-        const optimized = await compressHeroImage(file);
+        helpers.showLoading("Cargando fotografía en Google Drive…");
+        const metadata = await window.FirebasePortal.uploadFile(file, window.DrivePortal?.modulePath?.("inicioBanners","Inicio/Banners") || "Inicio/Banners", {returnMetadata:true,makePublic:true,category:"inicio-banner"});
+        const ref = window.DrivePortal?.normalizeReference?.(metadata,{module:"inicioBanners",visibility:"public"}) || metadata;
         const input = document.querySelector("#adminHeroImageUrl");
-        if (input) input.value = optimized;
-        updateHeroAdminPreview(optimized);
-        helpers.hideLoading("Fotografía preparada.");
+        if (input) input.value = ref.displayUrl || ref.webViewLink || "";
+        const refInput = document.querySelector("#adminHeroDriveRef");
+        if (refInput) refInput.value = JSON.stringify(ref);
+        updateHeroAdminPreview(input?.value || "");
+        helpers.hideLoading("Fotografía cargada en Drive.");
       } catch (error) {
-        helpers.failLoading(error?.message || "No fue posible procesar la fotografía.");
-      } finally {
-        event.target.value = "";
+        helpers.failLoading(error?.message || "No fue posible cargar la fotografía en Drive.");
       }
+    });
+
+    document.querySelector("#adminHeroDrive")?.addEventListener("click", async () => {
+      try {
+        const ref = await window.DriveMedia?.choose?.({module:"inicioBanners",title:"Fotografía del banner principal",publicResource:true,mimeTypes:["image/jpeg","image/png","image/webp"]});
+        if (!ref) return;
+        document.querySelector("#adminHeroImageUrl").value = ref.displayUrl || ref.webViewLink || "";
+        document.querySelector("#adminHeroDriveRef").value = JSON.stringify(ref);
+        updateHeroAdminPreview(ref.displayUrl || ref.webViewLink || "");
+      } catch (error) { helpers.toast(error.message); }
     });
 
     document.querySelector("#applyAdminHero")?.addEventListener("click", () => {
       state.settings.heroImage = document.querySelector("#adminHeroImageUrl")?.value.trim() || "";
+      try { state.settings.heroImageDrive = JSON.parse(document.querySelector("#adminHeroDriveRef")?.value || "null"); } catch { state.settings.heroImageDrive = null; }
       state.settings.heroImageAlt = document.querySelector("#adminHeroImageAlt")?.value.trim()
         || "Vista panorámica institucional de San Pedro, Valle del Cauca";
       state.settings.heroImagePosition = document.querySelector("#adminHeroImagePosition")?.value || "center center";
@@ -2122,28 +2087,44 @@ helpers.showClickEffect = showClickEffect;
       helpers.save();
       syncAdmin();
       event.target.reset();
-      helpers.toast(`Vigencia ${year} creada. Actualizando navegación...`);
-      setTimeout(() => location.reload(), 700);
+      helpers.toast(`Vigencia ${year} creada.`);
+      window.dispatchEvent(new CustomEvent("portal:datachange"));
+    });
+
+    document.querySelector("#adminResourceDrive")?.addEventListener("click", async () => {
+      try {
+        const form = document.querySelector("#createResourceForm");
+        const year = Number(form?.elements?.year?.value || new Date().getFullYear());
+        const ref = await window.DriveMedia?.choose?.({module:"documentos",title:"Recurso de la Rendición de Cuentas",publicResource:true});
+        if (!ref || !form) return;
+        form.elements.url.value = ref.webViewLink || ref.displayUrl || "#";
+        form.elements.driveRef.value = JSON.stringify({...ref,year});
+      } catch (error) { helpers.toast(error.message); }
     });
 
     document.querySelector("#createResourceForm")?.addEventListener("submit", event => {
       event.preventDefault();
       const form = new FormData(event.target);
+      let driveRef = null;
+      try { driveRef = JSON.parse(String(form.get("driveRef") || "null")); } catch {}
       state.resources.unshift({
         id:`r${Date.now()}`,
         title:form.get("title"),
         year:Number(form.get("year")),
         type:form.get("type"),
         description:form.get("description"),
-        meta:"Recurso agregado desde el panel",
-        url:form.get("url") || "#",
-        featured:false
+        meta:driveRef?.size ? `${Math.ceil(Number(driveRef.size)/1024)} KB · Google Drive` : "Recurso agregado desde el panel",
+        url:driveRef?.webViewLink || form.get("url") || "#",
+        driveRef,
+        featured:false,
+        published:true,
+        updatedAt:new Date().toISOString()
       });
       helpers.save();
       syncAdmin();
       event.target.reset();
-      helpers.toast("Recurso agregado. Actualizando contenido...");
-      setTimeout(() => location.reload(), 700);
+      helpers.toast("Recurso agregado correctamente.");
+      window.dispatchEvent(new CustomEvent("portal:datachange"));
     });
 
     document.addEventListener("submit", event => {

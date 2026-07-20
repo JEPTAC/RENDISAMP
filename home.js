@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const { state, helpers } = window.Portal;
+  const mediaUrl = (value, fallback = "") => window.DriveMedia?.resolveUrl?.(value, fallback)
+    || (value && typeof value === "object" ? value.thumbnailUrl || value.webContentLink || value.webViewLink || value.url || fallback : String(value || fallback));
   const years = [...state.years].sort((a,b) => Number(a.year)-Number(b.year));
 
   const selector = document.querySelector("#homeYear");
@@ -18,9 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const grid = document.querySelector("#featuredYears");
-  if (grid) grid.innerHTML = years.slice(0,4).map((year,index) => `
+  if (grid) grid.innerHTML = years.slice(0,4).map((year,index) => {
+    const cover = mediaUrl(year.coverRef || year.cover, "");
+    return `
     <article class="edition-card reveal visible ${index === 0 ? "edition-card--featured" : ""}" data-admin-entity="year" data-entity-id="${year.year}">
-      <div class="edition-card__visual edition-visual-${index%3}${year.cover ? " has-cover-image" : ""}" ${year.cover ? `style="background-image:linear-gradient(rgba(5,34,78,.12),rgba(5,34,78,.3)),url('${year.cover}')"` : ""}>
+      <div class="edition-card__visual edition-visual-${index%3}${cover ? " has-cover-image" : ""}" ${cover ? `style="background-image:linear-gradient(rgba(5,34,78,.12),rgba(5,34,78,.3)),url('${cover}')"` : ""}>
         <span class="edition-discount">${year.progress}%</span>
         <div class="edition-landscape"><i></i><b></b><u></u></div>
         <small>${helpers.escape(year.status)}</small>
@@ -31,7 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <p>${helpers.escape(year.summary)}</p>
         <div class="edition-card__footer"><span>${year.documents} recursos</span><a href="${helpers.yearUrl(year.year)}">Explorar →</a></div>
       </div>
-    </article>`).join("");
+    </article>`;
+  }).join("");
 
   const featureYear = helpers.getYear(2025) || years[0];
   const homeHeroProgress = document.querySelector("#homeHeroProgress");
@@ -43,12 +48,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const editorialResources = state.resources.filter(r => r.featured).slice(0,3);
   const editorialCards = document.querySelector("#editorialCards");
-  if (editorialCards) editorialCards.innerHTML = editorialResources.map((item,index) => `
+  if (editorialCards) editorialCards.innerHTML = editorialResources.map((item,index) => {
+    const cover = mediaUrl(item.imageRef || item.image, "");
+    return `
     <article class="deal-card deal-card--${helpers.escape(item.type)} reveal visible"
       data-admin-entity="resource"
       data-entity-id="${item.id}">
-      <div class="deal-card__visual deal-${index}${item.image ? " has-cover-image" : ""}"
-        ${item.image ? `style="background-image:linear-gradient(rgba(7,46,105,.16),rgba(7,46,105,.28)),url('${item.image}')"` : ""}>
+      <div class="deal-card__visual deal-${index}${cover ? " has-cover-image" : ""}"
+        ${cover ? `style="background-image:linear-gradient(rgba(7,46,105,.16),rgba(7,46,105,.28)),url('${cover}')"` : ""}>
         <span class="document-format" aria-label="Formato ${helpers.escape(helpers.typeLabel(item.type))}">
           ${helpers.typeIcon(item.type)}
         </span>
@@ -66,7 +73,8 @@ document.addEventListener("DOMContentLoaded", () => {
           <b aria-hidden="true">↗</b>
         </a>
       </div>
-    </article>`).join("");
+    </article>`;
+  }).join("");
 
   const ideas = state.ideas.slice(0,3);
   const citizenQuotes = document.querySelector("#citizenQuotes");
@@ -86,10 +94,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.dispatchEvent(new CustomEvent("portal:rendered"));
 
-  const newsletterForm = document.querySelector("#newsletterForm");
-  if (newsletterForm) newsletterForm.addEventListener("submit", event => {
-    event.preventDefault();
-    event.target.reset();
-    helpers.toast("Suscripción registrada en la demostración.");
-  });
 });

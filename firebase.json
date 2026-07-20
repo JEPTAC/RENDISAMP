@@ -7,35 +7,27 @@
     "ignore": [
       "firebase.json",
       ".firebaserc",
-      ".firebaseignore",
       "firestore.rules",
       "**/.*",
       "**/node_modules/**",
-      "docs/**",
-      "scripts/**",
-      "*.md",
+      "**/*.md",
       "QA_*.json",
-      "package*.json"
+      "version-*.txt",
+      "verificar-firebase.mjs",
+      "scripts/**",
+      "**/*service-account*.json",
+      "**/*credentials*.json",
+      "QA*.json",
+      "PRUEBAS*.json",
+      "*.sha256"
     ],
-    "headers": [
-      {
-        "source": "**/*.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "manifest.json",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
-      }
-    ]
+    "cleanUrls": false,
+    "trailingSlash": false
+  },
+  "emulators": {
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8185
+    }
   }
 }

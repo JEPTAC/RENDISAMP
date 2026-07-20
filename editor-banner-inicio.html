@@ -96,8 +96,9 @@
       else el.addEventListener(el.type==="color"?"input":"input",update);
     });
     $("imageFile").addEventListener("change",event=>{
-      const file=event.target.files[0];if(!file)return;
-      const reader=new FileReader();reader.onload=()=>{fields.slideImage.value=reader.result;update()};reader.readAsDataURL(file);
+      event.target.value="";
+      $("status").textContent="La carga local fue deshabilitada. Seleccione la imagen desde Google Drive en el editor integrado del portal o pegue una URL de Drive autorizada.";
+      $("status").className="error";
     });
     $("download").addEventListener("click",()=>{
       const content="window.SP_HOME_BANNER_CONFIG = "+JSON.stringify(cfg,null,2)+";\n";

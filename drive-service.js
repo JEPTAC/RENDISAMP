@@ -42,8 +42,10 @@
       appId:"",
       rootFolderId:"",
       rootFolderName:"Rendición de Cuentas San Pedro",
-      makeFilesPublic:true,
+      makeFilesPublic:false,
       scope:"https://www.googleapis.com/auth/drive.file",
+      folderPaths:{},
+      folderIds:{},
       ...baseConfig,
       ...local
     };
@@ -56,6 +58,47 @@
         id:config.rootFolderId,
         name:config.rootFolderName || "Rendición de Cuentas San Pedro"
       }));
+    }
+  }
+
+  let centralSaveTimer = 0;
+  function scheduleCentralSave() {
+    clearTimeout(centralSaveTimer);
+    centralSaveTimer = window.setTimeout(async () => {
+      try {
+        if (!window.FirebasePortal?.saveDriveSettings || !window.FirebasePortal?.getStatus?.()?.isAdmin && !window.FirebasePortal?.getStatus?.()?.isSuperAdmin) return;
+        await window.FirebasePortal.saveDriveSettings({
+          rootFolderId:config.rootFolderId || runtime.rootFolderId || "",
+          rootFolderName:config.rootFolderName || runtime.rootFolderName || "",
+          folderIds:{...(config.folderIds || {})},
+          folderPaths:{...(config.folderPaths || {})}
+        });
+      } catch (error) {
+        console.warn("[Drive] No fue posible guardar la estructura central.",error);
+      }
+    },500);
+  }
+
+  async function syncCentralConfig() {
+    try {
+      if (!window.FirebasePortal?.getDriveSettings || !window.FirebasePortal?.canWrite?.()) return getPublicConfig();
+      const central = await window.FirebasePortal.getDriveSettings();
+      if (!central) return getPublicConfig();
+      config = {
+        ...config,
+        rootFolderId:central.rootFolderId || config.rootFolderId,
+        rootFolderName:central.rootFolderName || config.rootFolderName,
+        folderIds:{...(config.folderIds || {}),...(central.folderIds || {})},
+        folderPaths:{...(config.folderPaths || {}),...(central.folderPaths || {})}
+      };
+      runtime.rootFolderId = config.rootFolderId || runtime.rootFolderId;
+      runtime.rootFolderName = config.rootFolderName || runtime.rootFolderName;
+      saveConfig();
+      emit("drive:config",{config:getPublicConfig(),source:"firestore"});
+      return getPublicConfig();
+    } catch (error) {
+      console.warn("[Drive] Configuración central no disponible.",error);
+      return getPublicConfig();
     }
   }
 
@@ -209,8 +252,10 @@
       appId:config.appId || "",
       rootFolderId:config.rootFolderId || runtime.rootFolderId || "",
       rootFolderName:config.rootFolderName || runtime.rootFolderName || "",
-      makeFilesPublic:config.makeFilesPublic !== false,
-      scope:config.scope
+      makeFilesPublic:config.makeFilesPublic === true,
+      scope:config.scope,
+      folderPaths:{...(config.folderPaths || {})},
+      folderIds:{...(config.folderIds || {})}
     };
   }
 
@@ -315,6 +360,7 @@
         config.rootFolderId = folder.id;
         config.rootFolderName = folder.name;
         saveConfig();
+        scheduleCentralSave();
         emit("drive:folder", {folder});
         return folder;
       } catch (error) {
@@ -331,6 +377,7 @@
     config.rootFolderId = folder.id;
     config.rootFolderName = folder.name;
     saveConfig();
+    scheduleCentralSave();
     emit("drive:folder", {folder});
     return folder;
   }
@@ -357,27 +404,49 @@
       || clean.replace(/[-_]+/g, " ").replace(/\b\w/g, letter => letter.toUpperCase());
   }
 
+  function modulePath(key, fallback = "Documentos") {
+    const paths = config.folderPaths || baseConfig.folderPaths || {};
+    return paths[key] || fallback;
+  }
+
+  async function ensureModuleFolder(key, options = {}) {
+    return ensureFolderPath(modulePath(key, key), options);
+  }
+
   async function ensureFolderPath(path, options = {}) {
     const root = await ensureRootFolder({fallbackCreate:true});
     const segments = [];
-
     if (options.year) segments.push(String(options.year));
-    String(path || "")
-      .split("/")
-      .map(normalizeFolderSegment)
-      .filter(Boolean)
-      .forEach(segment => {
-        if (!segments.includes(segment)) segments.push(segment);
-      });
-
+    String(path || "").split("/").map(normalizeFolderSegment).filter(Boolean).forEach(segment => {
+      if (!segments.includes(segment)) segments.push(segment);
+    });
+    const cacheKey = [options.year || "",...segments].filter(Boolean).join("/");
+    const cachedId = config.folderIds?.[cacheKey];
+    if (cachedId) {
+      try {
+        const cached = await getFile(cachedId,"id,name,mimeType,parents,webViewLink");
+        if (cached.mimeType === FOLDER_MIME) return cached;
+      } catch (_) { delete config.folderIds[cacheKey]; }
+    }
     let parentId = root.id;
     let lastFolder = root;
+    const walked = [];
     for (const segment of segments) {
-      let folder = await findFolder(segment, parentId);
+      walked.push(segment);
+      const partialKey = [options.year || "",...walked].filter(Boolean).join("/");
+      const partialId = config.folderIds?.[partialKey];
+      let folder = null;
+      if (partialId) {
+        try { folder = await getFile(partialId,"id,name,mimeType,parents,webViewLink"); } catch (_) {}
+      }
+      if (!folder) folder = await findFolder(segment, parentId);
       if (!folder) folder = await createFolder(segment, parentId);
+      config.folderIds = {...(config.folderIds || {}),[partialKey]:folder.id};
       parentId = folder.id;
       lastFolder = folder;
     }
+    saveConfig();
+    scheduleCentralSave();
     return lastFolder;
   }
 
@@ -414,8 +483,14 @@
       displayUrl:isImage
         ? `https://drive.google.com/thumbnail?id=${id}&sz=w2000`
         : (file.webViewLink || `https://drive.google.com/file/d/${id}/view`),
+      thumbnailUrl:file.thumbnailLink || (isImage ? `https://drive.google.com/thumbnail?id=${id}&sz=w1000` : ""),
       folderId:file.parents?.[0] || "",
-      createdTime:file.createdTime || ""
+      createdTime:file.createdTime || "",
+      driveFileId:id,
+      driveFolderId:file.parents?.[0] || "",
+      uploadedAt:file.createdTime || new Date().toISOString(),
+      uploadedBy:window.FirebasePortal?.getStatus?.()?.user?.uid || "",
+      visibility:"private"
     };
   }
 
@@ -505,7 +580,7 @@
       throw new Error("Google Drive no confirmó el archivo cargado.");
     }
 
-    if (config.makeFilesPublic !== false && options.makePublic !== false) {
+    if (options.makePublic === true) {
       try {
         await createPublicPermission(uploaded.id);
       } catch (error) {
@@ -619,6 +694,7 @@
             config.rootFolderId = folder.id;
             config.rootFolderName = folder.name;
             saveConfig();
+            scheduleCentralSave();
             emit("drive:folder", {folder});
             resolve(folder);
           }
@@ -630,6 +706,87 @@
 
       builder.build().setVisible(true);
     });
+  }
+
+  async function chooseFiles(options = {}) {
+    await connect();
+    if (!config.apiKey) throw new Error("Debe configurar una API key para abrir Google Picker.");
+    await loadPicker();
+
+    const mimeTypes = Array.isArray(options.mimeTypes)
+      ? options.mimeTypes.filter(Boolean).join(",")
+      : String(options.mimeTypes || "").trim();
+
+    return new Promise((resolve, reject) => {
+      const view = new google.picker.DocsView(google.picker.ViewId.DOCS);
+      view.setIncludeFolders(false);
+      if (mimeTypes && typeof view.setMimeTypes === "function") view.setMimeTypes(mimeTypes);
+
+      const builder = new google.picker.PickerBuilder()
+        .addView(view)
+        .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
+        .setOAuthToken(runtime.accessToken)
+        .setDeveloperKey(config.apiKey)
+        .setCallback(async data => {
+          const action = data[google.picker.Response.ACTION];
+          if (action === google.picker.Action.CANCEL) return resolve([]);
+          if (action !== google.picker.Action.PICKED) return;
+          try {
+            const docs = data[google.picker.Response.DOCUMENTS] || [];
+            const selected = [];
+            for (const document of docs) {
+              const id = document?.[google.picker.Document.ID];
+              if (!id) continue;
+              selected.push(fileLinks(await getFile(id)));
+            }
+            resolve(selected);
+          } catch (error) { reject(error); }
+        });
+      if (options.multiple) builder.enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
+      if (config.appId) builder.setAppId(config.appId);
+      if (typeof builder.setOrigin === "function") builder.setOrigin(location.origin);
+      builder.build().setVisible(true);
+    });
+  }
+
+  async function setPublicVisibility(fileId, makePublic) {
+    if (!fileId) throw new Error("Falta el ID del archivo de Drive.");
+    await connect();
+    const list = await authorizedFetch(`${DRIVE_API}/files/${encodeURIComponent(fileId)}/permissions?fields=permissions(id,type,role)&supportsAllDrives=true`)
+      .then(response => response.json());
+    const anyone = (list.permissions || []).find(permission => permission.type === "anyone");
+    if (makePublic && !anyone) await createPublicPermission(fileId);
+    if (!makePublic && anyone) {
+      await authorizedFetch(`${DRIVE_API}/files/${encodeURIComponent(fileId)}/permissions/${encodeURIComponent(anyone.id)}?supportsAllDrives=true`, {method:"DELETE"});
+    }
+    return {...fileLinks(await getFile(fileId)), visibility:makePublic ? "public" : "private"};
+  }
+
+  async function deleteFile(fileId) {
+    if (!fileId) return false;
+    await authorizedFetch(`${DRIVE_API}/files/${encodeURIComponent(fileId)}?supportsAllDrives=true`, {method:"DELETE"});
+    emit("drive:filedeleted", {fileId});
+    return true;
+  }
+
+  function normalizeReference(file, extra = {}) {
+    if (!file) return null;
+    const ref = file.driveFileId ? file : fileLinks(file);
+    return {
+      driveFileId:ref.driveFileId || ref.id || "",
+      driveFolderId:ref.driveFolderId || ref.folderId || "",
+      name:ref.name || "",
+      mimeType:ref.mimeType || "application/octet-stream",
+      size:Number(ref.size || 0),
+      thumbnailUrl:ref.thumbnailUrl || "",
+      displayUrl:ref.displayUrl || "",
+      webViewLink:ref.webViewLink || "",
+      webContentLink:ref.webContentLink || "",
+      uploadedAt:ref.uploadedAt || ref.createdTime || new Date().toISOString(),
+      uploadedBy:ref.uploadedBy || window.FirebasePortal?.getStatus?.()?.user?.uid || "",
+      visibility:extra.visibility || ref.visibility || "private",
+      module:extra.module || ""
+    };
   }
 
   async function createNewRootFolder() {
@@ -667,18 +824,29 @@
     disconnect,
     testConnection,
     chooseFolder,
+    chooseFiles,
     ensureRootFolder,
+    ensureFolderPath,
+    ensureModuleFolder,
+    modulePath,
     createNewRootFolder,
     openRootFolder,
     uploadFile,
     uploadDataUrl,
+    setPublicVisibility,
+    deleteFile,
+    getFile,
+    normalizeReference,
     friendlyError,
     isConfigured,
     getConfig:getPublicConfig,
-    getStatus
+    getStatus,
+    syncCentralConfig
   };
 
-  init().catch(error => {
+  ["firebase:auth","firebase:data"].forEach(eventName => window.addEventListener(eventName,() => syncCentralConfig()));
+
+  init().then(() => syncCentralConfig()).catch(error => {
     console.warn("[Drive] No fue posible inicializar.", error);
     emit("drive:ready", {configured:isConfigured(), connected:false, error:friendlyError(error)});
   });

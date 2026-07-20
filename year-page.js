@@ -28,12 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="hero-gif-glow hero-gif-glow--a"></span>
           <span class="hero-gif-glow hero-gif-glow--b"></span>
           <img class="hero-gif hero-gif--festival-main" src="hero-gifs/festival-main.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--music-parade" src="hero-gifs/notes.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--music-parade" src="hero-gifs/music-parade.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--notes-a" src="hero-gifs/notes.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--notes-b" src="hero-gifs/notes.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--sparkle-a" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--sparkle-b" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--stream-a" src="hero-gifs/festival-main.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--stream-a" src="hero-gifs/party-band.gif" alt="" loading="eager" decoding="async">
         </div>
       </div>`,
     mobility: `
@@ -43,12 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="hero-gif-glow hero-gif-glow--c"></span>
           <img class="hero-gif hero-gif--mobility-festival" src="hero-gifs/mobility-festival.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--bus-main" src="hero-gifs/bus.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--bus-accent" src="hero-gifs/bus.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--headline-festival" src="hero-gifs/festival-main.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--bus-accent" src="hero-gifs/bus-accent.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--headline-festival" src="hero-gifs/headline-festival.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--sparkle-route" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--sparkle-route-b" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--stream-route" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--stream-route-b" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--stream-route" src="hero-gifs/streamer.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--stream-route-b" src="hero-gifs/streamer.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--notes-route" src="hero-gifs/notes.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--notes-route-b" src="hero-gifs/notes.gif" alt="" loading="eager" decoding="async">
         </div>
@@ -60,14 +60,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="hero-gif-glow hero-gif-glow--d"></span>
           <img class="hero-gif hero-gif--sports-main" src="hero-gifs/sports-main.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--football" src="hero-gifs/football.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--sports-accent" src="hero-gifs/basketball.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--sports-accent" src="hero-gifs/sports-accent.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--basketball" src="hero-gifs/basketball.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--headline-festival" src="hero-gifs/festival-main.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--music-parade" src="hero-gifs/notes.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--headline-festival" src="hero-gifs/headline-festival.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--music-parade" src="hero-gifs/music-parade.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--sparkle-sport" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--sparkle-sport-b" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--stream-sport" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
-          <img class="hero-gif hero-gif--stream-sport-b" src="hero-gifs/sparkle.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--stream-sport" src="hero-gifs/streamer.gif" alt="" loading="eager" decoding="async">
+          <img class="hero-gif hero-gif--stream-sport-b" src="hero-gifs/streamer.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--notes-sport" src="hero-gifs/notes.gif" alt="" loading="eager" decoding="async">
           <img class="hero-gif hero-gif--notes-sport-b" src="hero-gifs/notes.gif" alt="" loading="eager" decoding="async">
         </div>
@@ -243,12 +243,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const resources = state.resources.filter(r => Number(r.year) === year.year);
   const featured = resources.slice(0,6);
-  document.querySelector("#yearResources").innerHTML = featured.length ? featured.map(item => `
+  document.querySelector("#yearResources").innerHTML = featured.length ? featured.map(item => {
+    const cover = mediaUrl(item.imageRef || item.image, "");
+    return `
     <article class="year-resource-card reveal" data-resource-id="${item.id}" data-admin-entity="resource" data-entity-id="${item.id}">
-      <span class="${item.image ? "has-resource-image" : ""}" ${item.image ? `style="background-image:url('${item.image}')"` : ""}>${item.image ? "" : helpers.typeIcon(item.type)}</span>
+      <span class="${cover ? "has-resource-image" : ""}" ${cover ? `style="background-image:url('${cover}')"` : ""}>${cover ? "" : helpers.typeIcon(item.type)}</span>
       <div><small>${helpers.typeLabel(item.type)}</small><strong>${helpers.escape(item.title)}</strong><p>${helpers.escape(item.meta)}</p></div>
       <button class="year-resource-open" type="button" aria-label="Ver recurso">↗</button>
-    </article>`).join("") : `
+    </article>`;
+  }).join("") : `
     <div class="empty-year"><strong>La documentación todavía no está publicada.</strong><p>La estructura está preparada para incorporar los recursos cuando estén disponibles.</p></div>`;
 
   const stories = [

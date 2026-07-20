@@ -47,6 +47,7 @@
   const portal = () => window.Portal;
   const isAdmin = () => Boolean(
     portal()?.state?.admin ||
+    sessionStorage.getItem(portal()?.KEYS?.admin || "sp_v6_admin") === "1" ||
     window.FirebasePortal?.getStatus?.()?.canWrite
   );
 
@@ -371,7 +372,9 @@
             <img src="${image.currentSrc || image.src}" alt="">
             <label>Dirección de la imagen<input data-image-src="${index}" value=""></label>
             <label>Texto alternativo<input data-image-alt="${index}" value=""></label>
-            <label>Subir imagen local<input type="file" accept="image/*" data-image-file="${index}"></label>
+            <label>Imagen desde Google Drive
+              <div class="context-drive-actions"><input type="file" accept="image/*" data-image-file="${index}"><button type="button" class="button button-secondary" data-image-drive="${index}">Elegir en Drive</button></div>
+            </label>
           </fieldset>`).join("")
       : `<p class="context-editor__empty">Este bloque no contiene imágenes.</p>`;
     images.forEach((image,index) => {
@@ -380,21 +383,33 @@
     });
 
     imageHolder.querySelectorAll("[data-image-file]").forEach(input => {
-      input.addEventListener("change",event => {
+      input.addEventListener("change",async event => {
         const file = event.target.files?.[0];
+        event.target.value = "";
         if (!file) return;
-        if (file.size > 1_500_000) {
-          portal()?.helpers?.toast?.("La imagen local debe pesar menos de 1,5 MB. Para archivos mayores utilice Google Drive.");
-          event.target.value = "";
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = () => {
+        try {
+          const metadata = await window.FirebasePortal.uploadFile(file, window.DrivePortal?.modulePath?.("inicio","Inicio") || "Inicio", {returnMetadata:true,makePublic:true,category:"edicion-contextual"});
+          const ref = window.DrivePortal?.normalizeReference?.(metadata,{module:"inicio",visibility:"public"}) || metadata;
           const index = event.target.dataset.imageFile;
-          imageHolder.querySelector(`[data-image-src="${index}"]`).value = String(reader.result || "");
-          imageHolder.querySelectorAll(".context-image-field")[Number(index)]?.querySelector("img")?.setAttribute("src",String(reader.result || ""));
-        };
-        reader.readAsDataURL(file);
+          const srcInput = imageHolder.querySelector(`[data-image-src="${index}"]`);
+          srcInput.value = ref.displayUrl || ref.webViewLink || "";
+          srcInput.dataset.driveRef = JSON.stringify(ref);
+          imageHolder.querySelectorAll(".context-image-field")[Number(index)]?.querySelector("img")?.setAttribute("src",srcInput.value);
+        } catch (error) { portal()?.helpers?.toast?.(error.message || "No fue posible cargar la imagen en Drive."); }
+      });
+    });
+
+    imageHolder.querySelectorAll("[data-image-drive]").forEach(button => {
+      button.addEventListener("click",async () => {
+        try {
+          const ref = await window.DriveMedia?.choose?.({module:"inicio",title:"Imagen de la sección",publicResource:true,mimeTypes:["image/jpeg","image/png","image/webp"]});
+          if (!ref) return;
+          const index = button.dataset.imageDrive;
+          const srcInput = imageHolder.querySelector(`[data-image-src="${index}"]`);
+          srcInput.value = ref.displayUrl || ref.webViewLink || "";
+          srcInput.dataset.driveRef = JSON.stringify(ref);
+          imageHolder.querySelectorAll(".context-image-field")[Number(index)]?.querySelector("img")?.setAttribute("src",srcInput.value);
+        } catch (error) { portal()?.helpers?.toast?.(error.message); }
       });
     });
 
@@ -437,7 +452,9 @@
       const alt = dialog.querySelector(`[data-image-alt="${index}"]`)?.value.trim() || "";
       if (src) image.src = src;
       image.alt = alt;
-      imageRecords.push({path,src,alt});
+      let driveRef = null;
+      try { driveRef = JSON.parse(input.dataset.driveRef || "null"); } catch {}
+      imageRecords.push({path,src,alt,driveRef});
     });
 
     const form = dialog.querySelector("#contextEditorForm");

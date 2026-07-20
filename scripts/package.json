@@ -1,0 +1,12 @@
+{
+  "name": "rendisamp-admin-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "set-superadmin": "node set-superadmin.mjs",
+    "publish-public-state": "node publish-public-state.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.4.0"
+  }
+}

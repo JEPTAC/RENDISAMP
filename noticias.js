@@ -8,6 +8,9 @@
   };
 
   const escape = value => window.Portal.helpers.escape(value);
+  const mediaUrl = (value, fallback = "") => window.DriveMedia?.resolveUrl?.(value, fallback)
+    || (value && typeof value === "object" ? value.thumbnailUrl || value.webContentLink || value.webViewLink || value.url || fallback : String(value || fallback));
+  const fallbackImage = "assets/cinematica/parque-himno-1600.webp";
 
   function normalizedNews() {
     return (window.Portal.state.news || [])
@@ -54,15 +57,13 @@
   }
 
   function visual(item,className = "") {
-    const image = item.image
-      ? `style="background-image:linear-gradient(180deg,rgba(5,31,70,.04),rgba(5,31,70,.34)),url('${escape(item.image)}')"`
+    const source = mediaUrl(item.imageRef || item.image, fallbackImage);
+    const image = source
+      ? `style="background-image:linear-gradient(180deg,rgba(5,31,70,.04),rgba(5,31,70,.34)),url('${escape(source)}')"`
       : "";
-    return `
-      <div class="news-visual ${className} ${item.image ? "has-image" : ""}" ${image}>
-        ${item.image
-          ? ""
-          : `<span aria-hidden="true">${escape((item.category || "N").slice(0,1).toUpperCase())}</span>`}
-      </div>`;
+    return `<div class="news-visual ${className} ${source ? "has-image" : ""}" ${image}>
+      ${source ? "" : `<span aria-hidden="true">${escape((item.category || "N").slice(0,1).toUpperCase())}</span>`}
+    </div>`;
   }
 
   function renderFeatured(items) {
@@ -360,13 +361,24 @@
   }
 
 
-  function renderWithFeedback(message = "Actualizando noticias…") {
-    window.Portal.helpers.showLoading?.(message);
+  function persistView() {
+    const params = new URLSearchParams();
+    if (ui.query) params.set("q", ui.query);
+    if (ui.category !== "all") params.set("category", ui.category);
+    if (ui.year !== "all") params.set("year", ui.year);
+    if (ui.page > 1) params.set("page", String(ui.page));
+    const next = `${location.pathname.split("/").pop() || "noticias.html"}${params.size ? `?${params}` : ""}${location.hash || ""}`;
+    history.replaceState(null, "", next);
+    sessionStorage.setItem("news:return", `${next}${location.hash ? "" : `#scroll=${Math.round(window.scrollY)}`}`);
+  }
+
+  function renderWithFeedback() {
+    const grid = document.querySelector("#newsGrid");
+    grid?.classList.add("is-updating");
     window.requestAnimationFrame(() => {
       render();
-      window.setTimeout(() => {
-        window.Portal.helpers.hideLoading?.("Noticias actualizadas correctamente.");
-      }, 180);
+      persistView();
+      window.setTimeout(() => grid?.classList.remove("is-updating"), 180);
     });
   }
 
@@ -428,23 +440,30 @@
       });
     });
 
-    document.querySelector("#newsSubscriptionForm")?.addEventListener("submit",event => {
-      event.preventDefault();
-      event.currentTarget.reset();
-      window.Portal.helpers.hideLoading?.("Suscripción registrada correctamente.");
-      window.Portal.helpers.toast(
-        "Suscripción registrada en esta demostración. Conecte un servicio de correo para envíos reales."
-      );
+    document.addEventListener("click", event => {
+      const link = event.target.closest('a[href^="noticia.html?id="]');
+      if (!link) return;
+      persistView();
+      sessionStorage.setItem("news:returnScroll", String(window.scrollY));
     });
 
     window.addEventListener("portal:datachange",render);
   }
 
   document.addEventListener("DOMContentLoaded",() => {
+    const params = new URLSearchParams(location.search);
+    ui.query = params.get("q") || "";
+    ui.category = params.get("category") || "all";
+    ui.year = params.get("year") || "all";
+    ui.page = Math.max(1, Number(params.get("page") || 1));
     bind();
     render();
-    window.setTimeout(() => {
-      window.Portal.helpers.hideLoading?.("Noticias listas para consultar.");
-    }, 220);
+    const search = document.querySelector("#newsSearch");
+    if (search) search.value = ui.query;
+    const scroll = Number(sessionStorage.getItem("news:returnScroll") || 0);
+    if (scroll > 0) {
+      sessionStorage.removeItem("news:returnScroll");
+      requestAnimationFrame(() => window.scrollTo({ top:scroll, behavior:"auto" }));
+    }
   });
 })();

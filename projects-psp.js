@@ -75,6 +75,17 @@
     };
   }
 
+  function resolveMedia(value, fallback = "") {
+    if (window.DriveMedia?.resolveUrl) return window.DriveMedia.resolveUrl(value, fallback);
+    if (value && typeof value === "object") return value.thumbnailUrl || value.webContentLink || value.webViewLink || value.url || fallback;
+    return String(value || fallback);
+  }
+
+  function normalizeReference(value) {
+    if (!value || typeof value !== "object") return null;
+    return window.DriveMedia?.normalize ? window.DriveMedia.normalize(value) : value;
+  }
+
   function normalizeProject(project, index) {
     const fallback = defaultProject(index);
     const color = /^#[0-9a-f]{6}$/i.test(String(project?.color || "")) ? project.color : fallback.color;
@@ -103,10 +114,19 @@
       objective: String(project?.objective || fallback.objective).trim(),
       result: String(project?.result || fallback.result).trim(),
       next: String(project?.next || fallback.next).trim(),
-      image: String(project?.image || "").trim(),
-      gallery: Array.isArray(project?.gallery)
-        ? project.gallery.map(String).map(item => item.trim()).filter(Boolean).slice(0, 10)
-        : String(project?.gallery || "").split(/\r?\n/).map(item => item.trim()).filter(Boolean).slice(0, 10),
+      imageRef: normalizeReference(project?.imageRef || (project?.image && typeof project.image === "object" ? project.image : null)),
+      image: resolveMedia(project?.imageRef || project?.image, "").trim(),
+      galleryRefs: Array.isArray(project?.galleryRefs)
+        ? project.galleryRefs.map(normalizeReference).filter(Boolean).slice(0, 10)
+        : Array.isArray(project?.gallery)
+          ? project.gallery.filter(item => item && typeof item === "object").map(normalizeReference).filter(Boolean).slice(0, 10)
+          : [],
+      gallery: (Array.isArray(project?.galleryRefs) && project.galleryRefs.length
+        ? project.galleryRefs.map(item => resolveMedia(item, ""))
+        : Array.isArray(project?.gallery)
+          ? project.gallery.map(item => resolveMedia(item, ""))
+          : String(project?.gallery || "").split(/\r?\n/).map(item => item.trim()))
+        .filter(Boolean).slice(0, 10),
       url: String(project?.url || "").trim()
     };
   }
@@ -218,6 +238,47 @@
     [dom.details, dom.manager].forEach(dialog => {
       if (dialog && dialog.parentElement !== document.body) document.body.appendChild(dialog);
     });
+
+    function installDriveManagerControls() {
+      if (!dom.managerForm || dom.managerForm.dataset.driveControls === "true") return;
+      dom.managerForm.dataset.driveControls = "true";
+      const imageInput = dom.managerForm.elements.image;
+      const galleryInput = dom.managerForm.elements.gallery;
+      if (imageInput) {
+        imageInput.readOnly = true;
+        imageInput.placeholder = "Seleccione una imagen desde Google Drive";
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "button button-secondary projects-manager__drive";
+        button.textContent = "Elegir imagen en Drive";
+        button.addEventListener("click", async () => {
+          const reference = await window.DriveMedia?.choose?.({ modulePath:"Proyectos/Galerías", accept:"image/*", title:"Imagen principal del proyecto", makePublic:true });
+          if (!reference) return;
+          projects[managerIndex].imageRef = reference;
+          projects[managerIndex].image = resolveMedia(reference, "");
+          imageInput.value = reference.name || reference.driveFileId || "Imagen seleccionada";
+        });
+        imageInput.closest("label")?.appendChild(button);
+      }
+      if (galleryInput) {
+        galleryInput.readOnly = true;
+        galleryInput.placeholder = "Seleccione la galería desde Google Drive";
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "button button-secondary projects-manager__drive";
+        button.textContent = "Elegir galería en Drive";
+        button.addEventListener("click", async () => {
+          const references = await window.DriveMedia?.choose?.({ modulePath:"Proyectos/Galerías", accept:"image/*", multiple:true, title:"Galería del proyecto", makePublic:true });
+          const list = Array.isArray(references) ? references : references ? [references] : [];
+          if (!list.length) return;
+          projects[managerIndex].galleryRefs = list.slice(0,10);
+          projects[managerIndex].gallery = list.map(item => resolveMedia(item, "")).filter(Boolean);
+          galleryInput.value = list.map(item => item.name || item.driveFileId).join("\n");
+        });
+        galleryInput.closest("label")?.appendChild(button);
+      }
+    }
+    installDriveManagerControls();
 
     function applyTheme(project) {
       [root, dom.details, dom.manager].filter(Boolean).forEach(element => {
@@ -912,7 +973,10 @@
       ["id", "title", "category", "type", "year", "status", "icon", "color", "metric", "metricLabel", "progress", "secondaryMetric", "description", "objective", "result", "next", "image", "url"]
         .forEach(name => { if (form[name]) form[name].value = project[name] ?? ""; });
       form.tags.value = project.tags.join(", ");
-      form.gallery.value = project.gallery.join("\n");
+      if (form.image) form.image.value = project.imageRef?.name || project.imageRef?.driveFileId || (project.image && !project.image.startsWith("blob:") ? project.image : "");
+      form.gallery.value = project.galleryRefs?.length
+        ? project.galleryRefs.map(item => item.name || item.driveFileId).join("\n")
+        : project.gallery.join("\n");
       dom.managerDelete.disabled = projects.length <= MIN_PROJECTS;
     }
 
@@ -986,8 +1050,12 @@
         objective: String(data.get("objective") || "").trim(),
         result: String(data.get("result") || "").trim(),
         next: String(data.get("next") || "").trim(),
-        image: String(data.get("image") || "").trim(),
-        gallery: String(data.get("gallery") || "").split(/\r?\n/).map(item => item.trim()).filter(Boolean),
+        imageRef: current.imageRef || null,
+        image: current.imageRef ? resolveMedia(current.imageRef, "") : String(data.get("image") || current.image || "").trim(),
+        galleryRefs: Array.isArray(current.galleryRefs) ? current.galleryRefs : [],
+        gallery: Array.isArray(current.galleryRefs) && current.galleryRefs.length
+          ? current.galleryRefs.map(item => resolveMedia(item, "")).filter(Boolean)
+          : String(data.get("gallery") || "").split(/\r?\n/).map(item => item.trim()).filter(Boolean),
         url: String(data.get("url") || "").trim()
       }, managerIndex);
       activeIndex = managerIndex;

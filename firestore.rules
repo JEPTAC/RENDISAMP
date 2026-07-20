@@ -1,127 +1,160 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
-    }
+    function signedIn() { return request.auth != null; }
 
-    function currentUserPath() {
-      return /databases/$(database)/documents/users/$(request.auth.uid);
-    }
-
-    function hasCurrentProfile() {
-      return signedIn() && exists(currentUserPath());
-    }
-
-    function currentProfile() {
-      return get(currentUserPath()).data;
-    }
-
-    function hasActiveRole(roles) {
-      return hasCurrentProfile()
-        && currentProfile().active == true
-        && currentProfile().role in roles;
-    }
-
-    function isEditor() {
-      return hasActiveRole(['super_admin', 'admin', 'editor']);
-    }
-
-    function isSuperAdmin() {
-      return hasActiveRole(['super_admin']);
-    }
-
-    function isOwnUserDocument(userId) {
-      return signedIn() && request.auth.uid == userId;
-    }
-
-    function isOwnLegacyProfile() {
+    function tokenRole() {
       return signedIn()
-        && resource.data.email is string
-        && request.auth.token.email is string
-        && resource.data.email == request.auth.token.email;
+        ? request.auth.token.get('role', request.auth.token.get('userRole', 'guest'))
+        : 'guest';
     }
 
-    function isValidGuestCreation(userId) {
+    function ownProfileExists() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function ownProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function profileRole(profile) {
+      return profile.get('role', profile.get('rol', profile.get('tipoUsuario', profile.get('userRole', 'guest'))));
+    }
+
+    function activeProfileRole() {
+      return ownProfileExists() && ownProfile().get('active', true) == true
+        ? profileRole(ownProfile())
+        : 'guest';
+    }
+
+    function hasRole(roles) {
+      return signedIn() && (tokenRole() in roles || activeProfileRole() in roles);
+    }
+
+    function isRegistered() { return signedIn() && hasRole(['guest','editor','admin','super_admin']); }
+    function isEditor() { return hasRole(['editor','admin','super_admin']); }
+    function isAdmin() { return hasRole(['admin','super_admin']); }
+    function isSuperAdmin() { return hasRole(['super_admin']); }
+
+    function isOwnUserDocument(userId) { return signedIn() && request.auth.uid == userId; }
+
+    function validGuestCreate(userId) {
       return isOwnUserDocument(userId)
         && request.resource.data.uid == request.auth.uid
-        && request.resource.data.email == request.auth.token.email
         && request.resource.data.role == 'guest'
-        && request.resource.data.active == true;
+        && request.resource.data.active == true
+        && request.resource.data.email == request.auth.token.email;
     }
 
-    function legacyProfileExists() {
-      return signedIn()
-        && request.auth.token.email is string
-        && exists(/databases/$(database)/documents/users/$(request.auth.token.email));
+    function validOwnProfileUpdate() {
+      return request.resource.data.get('uid', '') == resource.data.get('uid', '')
+        && profileRole(request.resource.data) == profileRole(resource.data)
+        && request.resource.data.get('active', true) == resource.data.get('active', true)
+        && request.resource.data.get('email', '') == resource.data.get('email', '')
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'displayName','phone','neighborhood','emailVerified','lastLoginAt','updatedAt'
+        ]);
     }
 
-    function isValidLegacyMigration(userId) {
-      return isOwnUserDocument(userId)
-        && legacyProfileExists()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.email == request.auth.token.email
-        && request.resource.data.role == get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role
-        && request.resource.data.active == get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.active;
+    function validPublicIdeaCreate() {
+      return request.resource.data.keys().hasOnly([
+          'title','author','location','category','description','status','response','votes',
+          'created','createdBy','createdByEmail','createdAt'
+        ])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 2
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.author is string
+        && request.resource.data.author.size() > 1
+        && request.resource.data.author.size() <= 120
+        && request.resource.data.description is string
+        && request.resource.data.description.size() > 5
+        && request.resource.data.description.size() <= 1200
+        && request.resource.data.status == 'recibida'
+        && request.resource.data.response == ''
+        && request.resource.data.votes == 0;
     }
 
-    function ownProfileFieldsOnly() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-        'displayName', 'phone', 'neighborhood', 'emailVerified',
-        'lastLoginAt', 'updatedAt'
-      ]);
+    function validSubscriptionCreate() {
+      return request.resource.data.keys().hasOnly([
+        'email','emailHash','unsubscribeToken','consent','status','preferences','channels','source',
+        'publicationIds','userId','createdAt','updatedAt','lastSentAt','lastPublicationId','deliveryCount'
+      ])
+      && request.resource.data.email is string
+      && request.resource.data.email.size() >= 5
+      && request.resource.data.email.size() <= 254
+      && request.resource.data.emailHash is string
+      && request.resource.data.unsubscribeToken is string
+      && request.resource.data.unsubscribeToken.size() >= 8
+      && request.resource.data.consent == true
+      && request.resource.data.status in ['active','paused','cancelled']
+      && request.resource.data.preferences is list
+      && request.resource.data.channels is map
+      && request.resource.data.deliveryCount == 0;
     }
 
+    function validPublicSubscriptionUpdate() {
+      return request.resource.data.emailHash == resource.data.emailHash
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.unsubscribeToken == resource.data.unsubscribeToken
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status','preferences','channels','updatedAt','cancelledAt','unsubscribeToken','email','emailHash'
+        ]);
+    }
+
+    // Documento histórico: disponible únicamente para migración administrativa.
     match /portal/{documentId} {
+      allow read, create, update, delete: if isEditor();
+    }
+
+    // Estado administrativo completo, incluidas publicaciones en borrador.
+    match /portalState/{documentId} {
+      allow read, create, update, delete: if isEditor();
+    }
+
+    // Proyección pública generada al guardar: no contiene registros ocultos o en borrador.
+    match /portalPublicState/{documentId} {
+      allow read: if true;
+      allow create, update, delete: if isEditor();
+    }
+
+    match /portalEdits/{documentId} {
       allow read: if true;
       allow create, update, delete: if isEditor();
     }
 
     match /ideas/{ideaId} {
       allow read: if true;
-      allow create: if request.resource.data.keys().hasOnly([
-          'title', 'author', 'location', 'category', 'description',
-          'status', 'response', 'votes', 'created', 'createdBy',
-          'createdByEmail', 'createdAt'
-        ])
-        && request.resource.data.title is string
-        && request.resource.data.title.size() >= 3
-        && request.resource.data.title.size() <= 120
-        && request.resource.data.description is string
-        && request.resource.data.description.size() >= 10
-        && request.resource.data.description.size() <= 1200
-        && request.resource.data.status == 'recibida'
-        && request.resource.data.response == ''
-        && request.resource.data.votes == 0
-        && (
-          !signedIn()
-          || request.resource.data.createdBy == request.auth.uid
-        );
+      allow create: if isEditor() || validPublicIdeaCreate();
       allow update, delete: if isEditor();
     }
 
     match /users/{userId} {
-      allow get: if isOwnUserDocument(userId)
-        || isOwnLegacyProfile()
-        || isSuperAdmin();
+      allow get: if isOwnUserDocument(userId) || isSuperAdmin();
       allow list: if isSuperAdmin();
-      allow create: if isValidGuestCreation(userId)
-        || isValidLegacyMigration(userId)
-        || isSuperAdmin();
-      allow update: if (
-          isOwnUserDocument(userId)
-          && ownProfileFieldsOnly()
-          && request.resource.data.uid == resource.data.uid
-          && request.resource.data.email == resource.data.email
-          && request.resource.data.role == resource.data.role
-          && request.resource.data.active == resource.data.active
-        ) || isSuperAdmin();
-      allow delete: if isSuperAdmin() && request.auth.uid != userId;
+      allow create: if isSuperAdmin() || validGuestCreate(userId);
+      allow update: if isSuperAdmin() || (isOwnUserDocument(userId) && validOwnProfileUpdate());
+      allow delete: if isSuperAdmin();
+    }
+
+    // Correos nunca son públicos ni listables por visitantes.
+    match /subscriptions/{subscriptionId} {
+      allow create: if isEditor() || validSubscriptionCreate();
+      allow get, list: if isSuperAdmin();
+      allow update: if isEditor() || validPublicSubscriptionUpdate();
+      allow delete: if isSuperAdmin();
+    }
+
+    // Estructura central de carpetas de Drive. Solo personal autorizado.
+    match /portalSettings/{settingId} {
+      allow read: if isEditor();
+      allow create, update: if isAdmin();
+      allow delete: if isSuperAdmin();
     }
 
     match /auditLogs/{logId} {
-      allow create: if isEditor()
-        && request.resource.data.userId == request.auth.uid;
+      allow create: if isEditor();
       allow read: if isSuperAdmin();
       allow update, delete: if false;
     }
