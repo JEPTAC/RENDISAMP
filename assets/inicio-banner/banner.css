@@ -388,3 +388,62 @@
     white-space:normal!important;
   }
 }
+
+/* =========================================================
+   V2.5 · Corrección puntual: todos los textos del banner en blanco
+   ========================================================= */
+.spb-banner,
+.spb-banner__eyebrow,
+.spb-banner__title,
+.spb-banner__title span,
+.spb-banner__script,
+.spb-banner__description,
+.spb-banner__transport,
+.spb-banner__count,
+.spb-banner__count strong,
+.spb-banner__count span,
+.spb-banner__transport-label,
+.spb-banner__pill,
+.spb-banner__caption,
+.spb-banner__caption h2,
+.spb-banner__caption-main,
+.spb-banner__caption-script,
+.spb-banner__caption p,
+.spb-banner__discover{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+
+/* Contraste controlado sin alterar la composición aprobada. */
+.spb-banner__eyebrow,
+.spb-banner__title,
+.spb-banner__script,
+.spb-banner__description{
+  text-shadow:0 3px 16px rgba(0,0,0,.42),0 1px 2px rgba(0,0,0,.48)!important;
+}
+.spb-banner__caption-main,
+.spb-banner__caption-script,
+.spb-banner__caption p,
+.spb-banner__pill,
+.spb-banner__discover{
+  text-shadow:0 4px 18px rgba(0,0,0,.78),0 1px 3px rgba(0,0,0,.92)!important;
+}
+
+/* El control inferior deja de ser blanco para que sus letras blancas sean legibles. */
+.spb-banner__transport{
+  background:rgba(7,22,39,.62)!important;
+  border:1px solid rgba(255,255,255,.34)!important;
+  box-shadow:0 14px 34px rgba(4,15,29,.2),inset 0 1px 0 rgba(255,255,255,.18)!important;
+  backdrop-filter:blur(16px) saturate(1.06);
+}
+.spb-banner__transport:hover{
+  background:rgba(7,22,39,.76)!important;
+  box-shadow:0 18px 38px rgba(4,15,29,.26),inset 0 1px 0 rgba(255,255,255,.22)!important;
+}
+.spb-banner__play{
+  border-left-color:#fff!important;
+}
+.spb-banner__transport.is-paused .spb-banner__play{
+  border-left-color:#fff!important;
+  border-right-color:#fff!important;
+}
