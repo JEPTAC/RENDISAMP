@@ -80,10 +80,22 @@
     return normalized;
   }
 
+  function extractDriveId(value) {
+    const text = String(value || "");
+    return text.match(/\/d\/([a-zA-Z0-9_-]{10,})/)?.[1]
+      || text.match(/[?&]id=([a-zA-Z0-9_-]{10,})/)?.[1]
+      || "";
+  }
+
   function projectImage(project) {
     if (window.DriveMedia?.resolveUrl) return window.DriveMedia.resolveUrl(project.image,FALLBACK_IMAGE);
-    if (typeof project.image === "string") return project.image || FALLBACK_IMAGE;
-    return project.image?.displayUrl || project.image?.thumbnailUrl || FALLBACK_IMAGE;
+    if (typeof project.image === "string") {
+      const id = extractDriveId(project.image);
+      return id ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w2000` : (project.image || FALLBACK_IMAGE);
+    }
+    const ref = project.image || project.imageRef || {};
+    const id = ref.driveFileId || ref.id || extractDriveId(ref.webViewLink || ref.displayUrl || ref.webContentLink);
+    return ref.displayUrl || ref.thumbnailUrl || (id ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w2000` : FALLBACK_IMAGE);
   }
 
   function imageMarkup(project, className = "") {
@@ -243,6 +255,8 @@
           ${url ? `<a class="running-projects-dialog__link" href="${escapeHtml(url)}">Ver proyecto completo →</a>` : ""}
         </div>
       </div>`;
+    const dialogImage = modal.querySelector("[data-running-project-image]");
+    if (dialogImage) { dialogImage.loading = "eager"; dialogImage.fetchPriority = "high"; }
     if (!modal.open) {
       const gap = Math.max(0,window.innerWidth-document.documentElement.clientWidth);
       document.body.style.setProperty("--scrollbar-compensation",`${gap}px`);

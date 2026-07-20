@@ -2,7 +2,7 @@
   "use strict";
 
   const STORE_KEY = "sp_territory_experience_v1";
-  const BUILD = "11.60-territorio-drive-editor";
+  const BUILD = "11.61-territorio-estable";
   const HOME_PATHS = new Set(["","index.html","/"]);
   const CENTER = [3.99557,-76.22805];
 
@@ -1123,6 +1123,7 @@
       );
     const targetZoom = isUrban ? 17 : 15;
 
+    state.map.invalidateSize({animate:false});
     state.map.flyTo([item.lat,item.lng],targetZoom,{
       animate:true,
       duration:1.65,
@@ -1138,6 +1139,7 @@
         marker.options?.territoryId === item.id
       );
       layer?.openPopup?.();
+      window.setTimeout(() => layer?.openPopup?.(),90);
       setMapCameraStatus(`${item.name} en detalle`,false);
       state.zoomTimer = window.setTimeout(() => {
         shell?.classList.remove("is-cinematic-zoom");
@@ -1193,8 +1195,17 @@
       });
       marker.bindPopup(popupHtml(item),{
         className:"territory-popup-shell",
-        maxWidth:300
+        maxWidth:320,
+        autoPan:true,
+        autoPanPadding:[28,28],
+        keepInView:true
       });
+      marker.bindTooltip(item.name,{direction:"top",offset:[0,-18],opacity:.96,className:"territory-marker-tooltip",sticky:false});
+      marker.on("mouseover",event => {
+        event.target.getElement()?.classList.add("is-hovered");
+        event.target.openTooltip();
+      });
+      marker.on("mouseout",event => event.target.getElement()?.classList.remove("is-hovered"));
       marker.on("click",() => selectItem(item,{fly:false}));
 
       if (category === "neighborhood") {
@@ -1532,6 +1543,12 @@
         <div class="territory-admin-layout">
           <form id="territoryRecordForm" class="territory-record-form">
             <input type="hidden" name="recordId">
+            <div class="territory-admin-category-tabs" role="tablist" aria-label="Categoría del registro">
+              <button type="button" data-territory-admin-category="territory">Conozca cada lugar</button>
+              <button type="button" data-territory-admin-category="impact">Ubique dónde ocurrió</button>
+              <button type="button" data-territory-admin-category="work">Siga la respuesta</button>
+              <button type="button" data-territory-admin-category="participation">Participación</button>
+            </div>
             <label>Categoría<select name="category" required>
               <option value="territory">Conozca cada lugar</option><option value="impact">Ubique dónde ocurrió</option><option value="work">Siga la respuesta</option><option value="participation">Participación comunitaria</option>
             </select></label>
@@ -1553,6 +1570,7 @@
             <label><input name="visible" type="checkbox" checked> Visible en el portal</label>
             <div class="territory-drive-field"><label>Imagen principal<input name="imageRef" type="hidden"></label><button type="button" class="button button-secondary territory-drive-main">Seleccionar en Drive</button><div class="territory-drive-preview" data-territory-image-preview></div></div>
             <div class="territory-drive-field"><label>Galería<input name="galleryRefs" type="hidden"></label><button type="button" class="button button-secondary territory-drive-gallery">Agregar imágenes de Drive</button><div class="territory-drive-preview" data-territory-gallery-preview></div></div>
+            <p class="territory-admin-save-status" data-territory-save-status aria-live="polite"></p>
             <div class="territory-admin-form-actions"><button type="button" class="button button-secondary territory-clear-form">Limpiar</button><button type="submit" class="button button-primary">Guardar registro</button></div>
           </form>
 
@@ -1619,16 +1637,34 @@
       } catch (error) { portal()?.helpers?.toast?.(error.message); }
     });
 
+    const syncCategoryTabs = category => {
+      dialog.querySelectorAll("[data-territory-admin-category]").forEach(button => {
+        const active = button.dataset.territoryAdminCategory === category;
+        button.classList.toggle("is-active",active);
+        button.setAttribute("aria-selected",String(active));
+      });
+    };
+    dialog.querySelectorAll("[data-territory-admin-category]").forEach(button => {
+      button.addEventListener("click",() => {
+        const category = button.dataset.territoryAdminCategory;
+        const form = dialog.querySelector("#territoryRecordForm");
+        form.elements.category.value = category;
+        syncCategoryTabs(category);
+      });
+    });
+    dialog.querySelector("#territoryRecordForm").elements.category.addEventListener("change",event => syncCategoryTabs(event.target.value));
+    dialog._syncCategoryTabs = syncCategoryTabs;
+
     dialog.querySelector(".territory-clear-form")
-      .addEventListener("click",clearAdminForm);
+      .addEventListener("click",() => clearAdminForm());
 
     dialog.querySelector(".territory-export-data")
       .addEventListener("click",exportData);
 
     dialog.querySelector("#territoryRecordForm")
-      .addEventListener("submit",event => {
+      .addEventListener("submit",async event => {
         event.preventDefault();
-        saveAdminRecord(new FormData(event.currentTarget));
+        await saveAdminRecord(new FormData(event.currentTarget),event.currentTarget);
       });
 
     return dialog;
@@ -1645,23 +1681,25 @@
     if (list) list.innerHTML = gallery.length ? gallery.map((ref,index) => `<img src="${escapeHtml(window.DriveMedia?.resolveUrl?.(ref) || ref.displayUrl || "")}" alt="Imagen ${index+1}">`).join("") : "<small>Sin galería</small>";
   }
 
-  function clearAdminForm() {
+  function clearAdminForm(category = state.activeMode || "territory") {
     const form = state.adminDialog?.querySelector("#territoryRecordForm");
     if (!form) return;
+    const validCategory = ["territory","impact","work","participation"].includes(category) ? category : "territory";
     form.reset();
-    form.elements.category.value = "territory";
-    form.elements.status.value = "En seguimiento";
+    form.elements.category.value = validCategory;
+    form.elements.status.value = validCategory === "territory" ? "Publicado" : "En seguimiento";
     form.elements.recordId.value = "";
     form.elements.visible.checked = true;
     form.elements.publicationStatus.value = "published";
     form.elements.imageRef.value = "";
     form.elements.galleryRefs.value = "[]";
     state.editingRecordId = null;
+    state.adminDialog?._syncCategoryTabs?.(validCategory);
+    const status = form.querySelector("[data-territory-save-status]");
+    if (status) { status.textContent = ""; status.classList.remove("is-error"); }
     renderDrivePreviews(form);
 
-    const center = state.mapReady
-      ? state.map.getCenter()
-      : {lat:CENTER[0],lng:CENTER[1]};
+    const center = state.mapReady ? state.map.getCenter() : {lat:CENTER[0],lng:CENTER[1]};
     form.elements.lat.value = center.lat.toFixed(6);
     form.elements.lng.value = center.lng.toFixed(6);
   }
@@ -1690,6 +1728,7 @@
         <div>
           <strong>${escapeHtml(record.name)}</strong>
           <small>
+            ${escapeHtml(MODES[record.category]?.label || "Territorio")} ·
             ${escapeHtml(record.sector || "Sin sector")} ·
             ${escapeHtml(record.status || "Sin estado")}
           </small>
@@ -1713,17 +1752,19 @@
     refreshRecords();
     const dialog = ensureAdminDialog();
     renderAdminList();
-    clearAdminForm();
+    clearAdminForm(state.activeMode);
     if (!dialog.open) dialog.showModal();
   }
 
-  function saveAdminRecord(formData) {
+  async function saveAdminRecord(formData,formElement = null) {
     const lat = Number(formData.get("lat"));
     const lng = Number(formData.get("lng"));
     const name = String(formData.get("name") || "").trim();
+    const statusNode = formElement?.querySelector("[data-territory-save-status]");
     if (!name || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+      if (statusNode) { statusNode.textContent = "Complete nombre, latitud y longitud."; statusNode.classList.add("is-error"); }
       portal()?.helpers?.toast?.("Complete nombre, latitud y longitud.");
-      return;
+      return false;
     }
 
     const id = String(formData.get("recordId") || "").trim()
@@ -1762,14 +1803,24 @@
     if (index >= 0) store.records[index] = record;
     else store.records.push(record);
 
-    persistStore();
-    refreshRecords();
-    renderAdminList();
-    renderMetrics();
-    renderResultList();
-    renderMapLayers();
-    clearAdminForm();
-    portal()?.helpers?.toast?.("Punto territorial guardado.");
+    try {
+      if (statusNode) { statusNode.textContent = "Guardando y sincronizando…"; statusNode.classList.remove("is-error"); }
+      persistStore();
+      if (window.FirebasePortal?.canWrite?.()) await window.FirebasePortal.pushAll({action:"territory_record_save"});
+      refreshRecords();
+      renderAdminList();
+      renderMetrics();
+      renderResultList();
+      renderMapLayers();
+      const savedCategory = record.category;
+      clearAdminForm(savedCategory);
+      portal()?.helpers?.toast?.(`${MODES[savedCategory]?.label || "Punto territorial"} guardado correctamente.`);
+      return true;
+    } catch (error) {
+      if (statusNode) { statusNode.textContent = window.FirebasePortal?.friendlyError?.(error) || error.message || "No fue posible guardar."; statusNode.classList.add("is-error"); }
+      portal()?.helpers?.toast?.(window.FirebasePortal?.friendlyError?.(error) || "No fue posible guardar el registro.");
+      return false;
+    }
   }
 
   function editAdminRecord(id) {
@@ -1786,6 +1837,7 @@
     form.elements.imageRef.value = record.image ? JSON.stringify(record.image) : "";
     form.elements.galleryRefs.value = JSON.stringify(record.gallery || []);
     form.elements.recordId.value = id;
+    state.adminDialog?._syncCategoryTabs?.(record.category);
     renderDrivePreviews(form);
     form.scrollIntoView({behavior:"smooth",block:"start"});
   }
@@ -1803,6 +1855,7 @@
     renderMetrics();
     renderResultList();
     renderMapLayers();
+    if (window.FirebasePortal?.canWrite?.()) window.FirebasePortal.pushAll({action:"territory_record_delete"}).catch(error => portal()?.helpers?.toast?.(window.FirebasePortal?.friendlyError?.(error) || error.message));
     portal()?.helpers?.toast?.("Punto territorial eliminado.");
   }
 

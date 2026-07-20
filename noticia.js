@@ -59,7 +59,7 @@
   }
 
   function attachments(item) {
-    const values = Array.isArray(item.attachments) ? item.attachments : [];
+    const values = Array.isArray(item.attachments) ? [...item.attachments] : [];
     if (item.url && item.url !== "#") values.unshift({ name:"Documento relacionado", url:item.url, mimeType:"Enlace institucional" });
     const unique = values.filter(Boolean).filter((entry,index,array) => array.findIndex(other => (other.driveFileId || other.url) === (entry.driveFileId || entry.url)) === index);
     if (!unique.length) return "";

@@ -20,10 +20,25 @@
     return window.DrivePortal;
   }
 
+  function extractDriveId(value) {
+    const text = String(value || "");
+    return text.match(/\/d\/([a-zA-Z0-9_-]{10,})/)?.[1]
+      || text.match(/[?&]id=([a-zA-Z0-9_-]{10,})/)?.[1]
+      || "";
+  }
+
   function resolveUrl(value, fallback = FALLBACK_IMAGE) {
     if (!value) return fallback;
-    if (typeof value === "string") return value || fallback;
-    return value.displayUrl || value.thumbnailUrl || value.webViewLink || fallback;
+    if (typeof value === "string") {
+      const id = extractDriveId(value);
+      return id ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w2000` : (value || fallback);
+    }
+    const id = value.driveFileId || value.id || extractDriveId(value.webViewLink || value.webContentLink || value.displayUrl);
+    const mime = String(value.mimeType || "");
+    if (id && (!mime || mime.startsWith("image/"))) {
+      return value.displayUrl || value.thumbnailUrl || `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w2000`;
+    }
+    return value.displayUrl || value.thumbnailUrl || value.webContentLink || value.webViewLink || fallback;
   }
 
   function normalize(value, extra = {}) {

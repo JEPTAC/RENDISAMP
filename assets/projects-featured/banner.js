@@ -58,14 +58,7 @@ let lastY = 0;
 let audioCtx = null;
 let editorMode = 'add';
 let pendingImage = '';
-let pendingImageRef = null;
 let lastPortalSignature = '';
-function resolveMedia(value) {
-  if (window.DriveMedia?.resolveUrl) return window.DriveMedia.resolveUrl(value, FALLBACK_IMAGE);
-  if (value && typeof value === 'object') return value.thumbnailUrl || value.webContentLink || value.webViewLink || value.url || FALLBACK_IMAGE;
-  return String(value || FALLBACK_IMAGE);
-}
-
 function normalizeProject(project = {}) {
   const accent = /^#[0-9a-f]{6}$/i.test(project.accent || '') ? project.accent : '#2f6ff2';
   const rgb = hexToRgb(accent);
@@ -81,8 +74,7 @@ function normalizeProject(project = {}) {
     accent,
     rgb: `${rgb.r},${rgb.g},${rgb.b}`,
     soft: mixHex(accent, '#ffffff', .68),
-    image: resolveMedia(project.imageRef || project.image),
-    imageRef: project.imageRef || (project.image && typeof project.image === 'object' ? project.image : null),
+    image: String(project.image || FALLBACK_IMAGE),
     alt: String(project.alt || project.title || 'Fotografía del proyecto')
   };
 }
@@ -396,7 +388,6 @@ function openEditor(mode) {
   if (!CAN_EDIT) return;
   editorMode = mode;
   pendingImage = '';
-  pendingImageRef = null;
   editorForm.reset();
   $('#fpFieldAccent').value = '#2f6ff2';
   uploadZone.classList.remove('has-image');
@@ -422,44 +413,67 @@ function openEditor(mode) {
   setTimeout(() => $('#fpFieldTitle').focus(), 80);
 }
 
+async function optimizeImage(file) {
+  if (!file) return '';
+  if (!file.type.startsWith('image/')) throw new Error('Selecciona un archivo de imagen válido.');
+  const source = await fileToDataUrl(file);
+  const bitmap = await loadImage(source);
+  const maxWidth = 1200;
+  const maxHeight = 675;
+  const ratio = Math.min(1, maxWidth / bitmap.naturalWidth, maxHeight / bitmap.naturalHeight);
+  const width = Math.max(1, Math.round(bitmap.naturalWidth * ratio));
+  const height = Math.max(1, Math.round(bitmap.naturalHeight * ratio));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d', {alpha: false});
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, width, height);
+  context.drawImage(bitmap, 0, 0, width, height);
+  let quality = .82;
+  let result = canvas.toDataURL('image/jpeg', quality);
+  while (result.length > 130000 && quality > .46) {
+    quality -= .07;
+    result = canvas.toDataURL('image/jpeg', quality);
+  }
+  return result;
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(source) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = source;
+  });
+}
+
 async function handleImageFile(file) {
-  if (!file) return;
-  if (!file.type?.startsWith('image/')) {
-    alert('Selecciona un archivo de imagen válido.');
-    return;
-  }
-  if (!window.DriveMedia?.choose) {
-    alert('El selector central de Google Drive todavía no está disponible. Recarga la página e inténtalo nuevamente.');
-    return;
-  }
   try {
     uploadZone.setAttribute('aria-busy', 'true');
-    const reference = await window.DriveMedia.choose({
-      mode: 'upload',
-      file,
-      modulePath: 'Proyectos/Destacados',
-      accept: 'image/*',
-      title: 'Fotografía del proyecto destacado',
-      makePublic: true
-    });
-    if (!reference) return;
-    pendingImageRef = reference;
-    pendingImage = window.DriveMedia.resolveUrl(reference, FALLBACK_IMAGE);
+    pendingImage = await optimizeImage(file);
     uploadPreview.src = pendingImage;
     uploadZone.classList.add('has-image');
   } catch (error) {
-    alert(error?.message || 'No fue posible cargar la imagen en Google Drive.');
+    alert(error.message || 'No fue posible procesar la imagen.');
   } finally {
     uploadZone.removeAttribute('aria-busy');
-    imageInput.value = '';
   }
 }
 
 function formProject() {
   const form = new FormData(editorForm);
   const existing = editorMode === 'edit' ? PROJECTS[active] : null;
-  const selectedImageRef = pendingImageRef || existing?.imageRef || null;
-  const selectedImage = pendingImage || resolveMedia(selectedImageRef || existing?.image || '');
+  const selectedImage = pendingImage || existing?.image || '';
   const accent = String(form.get('accent') || '#2f6ff2');
   return normalizeProject({
     title: String(form.get('title') || '').trim(),
@@ -471,8 +485,7 @@ function formProject() {
     period: String(form.get('period') || '').trim() || '—',
     accent,
     alt: String(form.get('alt') || '').trim() || `Fotografía de ${String(form.get('title') || 'proyecto').trim()}`,
-    image: selectedImage,
-    imageRef: selectedImageRef
+    image: selectedImage
   });
 }
 
@@ -539,7 +552,7 @@ uploadZone.addEventListener('drop', event => {
   if (file) handleImageFile(file);
 });
 
-editorForm.addEventListener('submit', async event => {
+editorForm.addEventListener('submit', event => {
   event.preventDefault();
   if (!CAN_EDIT) return;
   const project = formProject();

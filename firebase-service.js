@@ -862,9 +862,9 @@
         id:item.id,
         ...decodeFirestoreValue(item.data())
       }));
-      if (cloudState?.remote) {
-        portal().state.ideas = cloudIdeas;
-      } else if (cloudIdeas.length) {
+      // Nunca vaciar las ideas locales cuando Firestore todavía no tiene documentos.
+      // Esto evita que una colección nueva o temporalmente vacía borre el tablero existente.
+      if (cloudIdeas.length) {
         portal().state.ideas = cloudIdeas;
       }
 
@@ -1024,11 +1024,16 @@
       const currentIds = new Set(portal().state.ideas.map(item => item.id));
       const ideaOperations = [];
 
-      existingIdeas.docs.forEach(item => {
-        if (!currentIds.has(item.id)) {
-          ideaOperations.push(batch => batch.delete(item.ref));
-        }
-      });
+      // La sincronización normal solo actualiza o crea ideas. La eliminación remota
+      // debe ser explícita desde el administrador para impedir pérdidas masivas por
+      // una caché local vacía o una lectura incompleta.
+      if (options.allowIdeaDeletion === true) {
+        existingIdeas.docs.forEach(item => {
+          if (!currentIds.has(item.id)) {
+            ideaOperations.push(batch => batch.delete(item.ref));
+          }
+        });
+      }
 
       portal().state.ideas.forEach(item => {
         const {id,...ideaData} = item;

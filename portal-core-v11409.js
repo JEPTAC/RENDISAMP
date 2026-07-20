@@ -1,5 +1,5 @@
 (() => {
-  const PORTAL_BUILD = "11.60.0-integral-drive";
+  const PORTAL_BUILD = "11.61.0-reparacion-controlada";
 
   /*
    * Retira definitivamente el service worker experimental de V11.40.2. GitHub Pages no

@@ -7,8 +7,8 @@
   <style>
     *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f8fc;color:#10233f;font-family:"Century Gothic",Arial,sans-serif}.card{width:min(92vw,420px);padding:28px;border:1px solid #dce5ef;border-radius:18px;background:#fff;box-shadow:0 18px 50px rgba(16,35,63,.12);text-align:center}.mark{width:42px;height:42px;margin:0 auto 16px;border:3px solid #dbe5f0;border-top-color:#1557a8;border-radius:50%;animation:spin .8s linear infinite}h1{font-size:18px;margin:0 0 8px}p{font-size:13px;line-height:1.55;margin:0;color:#607086}@keyframes spin{to{transform:rotate(360deg)}}
   </style>
-<link rel="stylesheet" href="platform-polish-v1152.css?v=11.52.1-integracion-estable">
-<link rel="stylesheet" href="portal-integral-v1160.css?v=11.60.0-integral-drive">
+<link rel="stylesheet" href="platform-polish-v1152.css?v=11.61.0-reparacion-controlada">
+  <link rel="stylesheet" href="repair-v1161.css?v=11.61.0-reparacion-controlada">
 </head>
 <body>
   <main class="card"><div class="mark" aria-hidden="true"></div><h1>Actualizando almacenamiento</h1><p>Se está aplicando la corrección de guardado en Firestore sin alterar el inicio de sesión.</p></main>
@@ -29,11 +29,12 @@
         sessionStorage.clear();
       }catch(_error){}
       const target=new URL('index.html',location.href);
-      target.searchParams.set('portal-build','11.52.1-integracion-estable');
+      target.searchParams.set('portal-build','11.61.0-reparacion-controlada');
       target.searchParams.set('_',Date.now().toString());
       location.replace(target.href);
     })();
   </script>
-  <script src="portal-integral-v1160.js?v=11.60.0-integral-drive"></script>
+  <script src="drive-media-manager.js?v=11.61.0-reparacion-controlada"></script>
+  <script src="repair-v1161.js?v=11.61.0-reparacion-controlada"></script>
 </body>
 </html>
