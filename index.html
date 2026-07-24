@@ -35,6 +35,191 @@
 
   <link rel="preconnect" href="https://accounts.google.com">
   <link rel="stylesheet" href="repair-v1161.css?v=11.61.0-reparacion-controlada">
+
+  <style id="sp-running-popup-editorial-fix">
+    .sp-editorial-popup {
+      position: relative !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      width: min(860px, 92vw) !important;
+      max-width: min(860px, 92vw) !important;
+      max-height: 88vh !important;
+      min-height: 0 !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      padding: 18px 18px 24px !important;
+      gap: 18px !important;
+      border-radius: 28px !important;
+      background: linear-gradient(180deg, rgba(245,249,255,.98) 0%, rgba(236,243,251,.98) 100%) !important;
+      box-shadow: 0 28px 70px rgba(17, 49, 93, 0.24) !important;
+      box-sizing: border-box !important;
+    }
+
+    .sp-editorial-popup > * {
+      box-sizing: border-box !important;
+      min-width: 0 !important;
+    }
+
+    .sp-editorial-popup__media {
+      order: 1 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      flex: none !important;
+      border-radius: 24px !important;
+      overflow: hidden !important;
+      background: #dce8f5 !important;
+      border: 1px solid rgba(22, 78, 146, 0.12) !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.36) !important;
+    }
+
+    .sp-editorial-popup__media img {
+      display: block !important;
+      width: 100% !important;
+      height: clamp(280px, 36vw, 390px) !important;
+      min-height: 280px !important;
+      max-height: 390px !important;
+      object-fit: cover !important;
+    }
+
+    .sp-editorial-popup__media [class*="fallback"],
+    .sp-editorial-popup__media [class*="caption"],
+    .sp-editorial-popup__media [class*="shade"] {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .sp-editorial-popup__content {
+      order: 2 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      flex: none !important;
+      display: grid !important;
+      gap: 18px !important;
+      padding: 2px 6px 2px !important;
+      overflow: visible !important;
+    }
+
+    .sp-editorial-popup__content > * {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      box-sizing: border-box !important;
+    }
+
+    .sp-editorial-popup__content h1,
+    .sp-editorial-popup__content h2,
+    .sp-editorial-popup__content h3 {
+      margin: 0 !important;
+      color: #0e2f67 !important;
+      font-size: clamp(2.2rem, 4.4vw, 4.25rem) !important;
+      line-height: 0.96 !important;
+      letter-spacing: -0.04em !important;
+      overflow-wrap: anywhere !important;
+      word-break: normal !important;
+      text-wrap: balance !important;
+    }
+
+    .sp-editorial-popup__content p {
+      margin: 0 !important;
+      line-height: 1.62 !important;
+      color: #466788 !important;
+      font-size: clamp(1rem, 1.45vw, 1.22rem) !important;
+    }
+
+    .sp-editorial-popup__content small,
+    .sp-editorial-popup__content [class*="status"],
+    .sp-editorial-popup__content [class*="eyebrow"] {
+      letter-spacing: 0.16em !important;
+      text-transform: uppercase !important;
+    }
+
+    .sp-editorial-popup__content [class*="heading"] {
+      display: grid !important;
+      gap: 12px !important;
+      align-items: start !important;
+    }
+
+    .sp-editorial-popup__content [class*="heading"] > *:last-child,
+    .sp-editorial-popup__content [class*="year"] {
+      justify-self: start !important;
+      align-self: start !important;
+    }
+
+    .sp-editorial-popup__content [class*="facts"],
+    .sp-editorial-popup__content [class*="meta"],
+    .sp-editorial-popup__content [class*="stats"] {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 14px !important;
+    }
+
+    .sp-editorial-popup__content [class*="facts"] > *,
+    .sp-editorial-popup__content [class*="meta"] > *,
+    .sp-editorial-popup__content [class*="stats"] > *,
+    .sp-editorial-popup__content section {
+      background: rgba(255,255,255,0.82) !important;
+      border: 1px solid rgba(24, 87, 160, 0.12) !important;
+      border-radius: 18px !important;
+      padding: 16px 18px !important;
+      box-shadow: 0 10px 24px rgba(20, 55, 99, 0.06) !important;
+    }
+
+    .sp-editorial-popup__content [class*="gallery"] {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+      gap: 12px !important;
+    }
+
+    .sp-editorial-popup__content [class*="gallery"] img {
+      width: 100% !important;
+      height: 120px !important;
+      object-fit: cover !important;
+      border-radius: 16px !important;
+    }
+
+    .sp-editorial-popup__content [class*="actions"] {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 12px !important;
+      align-items: center !important;
+    }
+
+    .sp-editorial-popup__content button,
+    .sp-editorial-popup__content a {
+      max-width: 100% !important;
+    }
+
+    .sp-editorial-popup__close {
+      position: absolute !important;
+      top: 16px !important;
+      right: 16px !important;
+      z-index: 8 !important;
+    }
+
+    @media (max-width: 900px) {
+      .sp-editorial-popup {
+        width: min(94vw, 760px) !important;
+        max-height: 90vh !important;
+        padding: 14px 14px 20px !important;
+        border-radius: 24px !important;
+      }
+
+      .sp-editorial-popup__media img {
+        height: clamp(220px, 40vw, 300px) !important;
+        min-height: 220px !important;
+      }
+
+      .sp-editorial-popup__content [class*="facts"],
+      .sp-editorial-popup__content [class*="meta"],
+      .sp-editorial-popup__content [class*="stats"] {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+    }
+  </style>
+
 </head>
 <body data-page="home">
   <div id="siteHeader"></div>
@@ -106,5 +291,102 @@
   <script src="home.js?v=11.61.0-reparacion-controlada"></script>
   <script src="subscriptions.js?v=11.61.0-reparacion-controlada"></script>
   <script src="repair-v1161.js?v=11.61.0-reparacion-controlada"></script>
+
+  <script id="sp-running-popup-editorial-script">
+    (function () {
+      const TEXT_HINTS = [
+        'objetivo',
+        'resultado',
+        'siguiente hito',
+        'área responsable',
+        'ubicación',
+        'finalización',
+        'inicio'
+      ];
+
+      function normalize(text) {
+        return (text || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+      }
+
+      function looksLikeRunningPopup(element) {
+        if (!(element instanceof HTMLElement)) return false;
+        if (element.dataset.spEditorialPopupReady === '1') return false;
+        const text = normalize(element.innerText);
+        const matches = TEXT_HINTS.filter(token => text.includes(normalize(token))).length;
+        const images = element.querySelectorAll('img');
+        if (matches < 3 || !images.length) return false;
+        const rect = element.getBoundingClientRect();
+        return rect.width > 520 && rect.height > 280;
+      }
+
+      function findCandidateRoots() {
+        const selectors = ['dialog[open]', '[role="dialog"]', '.modal', '.popup', '.overlay > div', '.overlay > article'];
+        const nodes = new Set();
+        selectors.forEach(selector => {
+          document.querySelectorAll(selector).forEach(node => nodes.add(node));
+        });
+        document.querySelectorAll('article, section, div').forEach(node => {
+          if (looksLikeRunningPopup(node)) nodes.add(node);
+        });
+        return [...nodes].filter(looksLikeRunningPopup);
+      }
+
+      function markChildren(root) {
+        const direct = [...root.children].filter(child => child instanceof HTMLElement);
+        const media = direct.find(child => child.querySelector('img')) || root.querySelector('img')?.parentElement;
+        if (!media) return;
+
+        let content = direct.find(child => child !== media && TEXT_HINTS.some(token => normalize(child.innerText).includes(normalize(token))));
+        if (!content) {
+          content = direct.find(child => child !== media && child.innerText.trim().length > 50);
+        }
+        if (!content || content === media) return;
+
+        if (media.parentElement === root && media !== root.firstElementChild) {
+          root.insertBefore(media, root.firstElementChild);
+        }
+        if (content.parentElement === root && content !== media.nextElementSibling) {
+          media.insertAdjacentElement('afterend', content);
+        }
+
+        root.classList.add('sp-editorial-popup');
+        media.classList.add('sp-editorial-popup__media');
+        content.classList.add('sp-editorial-popup__content');
+
+        const closeButton = [...root.querySelectorAll('button')].find(button => {
+          const label = normalize(button.getAttribute('aria-label') || button.textContent || '');
+          return label.includes('cerrar') || label === '×' || label === 'x';
+        });
+        if (closeButton) closeButton.classList.add('sp-editorial-popup__close');
+
+        root.dataset.spEditorialPopupReady = '1';
+      }
+
+      function enhanceEditorialPopups() {
+        findCandidateRoots().forEach(markChildren);
+      }
+
+      const observer = new MutationObserver(() => {
+        window.requestAnimationFrame(enhanceEditorialPopups);
+      });
+
+      window.addEventListener('load', () => {
+        enhanceEditorialPopups();
+        setTimeout(enhanceEditorialPopups, 600);
+        setTimeout(enhanceEditorialPopups, 1400);
+      });
+
+      document.addEventListener('click', () => {
+        setTimeout(enhanceEditorialPopups, 120);
+        setTimeout(enhanceEditorialPopups, 380);
+      }, true);
+
+      observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'class', 'style', 'aria-hidden'] });
+    })();
+  </script>
+
 </body>
 </html>
