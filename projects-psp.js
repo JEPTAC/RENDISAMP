@@ -543,29 +543,27 @@
         if (!front?.animate) return;
         if (index === nextIndex) {
           animations.push(front.animate([
-            { transform: "translate3d(0,10px,0) scale(.94)" },
-            { offset: .45, transform: `translate3d(${-direction * 4}px,-32px,0) scale(1.16) rotateY(${-direction * 2.2}deg)` },
-            { offset: .72, transform: "translate3d(0,3px,0) scale(.995) rotateY(.3deg)" },
+            { transform: "translate3d(0,6px,0) scale(.97)" },
+            { offset: .52, transform: `translate3d(${-direction * 2}px,-16px,0) scale(1.06) rotateY(${-direction * .8}deg)` },
             { transform: "translate3d(0,0,0) scale(1) rotateY(0)" }
-          ], { duration: 470, easing: "cubic-bezier(.2,.78,.2,1)", fill: "none" }));
+          ], { duration: 360, easing: "cubic-bezier(.22,.61,.36,1)", fill: "none" }));
           if (paper?.animate) animations.push(paper.animate([
             { transform: "translate3d(0,-8px,0)" },
-            { offset: .45, transform: "translate3d(0,-48px,0)" },
-            { offset: .72, transform: "translate3d(0,-15px,0)" },
-            { transform: "translate3d(0,-18px,0)" }
-          ], { duration: 470, easing: "cubic-bezier(.2,.78,.2,1)", fill: "none" }));
+            { offset: .52, transform: "translate3d(0,-24px,0)" },
+            { transform: "translate3d(0,-12px,0)" }
+          ], { duration: 360, easing: "cubic-bezier(.22,.61,.36,1)", fill: "none" }));
         } else if (index === previousIndex) {
           animations.push(front.animate([
-            { transform: "translate3d(0,-6px,0) scale(1.03)" },
-            { offset: .55, transform: `translate3d(${-direction * 14}px,9px,0) scale(.90)` },
+            { transform: "translate3d(0,-3px,0) scale(1.01)" },
+            { offset: .58, transform: `translate3d(${-direction * 6}px,5px,0) scale(.97)` },
             { transform: "translate3d(0,0,0) scale(1)" }
-          ], { duration: 390, easing: "cubic-bezier(.2,.72,.2,1)", fill: "none" }));
+          ], { duration: 320, easing: "cubic-bezier(.22,.61,.36,1)", fill: "none" }));
         } else if (distance <= 2) {
           animations.push(front.animate([
             { transform: "translate3d(0,0,0)" },
-            { offset: .55, transform: `translate3d(${direction * (3 - distance) * 2}px,-${Math.max(2,7-distance*2)}px,0)` },
+            { offset: .55, transform: `translate3d(${direction * (3 - distance)}px,-${Math.max(1,4-distance)}px,0)` },
             { transform: "translate3d(0,0,0)" }
-          ], { duration: 380 + distance * 35, delay: distance * 18, easing: "cubic-bezier(.2,.72,.2,1)", fill: "none" }));
+          ], { duration: 300 + distance * 28, delay: distance * 14, easing: "cubic-bezier(.22,.61,.36,1)", fill: "none" }));
         }
       });
       dockSelectionAnimations = animations;
@@ -582,16 +580,14 @@
       const animations = [];
       if (front?.animate) animations.push(front.animate([
         { transform: "translate3d(0,0,0) scale(1)" },
-        { offset: .44, transform: "translate3d(0,-32px,0) scale(1.14)" },
-        { offset: .72, transform: "translate3d(0,4px,0) scale(.99)" },
+        { offset: .52, transform: "translate3d(0,-14px,0) scale(1.055)" },
         { transform: "translate3d(0,0,0) scale(1)" }
-      ], { duration: 420, easing: "cubic-bezier(.2,.76,.2,1)", fill: "none" }));
+      ], { duration: 320, easing: "cubic-bezier(.22,.61,.36,1)", fill: "none" }));
       if (paper?.animate) animations.push(paper.animate([
-        { transform: "translate3d(0,-18px,0)" },
-        { offset: .44, transform: "translate3d(0,-48px,0)" },
-        { offset: .72, transform: "translate3d(0,-14px,0)" },
-        { transform: "translate3d(0,-18px,0)" }
-      ], { duration: 420, easing: "cubic-bezier(.2,.76,.2,1)", fill: "none" }));
+        { transform: "translate3d(0,-12px,0)" },
+        { offset: .52, transform: "translate3d(0,-28px,0)" },
+        { transform: "translate3d(0,-12px,0)" }
+      ], { duration: 320, easing: "cubic-bezier(.22,.61,.36,1)", fill: "none" }));
       folder.dataset.selectionSource = source;
       dockSelectionAnimations.push(...animations);
     }
@@ -678,11 +674,11 @@
       qa(".projects-folder", dom.carousel).forEach(folder => {
         const isActive = Number(folder.dataset.projectIndex) === activeIndex;
         const hasFocus = document.activeElement === folder;
-        folder.style.setProperty("--dock-scale", hasFocus ? "1.54" : isActive ? "1.46" : ".86");
-        folder.style.setProperty("--dock-lift", hasFocus ? "70px" : isActive ? "62px" : "0px");
+        folder.style.setProperty("--dock-scale", hasFocus ? "1.22" : isActive ? "1.16" : ".96");
+        folder.style.setProperty("--dock-lift", hasFocus ? "28px" : isActive ? "22px" : "0px");
         folder.style.setProperty("--dock-shift-x", "0px");
         folder.style.setProperty("--dock-tilt", "0deg");
-        folder.style.setProperty("--dock-z", hasFocus ? "50" : isActive ? "42" : "1");
+        folder.style.setProperty("--dock-z", hasFocus ? "32" : isActive ? "26" : "1");
       });
     }
 
@@ -697,16 +693,16 @@
         const center = viewportRect.left + folder.offsetLeft - dom.viewport.scrollLeft + folder.offsetWidth / 2;
         const signedDistance = center - pointerX;
         const distance = Math.abs(signedDistance);
-        const influence = clamp(1 - distance / 310, 0, 1);
+        const influence = clamp(1 - distance / 260, 0, 1);
         const nearInfluence = influence * influence * (3 - 2 * influence);
         const isActive = Number(folder.dataset.projectIndex) === activeIndex;
         const hasFocus = document.activeElement === folder;
-        const selected = hasFocus ? .26 : isActive ? .22 : 0;
-        const scale = .86 + nearInfluence * .46 + selected;
-        const lift = nearInfluence * 54 + selected * 128;
+        const selected = hasFocus ? .075 : isActive ? .055 : 0;
+        const scale = .96 + nearInfluence * .14 + selected;
+        const lift = nearInfluence * 20 + selected * 210;
         const pushDirection = signedDistance === 0 ? 0 : Math.sign(signedDistance);
-        const shift = pushDirection * nearInfluence * 42;
-        const tilt = clamp((pointerX - center) / 92, -1, 1) * nearInfluence * 1.05;
+        const shift = pushDirection * nearInfluence * 16;
+        const tilt = clamp((pointerX - center) / 120, -1, 1) * nearInfluence * .28;
         folder.style.setProperty("--dock-scale", scale.toFixed(3));
         folder.style.setProperty("--dock-lift", `${lift.toFixed(1)}px`);
         folder.style.setProperty("--dock-shift-x", `${shift.toFixed(1)}px`);

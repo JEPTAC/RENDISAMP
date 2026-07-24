@@ -500,7 +500,7 @@
   cursor:pointer;
   transform-origin:center bottom;
   transform:translate3d(var(--dock-shift-x),calc(-1 * var(--dock-lift)),0) scale(var(--dock-scale)) rotate(var(--dock-tilt));
-  transition:transform .24s cubic-bezier(.18,.84,.2,1),filter .3s ease,opacity .3s ease;
+  transition:transform .34s cubic-bezier(.22,.61,.36,1),filter .32s ease,opacity .32s ease;
   scroll-snap-align:center;
   z-index:var(--dock-z,1);
   outline:none;
@@ -650,7 +650,7 @@
 }
 .projects-folder:hover .projects-folder__paper,
 .projects-folder:focus-visible .projects-folder__paper,
-.projects-folder.is-active .projects-folder__paper{transform:translateY(-12px)}
+.projects-folder.is-active .projects-folder__paper{transform:translateY(-9px)}
 /* Respuesta física de selección: la carpeta enfocada crece y rebota sin mover la página. */
 .projects-folder.is-selection-bounce .projects-folder__front{
   animation:projectsFolderFocusBounce .68s both cubic-bezier(.18,.9,.24,1.18);
@@ -671,21 +671,18 @@
 }
 @keyframes projectsFolderFocusBounce{
   0%,100%{transform:translateY(0) scale(1) rotateX(0)}
-  24%{transform:translateY(-30px) scale(1.11) rotateX(-4deg)}
-  46%{transform:translateY(5px) scale(.985) rotateX(1.6deg)}
-  66%{transform:translateY(-14px) scale(1.035) rotateX(-1.2deg)}
-  84%{transform:translateY(1px) scale(1.006) rotateX(0)}
+  44%{transform:translateY(-14px) scale(1.045) rotateX(-1.2deg)}
+  72%{transform:translateY(1px) scale(.998) rotateX(.2deg)}
 }
 @keyframes projectsPaperFocusBounce{
-  0%,100%{transform:translateY(-18px)}
-  28%{transform:translateY(-44px) rotate(-.8deg)}
-  52%{transform:translateY(-12px) rotate(.35deg)}
-  72%{transform:translateY(-27px) rotate(-.25deg)}
+  0%,100%{transform:translateY(-12px)}
+  44%{transform:translateY(-26px) rotate(-.25deg)}
+  72%{transform:translateY(-10px) rotate(.12deg)}
 }
 @keyframes projectsFolderShadowBounce{
   0%,100%{opacity:.25;transform:translateX(-50%) scaleX(.78)}
-  30%{opacity:.7;transform:translateX(-50%) scaleX(1.08)}
-  60%{opacity:.4;transform:translateX(-50%) scaleX(.9)}
+  45%{opacity:.42;transform:translateX(-50%) scaleX(.98)}
+  70%{opacity:.32;transform:translateX(-50%) scaleX(.86)}
 }
 
 .projects-folder.is-opening{
@@ -1224,42 +1221,40 @@ body.projects-dialog-open{
 }
 
 .projects-psp.has-selection .projects-folder:not(.is-active):not(:hover):not(:focus-visible){
-  opacity:.72;
-  filter:saturate(.72) brightness(.94) blur(.18px);
+  opacity:.82;
+  filter:saturate(.84) brightness(.97);
 }
 .projects-folder.is-active{
   opacity:1;
-  filter:saturate(1.14) brightness(1.06) drop-shadow(0 22px 28px rgba(var(--projects-accent-rgb),.22));
+  filter:saturate(1.06) brightness(1.035) drop-shadow(0 14px 22px rgba(var(--projects-accent-rgb),.16));
 }
-.projects-folder.is-selection-entering .projects-folder__front{animation:projectsSelectionEnter .7s cubic-bezier(.16,.9,.18,1.12) both}
-.projects-folder.is-selection-entering .projects-folder__paper{animation:projectsSelectionPaper .7s cubic-bezier(.16,.9,.18,1.08) both}
+.projects-folder.is-selection-entering .projects-folder__front{animation:projectsSelectionEnter .38s cubic-bezier(.22,.61,.36,1) both}
+.projects-folder.is-selection-entering .projects-folder__paper{animation:projectsSelectionPaper .38s cubic-bezier(.22,.61,.36,1) both}
 .projects-folder.is-selection-entering::before{
-  content:"";position:absolute;z-index:-1;left:50%;bottom:-38px;width:112%;height:42%;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(var(--projects-accent-rgb),.28),transparent 68%);
-  transform:translateX(-50%);animation:projectsSelectionGlow .72s ease-out both;
+  content:"";position:absolute;z-index:-1;left:50%;bottom:-24px;width:86%;height:30%;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(var(--projects-accent-rgb),.18),transparent 68%);
+  transform:translateX(-50%);animation:projectsSelectionGlow .4s ease-out both;
 }
-.projects-folder.is-selection-leaving .projects-folder__front{animation:projectsSelectionLeave .54s cubic-bezier(.2,.75,.2,1) both}
-.projects-folder.is-selection-neighbor{animation:projectsNeighborWave .64s cubic-bezier(.2,.82,.2,1) both;animation-delay:calc(var(--selection-distance) * 28ms)}
-.projects-psp.is-selection-transition .projects-psp__ambient--one{animation:projectsAmbientPulse .72s cubic-bezier(.2,.82,.2,1) both}
+.projects-folder.is-selection-leaving .projects-folder__front{animation:projectsSelectionLeave .32s cubic-bezier(.22,.61,.36,1) both}
+.projects-folder.is-selection-neighbor{animation:projectsNeighborWave .34s cubic-bezier(.22,.61,.36,1) both;animation-delay:calc(var(--selection-distance) * 12ms)}
+.projects-psp.is-selection-transition .projects-psp__ambient--one{animation:projectsAmbientPulse .44s cubic-bezier(.22,.61,.36,1) both}
 @keyframes projectsSelectionEnter{
-  0%{transform:perspective(740px) translateY(22px) scale(.86) rotateY(calc(var(--selection-direction) * 9deg));filter:brightness(.86)}
-  42%{transform:perspective(740px) translateY(-34px) scale(1.18) rotateY(calc(var(--selection-direction) * -2.5deg));filter:brightness(1.16)}
-  70%{transform:perspective(740px) translateY(5px) scale(.99) rotateY(.5deg)}
+  0%{transform:perspective(700px) translateY(8px) scale(.97);filter:brightness(.96)}
+  52%{transform:perspective(700px) translateY(-14px) scale(1.055) rotateY(calc(var(--selection-direction) * -.7deg));filter:brightness(1.045)}
   100%{transform:none;filter:none}
 }
 @keyframes projectsSelectionPaper{
-  0%{transform:translateY(-4px) scale(.94);opacity:.78}
-  48%{transform:translateY(-46px) scale(1.06);opacity:1}
-  72%{transform:translateY(-16px) scale(.998)}
-  100%{transform:translateY(-18px) scale(1);opacity:1}
+  0%{transform:translateY(-6px) scale(.985);opacity:.9}
+  52%{transform:translateY(-24px) scale(1.01);opacity:1}
+  100%{transform:translateY(-9px) scale(1);opacity:1}
 }
 @keyframes projectsSelectionLeave{
-  0%{transform:translateY(-4px) scale(1.02);filter:brightness(1.04)}
-  100%{transform:translateY(6px) scale(.95) rotateY(calc(var(--selection-direction) * -3deg));filter:brightness(.92)}
+  0%{transform:translateY(-3px) scale(1.01);filter:brightness(1.02)}
+  100%{transform:translateY(2px) scale(.985);filter:brightness(.98)}
 }
-@keyframes projectsNeighborWave{0%,100%{filter:none}44%{filter:brightness(1.03);transform:translateY(calc((3 - var(--selection-distance)) * -3px))}}
-@keyframes projectsSelectionGlow{0%{opacity:0;transform:translateX(-50%) scale(.55)}45%{opacity:1;transform:translateX(-50%) scale(1.06)}100%{opacity:0;transform:translateX(-50%) scale(1.28)}}
-@keyframes projectsAmbientPulse{0%,100%{transform:scale(1);opacity:.78}48%{transform:scale(1.08) translate3d(-1.5%,1.5%,0);opacity:1}}
+@keyframes projectsNeighborWave{0%,100%{filter:none;transform:none}50%{filter:brightness(1.015);transform:translateY(calc((3 - var(--selection-distance)) * -1px))}}
+@keyframes projectsSelectionGlow{0%{opacity:0;transform:translateX(-50%) scale(.72)}50%{opacity:.55;transform:translateX(-50%) scale(.96)}100%{opacity:0;transform:translateX(-50%) scale(1.08)}}
+@keyframes projectsAmbientPulse{0%,100%{transform:scale(1);opacity:.78}48%{transform:scale(1.015);opacity:.88}}
 
 .projects-folder__title{overflow:visible;-webkit-line-clamp:unset;display:block;padding-bottom:5px}
 .projects-folder__title em{
