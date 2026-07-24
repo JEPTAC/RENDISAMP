@@ -19870,3 +19870,104 @@ body.page-ideas .idea-board{
     font-size:.68rem!important;
   }
 }
+
+
+/* V11.61.28 · Newsletter consentimiento compacto y organizado */
+.home-newsletter .newsletter-form.newsletter-form--home{
+  max-width:min(100%, 1080px)!important;
+  justify-self:end!important;
+  gap:8px!important;
+}
+.home-newsletter .newsletter-form__main{
+  grid-template-columns:minmax(380px,1fr) auto!important;
+  gap:10px!important;
+  align-items:center!important;
+}
+.home-newsletter .newsletter-form__main input{
+  min-height:52px!important;
+  border-right:1px solid rgba(255,255,255,.24)!important;
+  border-radius:15px!important;
+}
+.home-newsletter .newsletter-form__main button{
+  min-height:52px!important;
+  padding:0 22px!important;
+  border-radius:15px!important;
+  white-space:nowrap!important;
+}
+.home-newsletter .subscription-consent,
+.home-newsletter .newsletter-consent{
+  width:auto!important;
+  max-width:760px!important;
+  display:grid!important;
+  grid-template-columns:16px minmax(0,1fr)!important;
+  gap:8px!important;
+  align-items:start!important;
+  margin:2px 0 0 4px!important;
+  padding:0!important;
+  color:rgba(255,255,255,.9)!important;
+  font-size:.69rem!important;
+  line-height:1.36!important;
+  font-weight:600!important;
+}
+.home-newsletter .subscription-consent input[type="checkbox"],
+.home-newsletter .newsletter-consent input[type="checkbox"],
+.home-newsletter .newsletter-form input[type="checkbox"]{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  width:16px!important;
+  height:16px!important;
+  min-width:16px!important;
+  min-height:16px!important;
+  margin:1px 0 0!important;
+  border-radius:4px!important;
+  border:1.5px solid rgba(255,255,255,.62)!important;
+  background:rgba(255,255,255,.15)!important;
+  box-shadow:none!important;
+  display:inline-grid!important;
+  place-content:center!important;
+  cursor:pointer!important;
+}
+.home-newsletter .subscription-consent input[type="checkbox"]:checked,
+.home-newsletter .newsletter-consent input[type="checkbox"]:checked,
+.home-newsletter .newsletter-form input[type="checkbox"]:checked{
+  background:#ffd66b!important;
+  border-color:#ffd66b!important;
+  box-shadow:inset 0 0 0 3px rgba(7,67,118,.42)!important;
+}
+.home-newsletter .subscription-consent span,
+.home-newsletter .newsletter-consent span{
+  display:block!important;
+  max-width:100%!important;
+  color:rgba(255,255,255,.9)!important;
+}
+@media(max-width:980px){
+  .home-newsletter .newsletter-form.newsletter-form--home{
+    max-width:none!important;
+    justify-self:stretch!important;
+  }
+  .home-newsletter .newsletter-form__main{
+    grid-template-columns:minmax(0,1fr) auto!important;
+  }
+  .home-newsletter .subscription-consent,
+  .home-newsletter .newsletter-consent{
+    max-width:none!important;
+    margin-left:0!important;
+  }
+}
+@media(max-width:640px){
+  .home-newsletter .newsletter-form__main{
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+  }
+  .home-newsletter .newsletter-form__main input,
+  .home-newsletter .newsletter-form__main button{
+    min-height:48px!important;
+    border-radius:14px!important;
+  }
+  .home-newsletter .subscription-consent,
+  .home-newsletter .newsletter-consent{
+    grid-template-columns:16px 1fr!important;
+    font-size:.66rem!important;
+    line-height:1.32!important;
+  }
+}
