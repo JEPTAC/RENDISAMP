@@ -19900,9 +19900,9 @@ body.page-ideas .idea-board{
   max-width:760px!important;
   display:grid!important;
   grid-template-columns:16px minmax(0,1fr)!important;
-  gap:8px!important;
+  gap:10px!important;
   align-items:start!important;
-  margin:2px 0 0 4px!important;
+  margin:2px 0 0 12px!important;
   padding:0!important;
   color:rgba(255,255,255,.9)!important;
   font-size:.69rem!important;
